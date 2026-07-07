@@ -50,7 +50,7 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from cascade.loader import load_cascade_models
+from loader import load_cascade_models
 from training.trainer import KiDataset, load_spectrogram_cache
 from utils.classifier_registry import ClassifierRegistry
 from utils.labels import (
@@ -77,17 +77,55 @@ class CandidateMeta:
     wcet: float
 
 
+def _load_scene_spectrogram_cache(processed_dir: Path, scene: str) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
+    """Like training.trainer.load_spectrogram_cache, but for scene-prefixed
+    files (<scene>_paired_mic.npy etc., produced by
+    process_data.save_scene_paired_arrays) instead of hardcoded h24_*
+    filenames. Kept local here rather than editing trainer.py, since that
+    module is also used for actual model training and changing its
+    filename assumptions is a bigger risk than adding this local variant.
+    """
+    from training.trainer import normalize_spectrograms
+
+    norm_mic = processed_dir / f"{scene}_paired_mic_norm.npy"
+    norm_geo = processed_dir / f"{scene}_paired_geo_norm.npy"
+    meta_path = processed_dir / f"{scene}_metadata.parquet"
+
+    if not meta_path.exists():
+        raise FileNotFoundError(
+            f"{meta_path} not found -- run "
+            f"`python process_data.py --scene {scene}` first."
+        )
+
+    if norm_mic.exists() and norm_geo.exists():
+        mic = np.load(norm_mic)
+        geo = np.load(norm_geo)
+    else:
+        mic = normalize_spectrograms(np.load(processed_dir / f"{scene}_paired_mic.npy"))
+        geo = normalize_spectrograms(np.load(processed_dir / f"{scene}_paired_geo.npy"))
+        np.save(norm_mic, mic)
+        np.save(norm_geo, geo)
+
+    metadata = pd.read_parquet(meta_path)
+    return mic, geo, metadata
+
+
 def _shared_eval_mask(metadata: pd.DataFrame, eval_runs: set[str] | None) -> np.ndarray:
     """Rows used for the shared outcome log.
 
-    Default: union of every split currently used anywhere in utils/splits.py
-    (DEFAULT_VAL_RUNS | SUV_VAL_RUNS | COUPE_VAL_RUNS) so background, suv, and
-    coupe samples are all represented for every classifier -- including
-    classifiers asked to score inputs *outside* their own training subset.
-    Per the paper (Sec III-B, footnote 4): "we include all inputs and record
-    the true outputs, including those outside Iℓ, to accurately capture the
-    classifier's behavior in deployment."
+    Default (eval_runs=None): union of every split currently used anywhere
+    in utils/splits.py (DEFAULT_VAL_RUNS | SUV_VAL_RUNS | COUPE_VAL_RUNS).
+    This default is H24-SPECIFIC -- those run-id sets were chosen for h24's
+    particular run numbering and held-out convention, and have no meaning
+    for a different scene's run ids. For any non-h24 scene, this function
+    is instead called with eval_runs="ALL" (see collect_empirical_outcomes),
+    which uses every row in that scene -- there is no train/val split
+    concept for a scene you're only ever evaluating zero-shot on, never
+    training on.
     """
+    if eval_runs == "ALL":
+        return np.ones(len(metadata), dtype=bool)
+
     if eval_runs is None:
         from utils.splits import COUPE_VAL_RUNS, DEFAULT_VAL_RUNS, SUV_VAL_RUNS
 
@@ -173,7 +211,15 @@ def _run_one_classifier(
         else:
             shared_idx = _map_global(class_idx, class_names)
 
-        prediction = np.where(accepted, shared_idx, -1)
+        # NOTE: prediction is the RAW argmax class, unmasked by `accepted`.
+        # A downstream threshold optimizer needs to recompute `accepted =
+        # confidence >= t` for candidate thresholds t that may be LOWER than
+        # the one used here -- if prediction were masked to -1 whenever
+        # THIS threshold rejected a sample, a lower candidate threshold
+        # would have no way to know what the classifier actually predicted
+        # for that sample, and would incorrectly look unrecoverable no
+        # matter how low the threshold went.
+        prediction = shared_idx
 
         accepted_chunks.append(accepted)
         prediction_chunks.append(prediction)
@@ -207,30 +253,55 @@ def _candidate_group(ki_name: str) -> str | None:
 
 
 def collect_empirical_outcomes(
+    scene: str = "h24",
     processed_dir: str | Path = DEFAULT_PROCESSED_DIR,
     checkpoint_dir: str | Path = DEFAULT_CHECKPOINT_DIR,
     registry_path: str | Path = DEFAULT_REGISTRY_PATH,
-    output_path: str | Path = DEFAULT_OUTPUT_PATH,
-    eval_runs: set[str] | None = None,
+    output_path: str | Path | None = None,
+    eval_runs: set[str] | str | None = None,
     batch_size: int = 64,
 ) -> dict:
     """Run K0-K6 + Kdet over one shared eval set and save per-sample outcomes.
 
-    Requires datasets/processed/h24_paired_{mic,geo}.npy + h24_metadata.parquet
-    to already exist (run process_data.save_h24_paired_arrays() first), and
-    checkpoints/{Ki}.pt + classifier_registry.json to already exist (existing
-    trained checkpoints -- no retraining happens here).
+    scene: "h24", "h08", "s31", "a06", "i29", or "i22". Requires
+        datasets/processed/<scene>_paired_{mic,geo}.npy + <scene>_metadata.parquet
+        to already exist (run `python process_data.py --scene <scene>`
+        first), and checkpoints/{Ki}.pt + classifier_registry.json to
+        already exist (existing h24-trained checkpoints -- NO retraining
+        happens here, even for non-h24 scenes: this measures how the
+        frozen h24 models behave zero-shot on other scenes' data).
+
+    eval_runs: defaults to "ALL" for any scene other than "h24" (no
+        train/val split concept applies when you're only ever evaluating
+        zero-shot, never training, on that scene's data). For "h24",
+        defaults to the existing DEFAULT_VAL_RUNS|SUV_VAL_RUNS|COUPE_VAL_RUNS
+        union, preserving old behavior. Pass an explicit set to override
+        either default.
+
+    output_path: defaults to checkpoints/empirical_outcomes_<scene>.pkl
+        (or checkpoints/empirical_outcomes.pkl for scene="h24", to match
+        the existing default and avoid breaking anything that already
+        reads that exact filename).
     """
     processed_dir = Path(processed_dir)
     checkpoint_dir = Path(checkpoint_dir)
     registry_path = Path(registry_path)
 
-    mic, geo, metadata = load_spectrogram_cache(processed_dir)
+    if eval_runs is None:
+        eval_runs = None if scene == "h24" else "ALL"
+
+    if output_path is None:
+        output_path = (
+            DEFAULT_OUTPUT_PATH if scene == "h24"
+            else DEFAULT_CHECKPOINT_DIR / f"empirical_outcomes_{scene}.pkl"
+        )
+
+    mic, geo, metadata = _load_scene_spectrogram_cache(processed_dir, scene)
     mask = _shared_eval_mask(metadata, eval_runs)
     if mask.sum() == 0:
         raise ValueError(
-            "No rows matched the shared eval split. Check utils/splits.py run "
-            "ids against h24_metadata.parquet's run_id column."
+            f"No rows matched the shared eval split for scene '{scene}'. "
+            f"Check eval_runs against {scene}_metadata.parquet's run_id column."
         )
 
     dataset = _build_shared_dataset(mic, geo, mask)
@@ -282,6 +353,7 @@ def collect_empirical_outcomes(
     labels_df = pd.DataFrame(
         {
             "sample_id": sample_ids,
+            "scene": scene,
             "true_global_label": eval_metadata["global_label"].astype(str),
             "true_intermediate_label": eval_metadata["intermediate_label"].astype(str),
             "run_id": eval_metadata["run_id"].astype(str),
@@ -308,7 +380,7 @@ def collect_empirical_outcomes(
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     pd.to_pickle(payload, output_path)
-    print(f"Saved empirical outcomes -> {output_path} ({len(sample_ids)} shared rows)")
+    print(f"Saved empirical outcomes for scene '{scene}' -> {output_path} ({len(sample_ids)} shared rows)")
     return payload
 
 
@@ -317,4 +389,11 @@ def load_empirical_outcomes(path: str | Path = DEFAULT_OUTPUT_PATH) -> dict:
 
 
 if __name__ == "__main__":
-    collect_empirical_outcomes()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--scene", default="h24",
+                        help="Scene id: h24, h08, s31, a06, i29, or i22")
+    parser.add_argument("--batch-size", type=int, default=64)
+    args = parser.parse_args()
+
+    collect_empirical_outcomes(scene=args.scene, batch_size=args.batch_size)

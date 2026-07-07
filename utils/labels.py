@@ -44,9 +44,77 @@ GLOBAL_TO_INTERMEDIATE: dict[GlobalLabel, IntermediateLabel] = {
 
 
 def run_id_to_global(run_id: str) -> GlobalLabel:
-    """Map run id string (e.g. run3) to global vehicle label."""
+    """Map run id string (e.g. run3) to global vehicle label.
+
+    WARNING: this uses a HARDCODED run-number convention (run0/1=gle350,
+    run2/3=cx30, run4/5=mustang, run6/7=miata, run8/9=background) that only
+    holds for h24, because h24 happened to record vehicles in that fixed
+    order. It does NOT generalize to other M3N-VC scenes -- e.g. a06 has no
+    Mustang runs at all and i22 has no GLE350 runs, so their run-number
+    sequences cannot follow this same pattern. For any scene other than
+    h24, use `load_scene_run_labels()` below, which reads the real
+    ground-truth label from that scene's own run_ids.parquet instead of
+    guessing from the run number.
+    """
     run_number = int(str(run_id).removeprefix("run"))
     return RUN_NUMBER_TO_GLOBAL[run_number]
+
+
+# Aliases seen (or plausibly seen) in different scenes' run_ids.parquet
+# `label` column. M3N-VC's README abbreviates targets as C/G/M/X; extend
+# this if a scene's actual label column uses a different string and
+# load_scene_run_labels raises with the unmapped values it found.
+_SCENE_LABEL_ALIASES: dict[str, GlobalLabel] = {
+    "c": GlobalLabel.CX30, "cx30": GlobalLabel.CX30, "cx-30": GlobalLabel.CX30,
+    "g": GlobalLabel.GLE350, "gle350": GlobalLabel.GLE350, "gle-350": GlobalLabel.GLE350,
+    "m": GlobalLabel.MUSTANG, "mustang": GlobalLabel.MUSTANG,
+    "x": GlobalLabel.MIATA, "mx5": GlobalLabel.MIATA, "mx-5": GlobalLabel.MIATA,
+    "miata": GlobalLabel.MIATA,
+    "none": GlobalLabel.BACKGROUND, "background": GlobalLabel.BACKGROUND,
+    "bg": GlobalLabel.BACKGROUND, "": GlobalLabel.BACKGROUND,
+}
+
+
+def load_scene_run_labels(scene_dir: str) -> dict[str, GlobalLabel]:
+    """Read the REAL per-run ground-truth label for a scene from its own
+    run_ids.parquet (columns: run_id, label, set, start_time, end_time,
+    length -- per the M3N-VC README), instead of guessing from the run
+    number. Use this for every scene, including h24, going forward -- it's
+    the correct source of truth; run_id_to_global's hardcoded table should
+    be treated as h24-only legacy behavior.
+
+    Raises with the actual unmapped label strings found, rather than
+    silently mislabeling, if a scene uses label text not covered by
+    _SCENE_LABEL_ALIASES -- extend that dict once you see the real values.
+    """
+    import pandas as pd
+    from pathlib import Path
+
+    run_ids_path = Path(scene_dir) / "run_ids.parquet"
+    df = pd.read_parquet(run_ids_path)
+    if "run_id" not in df.columns or "label" not in df.columns:
+        raise ValueError(
+            f"{run_ids_path} missing expected 'run_id'/'label' columns; "
+            f"found: {list(df.columns)}"
+        )
+
+    result: dict[str, GlobalLabel] = {}
+    unmapped: set[str] = set()
+    for _, row in df.iterrows():
+        raw = str(row["label"]).strip().lower()
+        mapped = _SCENE_LABEL_ALIASES.get(raw)
+        if mapped is None:
+            unmapped.add(str(row["label"]))
+        else:
+            result[str(row["run_id"])] = mapped
+
+    if unmapped:
+        raise ValueError(
+            f"{run_ids_path}: found label value(s) not in _SCENE_LABEL_ALIASES: "
+            f"{sorted(unmapped)}. Add the correct mapping to _SCENE_LABEL_ALIASES "
+            f"in utils/labels.py before trusting any downstream result for this scene."
+        )
+    return result
 
 
 def global_to_intermediate(global_label: GlobalLabel) -> IntermediateLabel:
@@ -108,9 +176,21 @@ def label_to_index(label: str, class_names: list[str]) -> int:
     return class_names.index(label)
 
 
-def metadata_row_labels(run_id: str) -> dict[str, str]:
-    """Build global / intermediate / specialized string labels for one segment."""
-    global_label = run_id_to_global(run_id)
+def metadata_row_labels(run_id: str, run_labels: dict[str, "GlobalLabel"] | None = None) -> dict[str, str]:
+    """Build global / intermediate / specialized string labels for one segment.
+
+    run_labels: if given, must be the dict returned by load_scene_run_labels()
+    for the CURRENT scene -- looks up the real per-scene ground truth. If
+    None (legacy default, h24 only), falls back to run_id_to_global's
+    hardcoded run-number table. Always pass run_labels explicitly for any
+    scene other than h24.
+    """
+    if run_labels is not None:
+        if run_id not in run_labels:
+            raise KeyError(f"{run_id} not found in this scene's run_ids.parquet labels")
+        global_label = run_labels[run_id]
+    else:
+        global_label = run_id_to_global(run_id)
     intermediate = global_to_intermediate(global_label)
     specialized = global_label.value if global_label != GlobalLabel.BACKGROUND else ""
     return {

@@ -242,6 +242,96 @@ def _resize_geo_to_mic(geo_spec: np.ndarray, mic_shape: tuple[int, int]) -> np.n
     return t.squeeze(0).squeeze(0).numpy()
 
 
+def save_scene_paired_arrays(
+    scene: str,
+    output_dir: str | Path = DEFAULT_OUTPUT_DIR,
+    data_dir: str | Path | None = None,
+    segment_seconds: float = 2.0,
+    n_fft: int = 256,
+    hop_length: int | None = None,
+) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
+    """Build aligned mic/geo spectrogram pairs and metadata for ANY M3N-VC
+    scene (h24, h08, s31, a06, i29, i22), using that scene's OWN
+    run_ids.parquet for ground-truth labels -- see
+    utils.labels.load_scene_run_labels for why this matters (the old
+    run-number-based mapping does not generalize across scenes).
+
+    scene: e.g. "h24", "s31", "a06". Used both to locate the default
+        data_dir (datasets/<scene>/<scene>/) and to prefix every output
+        filename (<scene>_paired_mic.npy, <scene>_metadata.parquet, ...)
+        so multiple scenes' processed arrays can coexist in the same
+        output_dir without overwriting each other.
+    data_dir: defaults to datasets/<scene>/<scene>/ if not given.
+    """
+    from utils.labels import load_scene_run_labels, metadata_row_labels
+
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if data_dir is None:
+        data_dir = Path("datasets") / scene / scene
+    data_dir = Path(data_dir)
+
+    run_labels = load_scene_run_labels(str(data_dir))
+    print(f"  loaded {len(run_labels)} run labels for scene '{scene}' from "
+          f"{data_dir / 'run_ids.parquet'}")
+
+    mic_files = sorted(data_dir.glob("*_mic.parquet"))
+    if not mic_files:
+        raise FileNotFoundError(f"No *_mic.parquet files found in {data_dir}.")
+
+    mic_specs_all: list[np.ndarray] = []
+    geo_specs_all: list[np.ndarray] = []
+    metadata_rows: list[dict] = []
+
+    for index, mic_path in enumerate(mic_files, start=1):
+        geo_path = mic_path.with_name(mic_path.name.replace("_mic.parquet", "_geo.parquet"))
+        if not geo_path.exists():
+            raise FileNotFoundError(f"Missing paired geo file for {mic_path.name}")
+
+        print(f"  [{index}/{len(mic_files)}] {mic_path.name}")
+        mic_df = _read_and_segment_file(mic_path, "_mic", segment_seconds, "timestamp")
+        geo_df = _read_and_segment_file(geo_path, "_geo", segment_seconds, "timestamp")
+
+        mic_specs, mic_meta = segments_to_spectrograms_with_keys(
+            mic_df, n_fft=n_fft, hop_length=hop_length
+        )
+        geo_specs, geo_meta = segments_to_spectrograms_with_keys(
+            geo_df, n_fft=n_fft, hop_length=hop_length
+        )
+
+        mic_keys = [row["segment_key"] for row in mic_meta]
+        geo_keys = [row["segment_key"] for row in geo_meta]
+        if mic_keys != geo_keys:
+            raise ValueError(f"Mic/geo segment mismatch in {mic_path.name}")
+
+        for row, mic_spec, geo_spec in zip(mic_meta, mic_specs, geo_specs):
+            labels = metadata_row_labels(row["run_id"], run_labels=run_labels)
+            metadata_rows.append({**row, "scene": scene, **labels})
+            mic_specs_all.append(mic_spec)
+            geo_specs_all.append(_resize_geo_to_mic(geo_spec, mic_spec.shape))
+
+        del mic_df, geo_df
+
+    mic_array = np.stack(mic_specs_all)
+    geo_array = np.stack(geo_specs_all)
+    metadata = pd.DataFrame(metadata_rows)
+
+    np.save(output_dir / f"{scene}_paired_mic.npy", mic_array)
+    np.save(output_dir / f"{scene}_paired_geo.npy", geo_array)
+    metadata.to_parquet(output_dir / f"{scene}_metadata.parquet", index=False)
+
+    for stale in (f"{scene}_paired_mic_norm.npy", f"{scene}_paired_geo_norm.npy"):
+        stale_path = output_dir / stale
+        if stale_path.exists():
+            stale_path.unlink()
+
+    np.save(output_dir / f"{scene}_mic_spectrograms.npy", mic_array)
+    np.save(output_dir / f"{scene}_geo_spectrograms.npy", geo_array)
+
+    print(f"  saved {len(metadata)} segments -> {output_dir}/{scene}_*")
+    return mic_array, geo_array, metadata
+
+
 def save_h24_paired_arrays(
     output_dir: str | Path = DEFAULT_OUTPUT_DIR,
     data_dir: str | Path = DEFAULT_H24_DIR,
@@ -249,7 +339,11 @@ def save_h24_paired_arrays(
     n_fft: int = 256,
     hop_length: int | None = None,
 ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
-    """Build aligned mic/geo spectrogram pairs and metadata for hierarchical Ki training."""
+    """Legacy h24-only entry point, kept so existing h24 code/scripts keep
+    working unchanged. New code (any non-h24 scene, or new h24 runs too)
+    should call save_scene_paired_arrays("h24", ...) instead, which reads
+    real run_ids.parquet labels rather than the hardcoded run-number table.
+    """
     from utils.labels import metadata_row_labels
 
     output_dir = Path(output_dir)
@@ -373,8 +467,12 @@ def save_h24_spectrogram_arrays(
 
 
 if __name__ == "__main__":
-    (mic_spectrograms, mic_labels), (geo_spectrograms, geo_labels) = (
-        save_h24_spectrogram_arrays()
-    )
-    print(f"Mic spectrograms: {mic_spectrograms.shape}, labels: {mic_labels.shape}")
-    print(f"Geo spectrograms: {geo_spectrograms.shape}, labels: {geo_labels.shape}")
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--scene", default="h24",
+                        help="Scene id: h24, h08, s31, a06, i29, or i22")
+    parser.add_argument("--data-dir", default=None,
+                        help="Defaults to datasets/<scene>/<scene>/")
+    args = parser.parse_args()
+
+    save_scene_paired_arrays(args.scene, data_dir=args.data_dir)
