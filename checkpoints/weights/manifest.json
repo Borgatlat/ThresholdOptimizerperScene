@@ -1,0 +1,155 @@
+{
+  "format_version": 1,
+  "description": "Flat PyTorch state_dict files for K0-K6 and Kdet. Load with model.load_state_dict(torch.load(path, map_location=device)).",
+  "bundle_file": "checkpoints/weights/all_weights.pt",
+  "load_example": "weights = torch.load('checkpoints/weights/K0_weights.pt', map_location='cpu'); model.load_state_dict(weights)",
+  "classifiers": [
+    {
+      "name": "K0",
+      "level": "intermediate",
+      "modality": "both",
+      "class_names": [
+        "suv",
+        "coupe",
+        "background"
+      ],
+      "num_parameters": 141575,
+      "num_tensors": 32,
+      "loss_key": "weighted_ce",
+      "val_macro_f1": 0.9141198979229795,
+      "full_checkpoint": "checkpoints/K0.pt",
+      "weights_file": "checkpoints/weights/K0_weights.pt",
+      "sha256_weights": "ad1b1ac1fd631be42ecb9a41691e504c4a057a8083da0fe5d2f731e50e3d196a",
+      "sha256_full": "a268d8b534ba033e36bb1b3a88beb50b99f989075ed5ea8dc27b950320afb816"
+    },
+    {
+      "name": "K1",
+      "level": "intermediate",
+      "modality": "both",
+      "class_names": [
+        "suv",
+        "coupe",
+        "background"
+      ],
+      "num_parameters": 355337,
+      "num_tensors": 46,
+      "loss_key": "focal",
+      "val_macro_f1": 0.9265724979492346,
+      "full_checkpoint": "checkpoints/K1.pt",
+      "weights_file": "checkpoints/weights/K1_weights.pt",
+      "sha256_weights": "46432641f41951301e18cdc21582c591d18697b28104406d76143b3a65a782c1",
+      "sha256_full": "26a0cd33a41a7ac497612d949bae23d815ead11b1c67d3bad63f5f0eb5cfb724"
+    },
+    {
+      "name": "K2",
+      "level": "global",
+      "modality": "both",
+      "class_names": [
+        "gle350",
+        "cx30",
+        "mustang",
+        "miata",
+        "background"
+      ],
+      "num_parameters": 141833,
+      "num_tensors": 32,
+      "loss_key": "weighted_ce",
+      "val_macro_f1": 0.8419634781586083,
+      "full_checkpoint": "checkpoints/K2.pt",
+      "weights_file": "checkpoints/weights/K2_weights.pt",
+      "sha256_weights": "b320029bc329e183e6d3d0775580a071ec3977a0b67e3b3bc6c04d0f1628b497",
+      "sha256_full": "02f28ef64fda95fddcae2a97b6e30730868a8667e7d4ac656f5941a87d105efd"
+    },
+    {
+      "name": "K3",
+      "level": "global",
+      "modality": "both",
+      "class_names": [
+        "gle350",
+        "cx30",
+        "mustang",
+        "miata",
+        "background"
+      ],
+      "num_parameters": 1219801,
+      "num_tensors": 60,
+      "loss_key": "focal",
+      "val_macro_f1": 0.9362981940989548,
+      "full_checkpoint": "checkpoints/K3.pt",
+      "weights_file": "checkpoints/weights/K3_weights.pt",
+      "sha256_weights": "84a16df698ceebcb4d7dcd35407f8a68ef67a982cae30a7ff00c5d16488f1636",
+      "sha256_full": "76534924e2723a8e3878f3cd773300edb768046fe7c17bfbacc3b053a49550a1"
+    },
+    {
+      "name": "K4",
+      "level": "specialized_suv",
+      "modality": "mic",
+      "class_names": [
+        "gle350",
+        "cx30"
+      ],
+      "num_parameters": 37956,
+      "num_tensors": 18,
+      "loss_key": "weighted_ce",
+      "val_macro_f1": 0.9488286164512388,
+      "full_checkpoint": "checkpoints/K4.pt",
+      "weights_file": "checkpoints/weights/K4_weights.pt",
+      "sha256_weights": "32efceeaca85120d7592dc5d69af923fd498a464d4392ab4bdaca5d94a899f09",
+      "sha256_full": "c403791cc80d248de7f0af22857bfecb1fea364fbb545e2118d15289a7a46b97"
+    },
+    {
+      "name": "K5",
+      "level": "specialized_coupe",
+      "modality": "mic",
+      "class_names": [
+        "mustang",
+        "miata"
+      ],
+      "num_parameters": 37956,
+      "num_tensors": 18,
+      "loss_key": "focal",
+      "val_macro_f1": 0.8547492157965809,
+      "full_checkpoint": "checkpoints/K5.pt",
+      "weights_file": "checkpoints/weights/K5_weights.pt",
+      "sha256_weights": "7a0c78934178ecf31a2bfb80c6198d9fedb97685723376e1c84afdad317486f4",
+      "sha256_full": "8496e0508f4609d4c3bdaa23d053371bc93873a1b306ca8380683dc9b44bf9cc"
+    },
+    {
+      "name": "K6",
+      "level": "specialized_coupe",
+      "modality": "both",
+      "class_names": [
+        "mustang",
+        "miata"
+      ],
+      "num_parameters": 141446,
+      "num_tensors": 32,
+      "loss_key": "weighted_ce",
+      "val_macro_f1": 0.8797406218823152,
+      "full_checkpoint": "checkpoints/K6.pt",
+      "weights_file": "checkpoints/weights/K6_weights.pt",
+      "sha256_weights": "787375beef8837d0f3538bedf9066123849b80869565aab8dbf91db6bf775f6f",
+      "sha256_full": "5b4882de8f7aba807c278b247288183049bb73ff5ff580a810837e5b16920a2c"
+    },
+    {
+      "name": "Kdet",
+      "level": "deterministic",
+      "modality": "both",
+      "class_names": [
+        "gle350",
+        "cx30",
+        "mustang",
+        "miata",
+        "background"
+      ],
+      "num_parameters": 4503757,
+      "num_tensors": 60,
+      "loss_key": "weighted_ce",
+      "val_macro_f1": 0.9375320985544662,
+      "full_checkpoint": "checkpoints/Kdet.pt",
+      "weights_file": "checkpoints/weights/Kdet_weights.pt",
+      "sha256_weights": "42fe91500fdb9d89a78e01237c75e768e1da5a59274d13dcd149947afc8c82e1",
+      "sha256_full": "e071926c653ac754e94da2586184bda7f3ac2e9b019ccb3a6a8535fa12596dcf"
+    }
+  ]
+}

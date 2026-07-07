@@ -1,0 +1,58 @@
+[
+  {
+    "name": "K0",
+    "checkpoint": "K0.pt",
+    "num_parameters": 141575,
+    "num_tensors": 32,
+    "pt_file": "C:\\Users\\sborg\\IDKCascadeResearchCode\\HierarchalIDKCascades\\checkpoints\\K0.pt"
+  },
+  {
+    "name": "K1",
+    "checkpoint": "K1.pt",
+    "num_parameters": 355337,
+    "num_tensors": 46,
+    "pt_file": "C:\\Users\\sborg\\IDKCascadeResearchCode\\HierarchalIDKCascades\\checkpoints\\K1.pt"
+  },
+  {
+    "name": "K2",
+    "checkpoint": "K2.pt",
+    "num_parameters": 141833,
+    "num_tensors": 32,
+    "pt_file": "C:\\Users\\sborg\\IDKCascadeResearchCode\\HierarchalIDKCascades\\checkpoints\\K2.pt"
+  },
+  {
+    "name": "K3",
+    "checkpoint": "K3.pt",
+    "num_parameters": 1219801,
+    "num_tensors": 60,
+    "pt_file": "C:\\Users\\sborg\\IDKCascadeResearchCode\\HierarchalIDKCascades\\checkpoints\\K3.pt"
+  },
+  {
+    "name": "K4",
+    "checkpoint": "K4.pt",
+    "num_parameters": 37956,
+    "num_tensors": 18,
+    "pt_file": "C:\\Users\\sborg\\IDKCascadeResearchCode\\HierarchalIDKCascades\\checkpoints\\K4.pt"
+  },
+  {
+    "name": "K5",
+    "checkpoint": "K5.pt",
+    "num_parameters": 37956,
+    "num_tensors": 18,
+    "pt_file": "C:\\Users\\sborg\\IDKCascadeResearchCode\\HierarchalIDKCascades\\checkpoints\\K5.pt"
+  },
+  {
+    "name": "K6",
+    "checkpoint": "K6.pt",
+    "num_parameters": 141446,
+    "num_tensors": 32,
+    "pt_file": "C:\\Users\\sborg\\IDKCascadeResearchCode\\HierarchalIDKCascades\\checkpoints\\K6.pt"
+  },
+  {
+    "name": "Kdet",
+    "checkpoint": "Kdet.pt",
+    "num_parameters": 4503757,
+    "num_tensors": 60,
+    "pt_file": "C:\\Users\\sborg\\IDKCascadeResearchCode\\HierarchalIDKCascades\\checkpoints\\Kdet.pt"
+  }
+]
