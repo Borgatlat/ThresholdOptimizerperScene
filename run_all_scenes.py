@@ -26,7 +26,12 @@ from process_data import save_scene_paired_arrays
 ALL_SCENES = ["h24", "h08", "s31", "a06", "i29", "i22"]
 
 
-def run_all(scenes: list[str], skip_process: bool = False, batch_size: int = 64) -> dict[str, str]:
+def run_all(
+    scenes: list[str],
+    skip_process: bool = False,
+    batch_size: int = 64,
+    datasets_root: str | Path = "datasets",
+) -> dict[str, str]:
     """Returns {scene: "ok" | "<error message>"} so one scene's missing
     data or a mid-run crash doesn't stop the others from being attempted.
     """
@@ -36,7 +41,7 @@ def run_all(scenes: list[str], skip_process: bool = False, batch_size: int = 64)
         try:
             if not skip_process:
                 print(f"[{scene}] processing raw parquet -> spectrogram arrays...")
-                save_scene_paired_arrays(scene)
+                save_scene_paired_arrays(scene, datasets_root=datasets_root)
             print(f"[{scene}] running empirical_outcomes (frozen h24 models, zero-shot)...")
             collect_empirical_outcomes(scene=scene, batch_size=batch_size)
             results[scene] = "ok"
@@ -61,6 +66,16 @@ if __name__ == "__main__":
     parser.add_argument("--skip-process", action="store_true",
                         help="Skip process_data.py step (use if <scene>_paired_*.npy already exist)")
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument(
+        "--data-root",
+        default="datasets",
+        help="Root folder containing scene subdirs (default: datasets/)",
+    )
     args = parser.parse_args()
 
-    run_all(args.scenes, skip_process=args.skip_process, batch_size=args.batch_size)
+    run_all(
+        args.scenes,
+        skip_process=args.skip_process,
+        batch_size=args.batch_size,
+        datasets_root=args.data_root,
+    )
