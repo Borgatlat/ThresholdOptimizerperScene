@@ -100,13 +100,46 @@ def load_scene_run_labels(scene_dir: str) -> dict[str, GlobalLabel]:
 
     result: dict[str, GlobalLabel] = {}
     unmapped: set[str] = set()
+    skipped_multitarget: list[str] = []
     for _, row in df.iterrows():
-        raw = str(row["label"]).strip().lower()
+        raw_label = row["label"]
+
+        # Some scenes (i22 per the M3N-VC README: "multi-target (2)") have
+        # runs with more than one vehicle present simultaneously -- `label`
+        # comes back as an array/list of names for those rows instead of a
+        # single string. Our GlobalLabel schema is single-vehicle-per-run;
+        # there's no principled single answer for "the" vehicle in a
+        # multi-target run, so skip those runs explicitly rather than
+        # picking one name arbitrarily or crashing on the array repr.
+        if hasattr(raw_label, "__len__") and not isinstance(raw_label, str):
+            if len(raw_label) != 1:
+                skipped_multitarget.append(f"{row['run_id']}: {list(raw_label)}")
+                continue
+            raw_label = raw_label[0]
+
+        raw = str(raw_label).strip().lower()
         mapped = _SCENE_LABEL_ALIASES.get(raw)
         if mapped is None:
-            unmapped.add(str(row["label"]))
-        else:
-            result[str(row["run_id"])] = mapped
+            unmapped.add(str(raw_label))
+            continue
+
+        # run_ids.parquet stores run_id as a bare int/string (e.g. 0, 1, 2),
+        # but every mic/geo filename -- and therefore every segment's
+        # metadata built from it -- uses the "run<N>" prefix (e.g. "run0",
+        # from files like run0_rs1_mic.parquet, see process_data.py's
+        # _file_metadata). Normalize here so lookups by "run0" actually hit,
+        # instead of comparing "run0" against a bare "0" and never matching.
+        run_id_str = str(row["run_id"]).strip()
+        if not run_id_str.startswith("run"):
+            run_id_str = f"run{run_id_str}"
+        result[run_id_str] = mapped
+
+    if skipped_multitarget:
+        print(
+            f"  NOTE: {run_ids_path} has {len(skipped_multitarget)} multi-target "
+            f"run(s), skipped (no single-vehicle ground truth to assign): "
+            f"{skipped_multitarget}"
+        )
 
     if unmapped:
         raise ValueError(

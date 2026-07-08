@@ -27,6 +27,28 @@ def _file_metadata(file_path: Path, suffix: str) -> dict[str, str]:
     }
 
 
+def _normalize_timestamp_seconds(ts: pd.Series) -> pd.Series:
+    """Detect and correct timestamp units.
+
+    Unix time in SECONDS for a 2020s date is ~1.6-1.8e9 (10 digits).
+    Unix time in MILLISECONDS for the same date is ~1.6-1.8e12 (13 digits)
+    -- exactly 1000x larger. Confirmed on s31's run8_rs1_mic.parquet:
+    timestamps like 1704005460000 (13 digits, ms) instead of the ~10-digit
+    seconds seen in every other file checked so far. Segmenting by
+    `(timestamp - first) // segment_seconds` silently assumes seconds; an
+    unconverted millisecond column inflates the segment count ~1000x
+    (876,000 tiny ~3-row segments instead of ~900 real 2-second ones) while
+    staying internally "consistent" (both actual and expected segment
+    counts are wrong by the same factor), which is why a plausibility check
+    comparing segment count to span didn't catch it -- the bug is in the
+    units both numbers were computed from, not their relationship.
+    """
+    median_ts = ts.median()
+    if median_ts > 1e11:  # ~10x margin below the ms range, well above max plausible seconds value
+        return ts / 1000.0
+    return ts
+
+
 def _read_and_segment_file(
     file_path: Path,
     suffix: str,
@@ -37,6 +59,8 @@ def _read_and_segment_file(
 
     if timestamp_col not in df.columns:
         raise ValueError(f"{file_path} does not contain a '{timestamp_col}' column.")
+
+    df[timestamp_col] = _normalize_timestamp_seconds(df[timestamp_col])
 
     metadata = _file_metadata(file_path, suffix)
     for column, value in metadata.items():
@@ -279,6 +303,33 @@ def save_scene_paired_arrays(
     if not mic_files:
         raise FileNotFoundError(f"No *_mic.parquet files found in {data_dir}.")
 
+    # PRE-PASS: determine a single, scene-wide target_samples for mic and
+    # for geo separately, instead of letting each file pick its own via
+    # grouped.size().max() independently. Segments from different files
+    # get stacked together into one array at the end of this function --
+    # if per-file target_samples happened to differ (confirmed on a06:
+    # "all input arrays must have the same shape", after this worked fine
+    # on h24/h08/s31/i29 where files apparently all agreed on the same
+    # value by coincidence), stacking crashes. This pass only computes
+    # segment sizes (fast, no FFTs) to find the true scene-wide max before
+    # any real processing happens.
+    print(f"  pre-pass: determining scene-wide target_samples across {len(mic_files)} file(s)...")
+    mic_target_samples, geo_target_samples = 0, 0
+    for mic_path in mic_files:
+        geo_path = mic_path.with_name(mic_path.name.replace("_mic.parquet", "_geo.parquet"))
+        if not geo_path.exists():
+            continue
+        mic_df = _read_and_segment_file(mic_path, "_mic", segment_seconds, "timestamp")
+        geo_df = _read_and_segment_file(geo_path, "_geo", segment_seconds, "timestamp")
+        if len(mic_df) > 0:
+            mic_target_samples = max(mic_target_samples, int(mic_df.groupby("segment_id").size().max()))
+        if len(geo_df) > 0:
+            geo_target_samples = max(geo_target_samples, int(geo_df.groupby("segment_id").size().max()))
+        del mic_df, geo_df
+    mic_target_samples = max(mic_target_samples, n_fft)
+    geo_target_samples = max(geo_target_samples, n_fft)
+    print(f"  scene-wide target_samples: mic={mic_target_samples}, geo={geo_target_samples}")
+
     mic_specs_all: list[np.ndarray] = []
     geo_specs_all: list[np.ndarray] = []
     metadata_rows: list[dict] = []
@@ -292,19 +343,89 @@ def save_scene_paired_arrays(
         mic_df = _read_and_segment_file(mic_path, "_mic", segment_seconds, "timestamp")
         geo_df = _read_and_segment_file(geo_path, "_geo", segment_seconds, "timestamp")
 
+        if len(mic_df) == 0 or len(geo_df) == 0:
+            # Genuinely empty recording for this run+sensor (seen on a06:
+            # some mic files have 0 rows outright) -- nothing to segment,
+            # skip rather than crashing on grouped.size().max() over zero
+            # groups (which returns NaN, not a usable target_samples).
+            print(f"    SKIPPED: empty file (mic rows={len(mic_df)}, geo rows={len(geo_df)})")
+            del mic_df, geo_df
+            continue
+
+        skip_file = False
+        for name, df in [("mic", mic_df), ("geo", geo_df)]:
+            n_segments = df["segment_id"].nunique()
+            span = df["timestamp"].max() - df["timestamp"].min()
+            expected_segments = max(1, span / segment_seconds)
+            # Seen on s31 run8_rs1: 876,000 segments averaging 3 rows each,
+            # ~1000x more segments than the file's real time span implies --
+            # a per-file timing anomaly (not a units bug across the whole
+            # dataset, since other files' timestamp ranges looked normal),
+            # NOT a real memory-size issue. Every one of those tiny segments
+            # still gets padded to n_fft=256 and put through a full FFT, so
+            # processing it does ~1000x more (meaningless) work than it
+            # should, which is what looked like a hang. Skip files this
+            # badly over-segmented outright rather than grinding through
+            # garbage segments for potentially hours.
+            if n_segments > 5 * expected_segments:
+                print(
+                    f"    SKIPPED: {name} file has {n_segments} segments but "
+                    f"its {span:.1f}s span implies ~{expected_segments:.0f} -- "
+                    f"timing anomaly for this file, not a real recording. "
+                    f"(median segment size would be ~{len(df) / n_segments:.1f} rows)"
+                )
+                skip_file = True
+                break
+        if skip_file:
+            del mic_df, geo_df
+            continue
+
         mic_specs, mic_meta = segments_to_spectrograms_with_keys(
-            mic_df, n_fft=n_fft, hop_length=hop_length
+            mic_df, n_fft=n_fft, hop_length=hop_length, target_samples=mic_target_samples
         )
         geo_specs, geo_meta = segments_to_spectrograms_with_keys(
-            geo_df, n_fft=n_fft, hop_length=hop_length
+            geo_df, n_fft=n_fft, hop_length=hop_length, target_samples=geo_target_samples
         )
 
         mic_keys = [row["segment_key"] for row in mic_meta]
         geo_keys = [row["segment_key"] for row in geo_meta]
         if mic_keys != geo_keys:
-            raise ValueError(f"Mic/geo segment mismatch in {mic_path.name}")
+            # Mic and geo don't necessarily record for the same real-world
+            # duration (seen on s31: one node's geophone ran ~5.5x longer
+            # than its mic for the same run) or can differ by a single
+            # trailing segment from rounding at the boundary (seen on i29:
+            # <1s difference in total span). Synchronize by keeping only
+            # segments present in BOTH modalities instead of requiring an
+            # exact match -- a segment only belongs in the paired dataset
+            # if both sensors actually captured it.
+            shared_keys = set(mic_keys) & set(geo_keys)
+            n_dropped_mic = len(mic_keys) - len(shared_keys)
+            n_dropped_geo = len(geo_keys) - len(shared_keys)
+            print(
+                f"    NOTE: mic/geo segment mismatch in {mic_path.name} -- "
+                f"{len(mic_keys)} mic segments, {len(geo_keys)} geo segments, "
+                f"{len(shared_keys)} shared. Dropping {n_dropped_mic} mic-only "
+                f"and {n_dropped_geo} geo-only segments."
+            )
+            if not shared_keys:
+                print(f"    SKIPPED: zero shared segments, nothing usable from this pair")
+                del mic_df, geo_df
+                continue
+
+            mic_key_to_idx = {row["segment_key"]: i for i, row in enumerate(mic_meta)}
+            geo_key_to_idx = {row["segment_key"]: i for i, row in enumerate(geo_meta)}
+            shared_keys_sorted = sorted(shared_keys)
+            mic_specs = [mic_specs[mic_key_to_idx[k]] for k in shared_keys_sorted]
+            mic_meta = [mic_meta[mic_key_to_idx[k]] for k in shared_keys_sorted]
+            geo_specs = [geo_specs[geo_key_to_idx[k]] for k in shared_keys_sorted]
+            geo_meta = [geo_meta[geo_key_to_idx[k]] for k in shared_keys_sorted]
 
         for row, mic_spec, geo_spec in zip(mic_meta, mic_specs, geo_specs):
+            if row["run_id"] not in run_labels:
+                # Excluded upstream by load_scene_run_labels (e.g. a
+                # multi-target run in i22 with no single-vehicle ground
+                # truth) -- skip this segment rather than crashing.
+                continue
             labels = metadata_row_labels(row["run_id"], run_labels=run_labels)
             metadata_rows.append({**row, "scene": scene, **labels})
             mic_specs_all.append(mic_spec)

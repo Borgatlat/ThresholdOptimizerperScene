@@ -7,7 +7,7 @@ from pathlib import Path
 import torch
 from torch import nn
 
-from cascade.checkpoint_paths import resolve_registry_checkpoint
+from checkpoint_paths import resolve_registry_checkpoint
 from models.dual_modal_cnn import build_ki_model
 from training.trainer import get_device
 from utils.classifier_registry import ClassifierRegistry

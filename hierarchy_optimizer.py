@@ -52,7 +52,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from cascade.empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
+from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
 
 PAPER_DETECTOR_COST_MS = 10_000.0
 
