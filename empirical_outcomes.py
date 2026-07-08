@@ -77,6 +77,17 @@ class CandidateMeta:
     wcet: float
 
 
+def _scene_processed_dir(processed_dir: Path, scene: str) -> Path:
+    """Resolve folder containing <scene>_metadata.parquet (flat or per-scene subdir)."""
+    processed_dir = Path(processed_dir)
+    if (processed_dir / f"{scene}_metadata.parquet").is_file():
+        return processed_dir
+    nested = processed_dir / scene
+    if (nested / f"{scene}_metadata.parquet").is_file():
+        return nested
+    return processed_dir
+
+
 def _load_scene_spectrogram_cache(processed_dir: Path, scene: str) -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
     """Like training.trainer.load_spectrogram_cache, but for scene-prefixed
     files (<scene>_paired_mic.npy etc., produced by
@@ -87,9 +98,10 @@ def _load_scene_spectrogram_cache(processed_dir: Path, scene: str) -> tuple[np.n
     """
     from training.trainer import normalize_spectrograms
 
-    norm_mic = processed_dir / f"{scene}_paired_mic_norm.npy"
-    norm_geo = processed_dir / f"{scene}_paired_geo_norm.npy"
-    meta_path = processed_dir / f"{scene}_metadata.parquet"
+    scene_dir = _scene_processed_dir(processed_dir, scene)
+    norm_mic = scene_dir / f"{scene}_paired_mic_norm.npy"
+    norm_geo = scene_dir / f"{scene}_paired_geo_norm.npy"
+    meta_path = scene_dir / f"{scene}_metadata.parquet"
 
     if not meta_path.exists():
         raise FileNotFoundError(
@@ -101,8 +113,8 @@ def _load_scene_spectrogram_cache(processed_dir: Path, scene: str) -> tuple[np.n
         mic = np.load(norm_mic)
         geo = np.load(norm_geo)
     else:
-        mic = normalize_spectrograms(np.load(processed_dir / f"{scene}_paired_mic.npy"))
-        geo = normalize_spectrograms(np.load(processed_dir / f"{scene}_paired_geo.npy"))
+        mic = normalize_spectrograms(np.load(scene_dir / f"{scene}_paired_mic.npy"))
+        geo = normalize_spectrograms(np.load(scene_dir / f"{scene}_paired_geo.npy"))
         np.save(norm_mic, mic)
         np.save(norm_geo, geo)
 
