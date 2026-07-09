@@ -12,6 +12,24 @@ import torch.nn.functional as F
 
 DEFAULT_H24_DIR = Path("datasets/h24/h24")
 DEFAULT_OUTPUT_DIR = Path("datasets/processed")
+# M3N-VC scenes under datasets/ (each folder may nest scene_id/scene_id/).
+KNOWN_SCENES = ("h08", "h24", "s31", "a06", "i29", "i22")
+
+
+def resolve_scene_raw_dir(scene_id: str, datasets_root: Path | str = "datasets") -> Path:
+    """Return the folder containing *_mic.parquet for one M3N-VC scene."""
+    base = Path(datasets_root) / scene_id
+    if not base.exists():
+        raise FileNotFoundError(f"Scene folder not found: {base}")
+    if list(base.glob("*_mic.parquet")):
+        return base
+    nested = base / scene_id
+    if nested.exists() and list(nested.glob("*_mic.parquet")):
+        return nested
+    hits = sorted({p.parent for p in base.rglob("*_mic.parquet")})
+    if not hits:
+        raise FileNotFoundError(f"No *_mic.parquet files under {base}")
+    return hits[0]
 
 
 def _file_metadata(file_path: Path, suffix: str) -> dict[str, str]:
@@ -270,6 +288,7 @@ def save_scene_paired_arrays(
     scene: str,
     output_dir: str | Path = DEFAULT_OUTPUT_DIR,
     data_dir: str | Path | None = None,
+    datasets_root: Path | str = "datasets",
     segment_seconds: float = 2.0,
     n_fft: int = 256,
     hop_length: int | None = None,
@@ -292,7 +311,7 @@ def save_scene_paired_arrays(
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     if data_dir is None:
-        data_dir = Path("datasets") / scene / scene
+        data_dir = resolve_scene_raw_dir(scene, datasets_root)
     data_dir = Path(data_dir)
 
     run_labels = load_scene_run_labels(str(data_dir))
