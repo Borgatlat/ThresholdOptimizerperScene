@@ -59,6 +59,37 @@ python empirical_outcomes.py --scene h08
 python diagnose_scene.py
 ```
 
+## Fixed-layout threshold optimization
+
+`threshold_optimizer.py` replays the current hierarchy against cached raw
+confidence/prediction outputs. It does not run the Ki models again. The
+default target accuracy is **0.95** and the default benchmark uses a compact
+five-state grid per active model, so exhaustive search remains a quick,
+reproducible baseline.
+
+```bash
+# Compare exact Cartesian grid search with simulated annealing + coordinate descent.
+python threshold_optimizer.py --method benchmark
+
+# Run either optimizer independently.
+python threshold_optimizer.py --method exhaustive --target-accuracy 0.95
+python threshold_optimizer.py --method anneal --target-accuracy 0.95 --iterations 5000
+
+# Use a scene-specific empirical-output table.
+python threshold_optimizer.py --outcomes checkpoints/empirical_outcomes_h08.pkl --method anneal
+
+# Compare against the imperfect logged Kdet instead of the paper's
+# always-correct fallback assumption.
+python threshold_optimizer.py --method benchmark --detector-mode trained
+```
+
+For a finite empirical table, a policy only changes when a threshold crosses
+an observed confidence. `--all-observed-thresholds` therefore exposes the
+exact one-model breakpoints, but their Cartesian product grows exponentially;
+exhaustive mode intentionally rejects oversized searches. Increase
+`--quantile-points` for a denser bounded grid, or use annealing for a large
+grid.
+
 ## Troubleshooting
 
 - **Missing checkpoints**: run `python verify_setup.py`; weights live in `checkpoints/K*.pt`.
