@@ -1,0 +1,99 @@
+fixed initial layout: ['K0', 'K3', 'K2', 'K1', 'detector'
+]
+fixed specialized layout: {('K0', 'coupe'): ['K6', 'K3', 'K2', 'detector'
+    ], ('K0', 'suv'): ['K4', 'K3', 'K2', 'detector'
+    ], ('K1', 'coupe'): ['K6', 'detector'
+    ], ('K1', 'suv'): ['detector'
+    ]
+}
+tunable models: ['K0', 'K3', 'K2', 'K1', 'K6', 'K4'
+]
+{
+    "annealing": {
+        "accuracy": 0.9523625096824168,
+        "annealing_accepted_moves": 748,
+        "annealing_elapsed_seconds": 1.6437104859996907,
+        "annealing_evaluations": 1705,
+        "annealing_iterations": 2000,
+        "coordinate_descent_elapsed_seconds": 0.024828872000398405,
+        "coordinate_descent_evaluations": 25,
+        "coordinate_descent_passes": 1,
+        "correct": 7377,
+        "elapsed_seconds": 1.6685393580000891,
+        "evaluations": 1730,
+        "expected_cost": 978.8859563799589,
+        "feasible": true,
+        "method": "simulated_annealing_plus_coordinate_descent",
+        "route_counts": {
+            "K1": 111,
+            "K2": 183,
+            "K3": 6476,
+            "K6": 231,
+            "detector": 745
+        },
+        "target_accuracy": 0.95,
+        "thresholds": {
+            "K0": 1.0,
+            "K1": 0.35956838726997375,
+            "K2": 0.9,
+            "K3": 0.9,
+            "K4": 1.0000000000000002,
+            "K6": 0.95
+        },
+        "total": 7746
+    },
+    "annealing_cost_gap_ms": 0.0,
+    "annealing_runtime_speedup": 6.443754274329219,
+    "exhaustive": {
+        "accuracy": 0.9523625096824168,
+        "combinations": 15625,
+        "correct": 7377,
+        "elapsed_seconds": 10.751657619999605,
+        "evaluations": 15625,
+        "expected_cost": 978.8859563799589,
+        "feasible": true,
+        "grid_sizes": {
+            "K0": 5,
+            "K1": 5,
+            "K2": 5,
+            "K3": 5,
+            "K4": 5,
+            "K6": 5
+        },
+        "method": "exhaustive",
+        "route_counts": {
+            "K1": 111,
+            "K2": 183,
+            "K3": 6476,
+            "K6": 231,
+            "detector": 745
+        },
+        "target_accuracy": 0.95,
+        "thresholds": {
+            "K0": 1.0,
+            "K1": 0.0,
+            "K2": 0.9,
+            "K3": 0.9,
+            "K4": 0.0,
+            "K6": 0.95
+        },
+        "total": 7746
+    },
+    "grid_sizes": {
+        "K0": 5,
+        "K1": 5,
+        "K2": 5,
+        "K3": 5,
+        "K4": 5,
+        "K6": 5
+    },
+    "target_accuracy": 0.95,
+    "tunable_ids": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "K6",
+        "K4"
+    ]
+}
