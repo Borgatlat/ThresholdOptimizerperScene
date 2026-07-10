@@ -32,7 +32,7 @@ from typing import Mapping, Sequence
 
 import numpy as np
 
-from empirical_outcomes import DEFAULT_OUTPUT_PATH
+from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
 from hierarchy_optimizer import (
     PAPER_DETECTOR_COST_MS,
     Cascade,
@@ -176,6 +176,7 @@ class FixedLayoutThresholdEvaluator:
         thresholds: Mapping[str, float] | None = None,
         *,
         include_route_counts: bool = True,
+        include_class_metrics: bool | None = None,
     ) -> dict:
         """Replay the fixed hierarchy for every logged sample.
 
@@ -227,10 +228,14 @@ class FixedLayoutThresholdEvaluator:
         if (final_prediction < 0).any() or (ending < 0).any():
             raise RuntimeError("Fixed-layout replay left one or more samples unresolved.")
 
+        if include_class_metrics is None:
+            include_class_metrics = include_route_counts
+
+        correct_mask = final_prediction == self.true_global
         metrics = {
-            "accuracy": float(np.mean(final_prediction == self.true_global)),
+            "accuracy": float(np.mean(correct_mask)),
             "expected_cost": float(np.mean(final_cost)),
-            "correct": int(np.sum(final_prediction == self.true_global)),
+            "correct": int(np.sum(correct_mask)),
             "total": int(self.sample_count),
             "thresholds": threshold_map,
         }
@@ -240,6 +245,33 @@ class FixedLayoutThresholdEvaluator:
                 self._ending_ids[int(code)]: int(count)
                 for code, count in zip(route_codes, route_counts, strict=True)
             }
+        if include_class_metrics:
+            per_class: dict[str, dict[str, float | int | None]] = {}
+            represented_accuracies: list[float] = []
+            for class_index, class_name in enumerate(GLOBAL_CLASS_NAMES):
+                class_mask = self.true_global == class_index
+                support = int(np.sum(class_mask))
+                correct = int(np.sum(correct_mask & class_mask))
+                accuracy = correct / support if support else None
+                per_class[class_name] = {
+                    "accuracy": accuracy,
+                    "correct": correct,
+                    "total": support,
+                }
+                if accuracy is not None:
+                    represented_accuracies.append(accuracy)
+
+            metrics["per_class_accuracy"] = per_class
+            metrics["macro_accuracy"] = (
+                float(np.mean(represented_accuracies))
+                if represented_accuracies
+                else 0.0
+            )
+            metrics["worst_class_accuracy"] = (
+                float(np.min(represented_accuracies))
+                if represented_accuracies
+                else 0.0
+            )
         return metrics
 
     def _route_identifier(
@@ -356,6 +388,256 @@ def build_fixed_layout_evaluator(
         detector_cost_ms=detector_cost_ms,
     )
     return FixedLayoutThresholdEvaluator(optimizer, cascade)
+
+
+def _subset_empirical_payload(payload: dict, sample_ids: np.ndarray) -> dict:
+    """Copy one subset of a shared outcome table and renumber sample ids.
+
+    HierarchyOptimizer indexes its NumPy outcome arrays by ``sample_id``.  A
+    subset must therefore be remapped from its original ids into 0..N-1
+    before it can synthesize or replay a cascade independently.
+    """
+    original_ids = np.sort(np.asarray(sample_ids, dtype=int))
+    labels = payload["labels"].set_index("sample_id", drop=False)
+    subset_labels = labels.loc[original_ids].copy().reset_index(drop=True)
+    subset_labels["sample_id"] = np.arange(len(subset_labels), dtype=int)
+
+    id_map = {int(old_id): int(new_id) for new_id, old_id in enumerate(original_ids)}
+    subset_outcomes = payload["outcomes"].loc[
+        payload["outcomes"]["sample_id"].isin(original_ids)
+    ].copy()
+    subset_outcomes["sample_id"] = subset_outcomes["sample_id"].map(id_map).astype(int)
+
+    return {
+        "labels": subset_labels,
+        "candidates": payload["candidates"].copy(),
+        "detector": dict(payload["detector"]),
+        "outcomes": subset_outcomes,
+    }
+
+
+def split_empirical_outcomes(
+    payload: dict,
+    holdout_fraction: float = 0.20,
+    split_strategy: str = "blocked_per_run",
+    random_seed: int = 0,
+) -> tuple[dict, dict, dict]:
+    """Split outcomes into optimization and holdout partitions.
+
+    ``blocked_per_run`` is the default because consecutive M3N-VC segments
+    are strongly correlated.  It assigns the final fraction of each run to
+    holdout, preserving every class in both partitions for the current h24
+    table, where each run has exactly one class.  ``random_per_run`` is
+    provided only as a less conservative comparison point.
+    """
+    if not 0.0 < holdout_fraction < 1.0:
+        raise ValueError("holdout_fraction must be strictly between 0 and 1.")
+    if split_strategy not in {"blocked_per_run", "random_per_run"}:
+        raise ValueError(
+            "split_strategy must be 'blocked_per_run' or 'random_per_run'."
+        )
+
+    labels = payload["labels"].sort_values("sample_id")
+    sample_ids = labels["sample_id"].to_numpy(dtype=int)
+    if not np.array_equal(sample_ids, np.arange(len(labels), dtype=int)):
+        raise ValueError(
+            "Empirical labels must use contiguous sample_id values 0..N-1 "
+            "before they can be split. Regenerate empirical outcomes."
+        )
+
+    rng = np.random.default_rng(random_seed)
+    holdout_mask = np.zeros(len(labels), dtype=bool)
+    per_run: dict[str, dict[str, int]] = {}
+    for run_id, run_labels in labels.groupby("run_id", sort=False):
+        run_sample_ids = run_labels["sample_id"].to_numpy(dtype=int)
+        holdout_count = int(round(len(run_sample_ids) * holdout_fraction))
+        holdout_count = min(max(holdout_count, 1), len(run_sample_ids) - 1)
+        if holdout_count <= 0:
+            raise ValueError(
+                f"Run {run_id!r} has too few samples for a train/holdout split."
+            )
+
+        if split_strategy == "blocked_per_run":
+            selected = run_sample_ids[-holdout_count:]
+        else:
+            selected = rng.choice(run_sample_ids, size=holdout_count, replace=False)
+        holdout_mask[selected] = True
+        per_run[str(run_id)] = {
+            "optimization": int(len(run_sample_ids) - holdout_count),
+            "holdout": int(holdout_count),
+        }
+
+    optimization_ids = sample_ids[~holdout_mask]
+    holdout_ids = sample_ids[holdout_mask]
+    return (
+        _subset_empirical_payload(payload, optimization_ids),
+        _subset_empirical_payload(payload, holdout_ids),
+        {
+            "strategy": split_strategy,
+            "random_seed": int(random_seed),
+            "holdout_fraction": float(holdout_fraction),
+            "optimization_samples": int(len(optimization_ids)),
+            "holdout_samples": int(len(holdout_ids)),
+            "per_run": per_run,
+        },
+    )
+
+
+def build_holdout_evaluators(
+    path: str | Path = DEFAULT_OUTPUT_PATH,
+    detector_mode: str = "paper",
+    detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
+    holdout_fraction: float = 0.20,
+    split_strategy: str = "blocked_per_run",
+    random_seed: int = 0,
+) -> tuple[FixedLayoutThresholdEvaluator, FixedLayoutThresholdEvaluator, dict]:
+    """Build train/test evaluators without letting holdout outcomes pick layout.
+
+    The cascade topology is synthesized from the optimization split only, then
+    replayed unchanged on the holdout split.  This is stricter than merely
+    holding out threshold tuning, because it also prevents topology selection
+    from using held-out accept/reject outcomes.
+    """
+    payload = load_empirical_outcomes(path)
+    optimization_payload, holdout_payload, split = split_empirical_outcomes(
+        payload,
+        holdout_fraction=holdout_fraction,
+        split_strategy=split_strategy,
+        random_seed=random_seed,
+    )
+
+    optimization_optimizer = HierarchyOptimizer(
+        optimization_payload,
+        detector_mode=detector_mode,
+        detector_cost_ms=detector_cost_ms,
+    )
+    optimization_cascade = optimization_optimizer.synthesize()
+    holdout_optimizer = HierarchyOptimizer(
+        holdout_payload,
+        detector_mode=detector_mode,
+        detector_cost_ms=detector_cost_ms,
+    )
+
+    optimization_evaluator = FixedLayoutThresholdEvaluator(
+        optimization_optimizer,
+        optimization_cascade,
+    )
+    holdout_evaluator = FixedLayoutThresholdEvaluator(
+        holdout_optimizer,
+        optimization_cascade,
+    )
+    if optimization_evaluator.tunable_ids != holdout_evaluator.tunable_ids:
+        raise RuntimeError("Optimization and holdout evaluators have incompatible layouts.")
+
+    split["initial_layout"] = list(optimization_cascade.initial)
+    split["specialized_layout"] = {
+        f"{router_id}:{group}": list(chain)
+        for (router_id, group), chain in optimization_cascade.specialized.items()
+    }
+    return optimization_evaluator, holdout_evaluator, split
+
+
+def _holdout_summary(
+    optimization_metrics: Mapping[str, object],
+    holdout_evaluator: FixedLayoutThresholdEvaluator,
+    target_accuracy: float,
+) -> dict:
+    holdout_metrics = holdout_evaluator.evaluate(optimization_metrics["thresholds"])
+    return {
+        "optimization": dict(optimization_metrics),
+        "holdout": holdout_metrics,
+        "accuracy_gap": float(optimization_metrics["accuracy"]) - float(holdout_metrics["accuracy"]),
+        "cost_gap_ms": float(holdout_metrics["expected_cost"])
+        - float(optimization_metrics["expected_cost"]),
+        "holdout_feasible": bool(holdout_metrics["accuracy"] >= target_accuracy),
+    }
+
+
+def optimize_and_evaluate_holdout(
+    path: str | Path = DEFAULT_OUTPUT_PATH,
+    target_accuracy: float = DEFAULT_TARGET_ACCURACY,
+    *,
+    method: str = "anneal",
+    detector_mode: str = "paper",
+    detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
+    holdout_fraction: float = 0.20,
+    split_strategy: str = "blocked_per_run",
+    quantile_points: int | None = DEFAULT_QUANTILE_POINTS,
+    max_combinations: int = DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS,
+    annealing_iterations: int = 2_000,
+    random_seed: int = 0,
+) -> dict:
+    """Optimize on one partition and report the frozen policy on another."""
+    if method not in {"evaluate", "exhaustive", "anneal", "benchmark"}:
+        raise ValueError("method must be evaluate, exhaustive, anneal, or benchmark.")
+
+    optimization_evaluator, holdout_evaluator, split = build_holdout_evaluators(
+        path,
+        detector_mode=detector_mode,
+        detector_cost_ms=detector_cost_ms,
+        holdout_fraction=holdout_fraction,
+        split_strategy=split_strategy,
+        random_seed=random_seed,
+    )
+    baseline = _holdout_summary(
+        optimization_evaluator.evaluate(),
+        holdout_evaluator,
+        target_accuracy,
+    )
+    result: dict = {
+        "target_accuracy": float(target_accuracy),
+        "detector_mode": detector_mode,
+        "split": split,
+        "baseline": baseline,
+    }
+    if method == "evaluate":
+        return result
+
+    if method == "exhaustive":
+        optimized = optimize_fixed_layout_thresholds_exhaustive(
+            optimization_evaluator,
+            target_accuracy,
+            quantile_points=quantile_points,
+            max_combinations=max_combinations,
+        )
+        result["exhaustive"] = _holdout_summary(
+            optimized, holdout_evaluator, target_accuracy
+        )
+        return result
+
+    if method == "anneal":
+        optimized = optimize_fixed_layout_thresholds_simulated_annealing(
+            optimization_evaluator,
+            target_accuracy,
+            quantile_points=quantile_points,
+            n_iterations=annealing_iterations,
+            random_seed=random_seed,
+        )
+        result["annealing"] = _holdout_summary(
+            optimized, holdout_evaluator, target_accuracy
+        )
+        return result
+
+    comparison = benchmark_threshold_optimizers(
+        optimization_evaluator,
+        target_accuracy,
+        quantile_points=quantile_points,
+        max_combinations=max_combinations,
+        annealing_iterations=annealing_iterations,
+        random_seed=random_seed,
+    )
+    result["grid_sizes"] = comparison["grid_sizes"]
+    result["comparison"] = {
+        "annealing_cost_gap_ms": comparison["annealing_cost_gap_ms"],
+        "annealing_runtime_speedup": comparison["annealing_runtime_speedup"],
+    }
+    result["exhaustive"] = _holdout_summary(
+        comparison["exhaustive"], holdout_evaluator, target_accuracy
+    )
+    result["annealing"] = _holdout_summary(
+        comparison["annealing"], holdout_evaluator, target_accuracy
+    )
+    return result
 
 
 def build_threshold_grids(
@@ -772,9 +1054,45 @@ def main() -> None:
     parser.add_argument("--max-combinations", type=int, default=DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS)
     parser.add_argument("--iterations", type=int, default=2_000)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--holdout-fraction",
+        type=float,
+        default=None,
+        help=(
+            "Optimize on the earlier portion of every run and report the frozen "
+            "policy on this held-out fraction."
+        ),
+    )
+    parser.add_argument(
+        "--split-strategy",
+        choices=("blocked_per_run", "random_per_run"),
+        default="blocked_per_run",
+        help=(
+            "Use contiguous held-out blocks by default; random_per_run is a less "
+            "conservative comparison split."
+        ),
+    )
     args = parser.parse_args()
 
     quantile_points = None if args.all_observed_thresholds else args.quantile_points
+    if args.holdout_fraction is not None:
+        _print_result(
+            optimize_and_evaluate_holdout(
+                args.outcomes,
+                args.target_accuracy,
+                method=args.method,
+                detector_mode=args.detector_mode,
+                detector_cost_ms=args.detector_cost_ms,
+                holdout_fraction=args.holdout_fraction,
+                split_strategy=args.split_strategy,
+                quantile_points=quantile_points,
+                max_combinations=args.max_combinations,
+                annealing_iterations=args.iterations,
+                random_seed=args.seed,
+            )
+        )
+        return
+
     evaluator = build_fixed_layout_evaluator(
         args.outcomes,
         detector_mode=args.detector_mode,

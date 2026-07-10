@@ -75,6 +75,10 @@ python threshold_optimizer.py --method benchmark
 python threshold_optimizer.py --method exhaustive --target-accuracy 0.95
 python threshold_optimizer.py --method anneal --target-accuracy 0.95 --iterations 5000
 
+# Tune on 80% of every run, then report the frozen layout/policy on the
+# final 20% of every run. This is the recommended overfitting check.
+python threshold_optimizer.py --method benchmark --holdout-fraction 0.20
+
 # Use a scene-specific empirical-output table.
 python threshold_optimizer.py --outcomes checkpoints/empirical_outcomes_h08.pkl --method anneal
 
@@ -89,6 +93,18 @@ exact one-model breakpoints, but their Cartesian product grows exponentially;
 exhaustive mode intentionally rejects oversized searches. Increase
 `--quantile-points` for a denser bounded grid, or use annealing for a large
 grid.
+
+With `--holdout-fraction`, the hierarchy is synthesized and thresholds are
+optimized from the optimization partition only, then the frozen policy is
+replayed on the holdout partition. `blocked_per_run` is the default split: it
+uses each run's final contiguous segment block for holdout rather than mixing
+nearby windows randomly. The current h24 table has one class per run, so this
+keeps all classes in both partitions; a whole-run holdout would not.
+
+Every final baseline, optimized, and holdout report includes
+`per_class_accuracy`, `macro_accuracy`, and `worst_class_accuracy`. A class
+with no evaluated samples is reported with `accuracy: null` rather than being
+silently included as correct or incorrect.
 
 ## Troubleshooting
 
