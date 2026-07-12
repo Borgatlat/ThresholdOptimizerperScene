@@ -1,0 +1,85 @@
+{
+  "available_samples": 37014,
+  "baseline": {
+    "avg_ms": 3.6610375081800157,
+    "median_ms": 2.325958501387504,
+    "min_ms": 0.8142840015352704,
+    "p95_ms": 10.25602970057654,
+    "p99_ms": 17.56360178053,
+    "samples": 250,
+    "std_ms": 3.3975569330038824,
+    "thresholds": {
+      "K0": 0.95,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9,
+      "K4": 0.95,
+      "K6": 0.95
+    },
+    "total_ms": 915.2593770450039,
+    "wcet_ms": 20.731799999339273
+  },
+  "device": "cpu",
+  "fallback": "live Kdet model (not the synthetic paper detector)",
+  "layout": {
+    "initial": [
+      "K0",
+      "K3",
+      "K2",
+      "K1",
+      "detector"
+    ],
+    "specialized": {
+      "K0:coupe": [
+        "K6",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "K0:suv": [
+        "K4",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "K1:coupe": [
+        "K6",
+        "detector"
+      ],
+      "K1:suv": [
+        "detector"
+      ]
+    }
+  },
+  "loaded_samples": 275,
+  "optimized": {
+    "avg_ms": 5.110612363831024,
+    "median_ms": 4.885304500930943,
+    "min_ms": 0.9176450002996717,
+    "p95_ms": 6.82620965053502,
+    "p99_ms": 17.416215960620317,
+    "samples": 250,
+    "std_ms": 2.5602133957513318,
+    "thresholds": {
+      "K0": 0.9999650716781616,
+      "K1": 0.999854564666748,
+      "K2": 0.9485106468200684,
+      "K3": 0.7857465744018555,
+      "K4": 0.9626284241676331,
+      "K6": 0.7337954118847847
+    },
+    "total_ms": 1277.653090957756,
+    "wcet_ms": 18.925894997664727
+  },
+  "optimized_vs_baseline": {
+    "avg_reduction_percent": -39.594646392236065,
+    "avg_speedup": 0.7163598503557065,
+    "p95_speedup": 1.50244868318287,
+    "wcet_speedup": 1.0954197939858261
+  },
+  "partition": "all",
+  "scene": "h24",
+  "timing_scope": "live model forwards, softmax, and cascade routing; excludes data loading and host-to-device transfer",
+  "torch_version": "2.12.1+cu130",
+  "warmup_samples_per_policy": 25
+}

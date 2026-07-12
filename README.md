@@ -65,7 +65,9 @@ python diagnose_scene.py
 confidence/prediction outputs. It does not run the Ki models again. The
 default target accuracy is **0.95** and the default benchmark uses a compact
 five-state grid per active model, so exhaustive search remains a quick,
-reproducible baseline.
+reproducible baseline. By default it uses the logged, imperfect **trained
+Kdet** predictions and Kdet cost; the paper's perfect 10,000 ms fallback is
+available only through `--detector-mode paper`.
 
 ```bash
 # Compare exact Cartesian grid search with simulated annealing + coordinate descent.
@@ -76,15 +78,16 @@ python threshold_optimizer.py --method exhaustive --target-accuracy 0.95
 python threshold_optimizer.py --method anneal --target-accuracy 0.95 --iterations 5000
 
 # Tune on 80% of every run, then report the frozen layout/policy on the
-# final 20% of every run. This is the recommended overfitting check.
-python threshold_optimizer.py --method benchmark --holdout-fraction 0.20
+# final 20% of every run, save the real-Kdet policy. This is the recommended
+# overfitting and deployment check.
+python threshold_optimizer.py --method anneal --holdout-fraction 0.20 \
+  --iterations 10000 --output checkpoints/threshold_optimizer_trained_metrics.json
 
 # Use a scene-specific empirical-output table.
 python threshold_optimizer.py --outcomes checkpoints/empirical_outcomes_h08.pkl --method anneal
 
-# Compare against the imperfect logged Kdet instead of the paper's
-# always-correct fallback assumption.
-python threshold_optimizer.py --method benchmark --detector-mode trained
+# Reproduce the paper's synthetic perfect-fallback assumption only when needed.
+python threshold_optimizer.py --method benchmark --detector-mode paper
 ```
 
 For a finite empirical table, a policy only changes when a threshold crosses
@@ -105,6 +108,35 @@ Every final baseline, optimized, and holdout report includes
 `per_class_accuracy`, `macro_accuracy`, and `worst_class_accuracy`. A class
 with no evaluated samples is reported with `accuracy: null` rather than being
 silently included as correct or incorrect.
+
+## Live Runtime Benchmark
+
+`live_cascade_benchmark.py` loads the frozen layout and thresholds from the
+real-Kdet optimization report, then runs the actual Ki models on this machine.
+It compares the optimized policy against the saved baseline policy on the same
+inputs, alternates their order to reduce warm-cache bias, and records final
+prediction accuracy against the ground-truth class. It refuses a paper-mode
+metrics file so this comparison cannot silently mix two different fallbacks.
+
+```bash
+# Reproduce the saved holdout partition, then time 250 live cascade executions.
+python live_cascade_benchmark.py --timed-samples 250 \
+  --output checkpoints/live_cascade_benchmark.json
+
+# Benchmark a random 250-sample subset of every processed h24 input.
+python live_cascade_benchmark.py --scene h24 --partition all --timed-samples 250
+
+# Use the full holdout partition for both live accuracy and timing.
+python live_cascade_benchmark.py --timed-samples 0
+```
+
+The report contains `avg_ms`, `median_ms`, `p95_ms`, `p99_ms`, `wcet_ms`
+(the largest measured latency), `min_ms`, and `std_ms` for both policies.
+It also contains `accuracy`, `macro_accuracy`, `worst_class_accuracy`, and
+`per_class_accuracy` from live predictions. The accuracy count includes the
+untimed warmup samples; `--timed-samples 0` loads the complete selected
+partition. Timing starts after input loading and host-to-device transfer,
+matching the existing per-Ki profiler.
 
 ## Troubleshooting
 

@@ -1,0 +1,136 @@
+{
+  "accuracy_scope": "live predictions on every loaded sample, including untimed warmup samples; use --timed-samples 0 to load the full selected partition",
+  "available_samples": 1550,
+  "baseline": {
+    "accuracy": 0.9490909090909091,
+    "accuracy_samples": 275,
+    "avg_ms": 1.7209260879967587,
+    "correct": 261,
+    "macro_accuracy": 0.9476672634103449,
+    "median_ms": 0.9644994999860046,
+    "min_ms": 0.47695200004227445,
+    "p95_ms": 5.068452750029451,
+    "p99_ms": 5.601177670009746,
+    "per_class_accuracy": {
+      "background": {
+        "accuracy": null,
+        "correct": 0,
+        "total": 0
+      },
+      "cx30": {
+        "accuracy": 0.9850746268656716,
+        "correct": 66,
+        "total": 67
+      },
+      "gle350": {
+        "accuracy": 0.971830985915493,
+        "correct": 69,
+        "total": 71
+      },
+      "miata": {
+        "accuracy": 0.9466666666666667,
+        "correct": 71,
+        "total": 75
+      },
+      "mustang": {
+        "accuracy": 0.8870967741935484,
+        "correct": 55,
+        "total": 62
+      }
+    },
+    "samples": 250,
+    "std_ms": 1.4115233716579865,
+    "thresholds": {
+      "K0": 0.95,
+      "K3": 0.9,
+      "K4": 0.95,
+      "K6": 0.95
+    },
+    "total_ms": 430.2315219991897,
+    "wcet_ms": 6.2161379999565725,
+    "worst_class_accuracy": 0.8870967741935484
+  },
+  "detector_mode": "trained",
+  "device": "cpu",
+  "fallback": "live trained Kdet model",
+  "layout": {
+    "initial": [
+      "K0",
+      "K3",
+      "detector"
+    ],
+    "specialized": {
+      "K0:coupe": [
+        "K6",
+        "K3",
+        "detector"
+      ],
+      "K0:suv": [
+        "K4",
+        "K3",
+        "detector"
+      ]
+    }
+  },
+  "loaded_samples": 275,
+  "optimized": {
+    "accuracy": 0.9527272727272728,
+    "accuracy_samples": 275,
+    "avg_ms": 1.3168518679979115,
+    "correct": 262,
+    "macro_accuracy": 0.9506996819627442,
+    "median_ms": 0.9482799999886993,
+    "min_ms": 0.48753900000519934,
+    "p95_ms": 2.4633408000056534,
+    "p99_ms": 5.0472067899920585,
+    "per_class_accuracy": {
+      "background": {
+        "accuracy": null,
+        "correct": 0,
+        "total": 0
+      },
+      "cx30": {
+        "accuracy": 1.0,
+        "correct": 67,
+        "total": 67
+      },
+      "gle350": {
+        "accuracy": 0.971830985915493,
+        "correct": 69,
+        "total": 71
+      },
+      "miata": {
+        "accuracy": 0.96,
+        "correct": 72,
+        "total": 75
+      },
+      "mustang": {
+        "accuracy": 0.8709677419354839,
+        "correct": 54,
+        "total": 62
+      }
+    },
+    "samples": 250,
+    "std_ms": 0.8253230017279182,
+    "thresholds": {
+      "K0": 0.911189466714859,
+      "K3": 0.6357629299163818,
+      "K4": 0.8772214502096176,
+      "K6": 0.9498215317726135
+    },
+    "total_ms": 329.2129669994779,
+    "wcet_ms": 5.6459529999983715,
+    "worst_class_accuracy": 0.8709677419354839
+  },
+  "optimized_vs_baseline": {
+    "avg_reduction_percent": 23.480045007000218,
+    "avg_speedup": 1.3068486515595603,
+    "p95_speedup": 2.0575523898349015,
+    "wcet_speedup": 1.1009900365728098
+  },
+  "partition": "holdout",
+  "scene": "h24",
+  "timing_scope": "live model forwards, softmax, and cascade routing; excludes data loading and host-to-device transfer",
+  "torch_version": "2.13.0+cu130",
+  "warmup_samples_per_policy": 25
+}

@@ -45,6 +45,9 @@ from utils.labels import GLOBAL_CLASS_NAMES
 DEFAULT_TARGET_ACCURACY = 0.95
 DEFAULT_QUANTILE_POINTS = 2
 DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS = 500_000
+# A deployment policy must be selected against the fallback that will really
+# run. The paper's perfect, 10-second surrogate remains available explicitly.
+DEFAULT_DETECTOR_MODE = "trained"
 
 
 class FixedLayoutThresholdEvaluator:
@@ -378,7 +381,7 @@ class FixedLayoutThresholdEvaluator:
 
 def build_fixed_layout_evaluator(
     path: str | Path = DEFAULT_OUTPUT_PATH,
-    detector_mode: str = "paper",
+    detector_mode: str = DEFAULT_DETECTOR_MODE,
     detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
 ) -> FixedLayoutThresholdEvaluator:
     """Synthesize the current layout, then prepare it for threshold replay."""
@@ -485,7 +488,7 @@ def split_empirical_outcomes(
 
 def build_holdout_evaluators(
     path: str | Path = DEFAULT_OUTPUT_PATH,
-    detector_mode: str = "paper",
+    detector_mode: str = DEFAULT_DETECTOR_MODE,
     detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
     holdout_fraction: float = 0.20,
     split_strategy: str = "blocked_per_run",
@@ -558,7 +561,7 @@ def optimize_and_evaluate_holdout(
     target_accuracy: float = DEFAULT_TARGET_ACCURACY,
     *,
     method: str = "anneal",
-    detector_mode: str = "paper",
+    detector_mode: str = DEFAULT_DETECTOR_MODE,
     detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
     holdout_fraction: float = 0.20,
     split_strategy: str = "blocked_per_run",
@@ -587,6 +590,10 @@ def optimize_and_evaluate_holdout(
     result: dict = {
         "target_accuracy": float(target_accuracy),
         "detector_mode": detector_mode,
+        "detector": {
+            "id": optimization_evaluator.optimizer.detector_outcome_id,
+            "cost_ms": float(optimization_evaluator.optimizer.detector_cost),
+        },
         "split": split,
         "baseline": baseline,
     }
@@ -1013,8 +1020,13 @@ def benchmark_threshold_optimizers(
     }
 
 
-def _print_result(result: Mapping[str, object]) -> None:
-    print(json.dumps(result, indent=2, sort_keys=True, default=float))
+def _print_result(result: Mapping[str, object], output_path: Path | None = None) -> None:
+    text = json.dumps(result, indent=2, sort_keys=True, default=float)
+    print(text)
+    if output_path is not None:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(text + "\n")
+        print(f"Wrote {output_path}")
 
 
 def main() -> None:
@@ -1036,10 +1048,18 @@ def main() -> None:
     parser.add_argument(
         "--detector-mode",
         choices=("paper", "trained"),
-        default="paper",
-        help="Use paper's always-correct fallback or the logged Kdet predictions.",
+        default=DEFAULT_DETECTOR_MODE,
+        help=(
+            "Use the logged Kdet predictions/cost (default) or the paper's "
+            "always-correct fallback surrogate."
+        ),
     )
-    parser.add_argument("--detector-cost-ms", type=float, default=PAPER_DETECTOR_COST_MS)
+    parser.add_argument(
+        "--detector-cost-ms",
+        type=float,
+        default=PAPER_DETECTOR_COST_MS,
+        help="Synthetic fallback cost; used only with --detector-mode paper.",
+    )
     parser.add_argument(
         "--quantile-points",
         type=int,
@@ -1054,6 +1074,12 @@ def main() -> None:
     parser.add_argument("--max-combinations", type=int, default=DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS)
     parser.add_argument("--iterations", type=int, default=2_000)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Optional path for the JSON optimization report.",
+    )
     parser.add_argument(
         "--holdout-fraction",
         type=float,
@@ -1089,7 +1115,8 @@ def main() -> None:
                 max_combinations=args.max_combinations,
                 annealing_iterations=args.iterations,
                 random_seed=args.seed,
-            )
+            ),
+            args.output,
         )
         return
 
@@ -1103,7 +1130,7 @@ def main() -> None:
     print(f"tunable models: {list(evaluator.tunable_ids)}")
 
     if args.method == "evaluate":
-        _print_result(evaluator.evaluate())
+        _print_result(evaluator.evaluate(), args.output)
         return
 
     if args.method == "exhaustive":
@@ -1113,7 +1140,8 @@ def main() -> None:
                 args.target_accuracy,
                 quantile_points=quantile_points,
                 max_combinations=args.max_combinations,
-            )
+            ),
+            args.output,
         )
         return
 
@@ -1125,7 +1153,8 @@ def main() -> None:
                 quantile_points=quantile_points,
                 n_iterations=args.iterations,
                 random_seed=args.seed,
-            )
+            ),
+            args.output,
         )
         return
 
@@ -1137,7 +1166,8 @@ def main() -> None:
             max_combinations=args.max_combinations,
             annealing_iterations=args.iterations,
             random_seed=args.seed,
-        )
+        ),
+        args.output,
     )
 
 
