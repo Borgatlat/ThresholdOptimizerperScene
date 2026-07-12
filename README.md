@@ -112,3 +112,140 @@ silently included as correct or incorrect.
 - **Scene skipped (data not found)**: download that scene from M3N-VC and place under `datasets/<scene>/`.
 - **i22 multi-target runs**: segments without a single-vehicle label in `run_ids.parquet` are skipped by design.
 - **Memory on large scenes**: processing is file-by-file; use `--scenes` to run one scene at a time.
+
+## Algorithm for Threshold Optimization
+
+The threshold optimizer can use either:
+
+- **exhaustive search** over every combination of the allowed thresholds. If
+  every one of `n` models has roughly `q` threshold values, this is
+  `O(q^n)` evaluations.
+- **simulated annealing with coordinate descent**, which evaluates a limited
+  number of random proposals for `t` iterations, then greedily polishes the
+  best policy it found.
+
+### Terms for the Optimizer
+
+- **Cached confidence score**: the maximum softmax probability produced by a
+  model for one saved sample. These scores are collected once in
+  `empirical_outcomes.pkl`; threshold tuning does not rerun the models.
+
+- **Quantile points**: the number of equally spaced *percentiles* sampled
+  from a model's cached confidence distribution. For example, four points are
+  `0%, 33.3%, 66.7%, 100%`, not confidence values uniformly spaced from zero
+  to one. A quantile is not an accuracy or recall value; it is a way of
+  choosing thresholds where confidence values actually occur.
+
+- **Threshold grid**: the allowed confidence thresholds for one model. It
+  contains the selected confidence quantiles, the model's current threshold,
+  `0.0` (accept every cached sample), and a value just above the maximum
+  confidence (reject every cached sample). Between two adjacent cached
+  confidence values, changing the threshold cannot change any cached route,
+  so a continuous search would mostly repeat equivalent policies.
+
+- **Policy**: one chosen threshold from every active model's grid. Replaying
+  a policy gives end-to-end accuracy, expected runtime, routes, and per-class
+  metrics.
+
+- **Policy key**: the hard final ranking rule used by both optimizers. A
+  policy that meets the target accuracy always beats one that misses it. Among
+  feasible policies, lower expected runtime wins; accuracy breaks an exact
+  runtime tie. If no policy is feasible, the smallest accuracy shortfall wins,
+  then lower runtime breaks a tie.
+
+### Exhaustive Search
+
+This is the brute-force baseline. It evaluates every Cartesian product of the
+threshold grids, then selects the policy with the best policy key. It is exact
+for that discrete grid, but becomes impractical once many models or many
+thresholds are used.
+
+```text
+best_policy = None
+
+for policy in every_combination(threshold_grids):
+    metrics = replay_cached_outcomes(policy)
+
+    if policy_key(metrics) is better than policy_key(best_policy):
+        best_policy = metrics
+
+return best_policy
+```
+
+### Simulated Annealer
+
+This is a probabilistic search over the same threshold grids. The annealing
+schedule decays exponentially. Early in the search, a proposal can move many
+grid positions and worse-energy proposals are sometimes accepted. Later, steps
+become smaller and worse proposals become unlikely.
+
+The proposal energy is:
+
+$$
+E = \mathrm{cost} + \mathrm{penalty}\;\max(0, \mathrm{accuracy}_{target} - \mathrm{accuracy}_{current})
+$$
+
+The second term is a ReLU-style penalty for missing the target accuracy. It
+gives the annealer a stronger signal that 94.9% is preferable to 70.0% when
+both policies miss a 95% target. This energy guides exploration; the policy
+key above still decides the final winner.
+
+At each iteration, the annealer chooses one model:
+
+- **80% chance**: move that model's threshold index by a random local step.
+  The maximum step decreases as the search progresses.
+- **20% chance**: jump to a random threshold index in that model's grid.
+
+```text
+current = grid value nearest to each model's current threshold
+current_metrics = replay_cached_outcomes(current)
+best = current
+best_metrics = current_metrics
+
+for iteration in range(n_iterations):
+    progress = iteration / (n_iterations - 1)
+    temperature = exponential_decay(start_temperature, end_temperature, progress)
+
+    model = random active model
+    proposal = copy(current)
+
+    if random() < 0.8:
+        proposal[model] = clamp(current[model] + random_local_step(progress))
+    else:
+        proposal[model] = random index from that model's grid
+
+    proposal_metrics = replay_cached_outcomes(proposal)
+    delta = energy(proposal_metrics) - energy(current_metrics)
+
+    if delta <= 0 or random() < exp(-delta / temperature):
+        current = proposal
+        current_metrics = proposal_metrics
+
+    if policy_key(proposal_metrics) is better than policy_key(best_metrics):
+        best = proposal
+        best_metrics = proposal_metrics
+
+return coordinate_descent(best)
+```
+
+### Coordinate Descent Polish
+
+Coordinate descent is the greedy finishing step. It holds every threshold
+fixed except one, tries every value in that model's grid, and keeps an
+improvement according to the policy key. It repeats full passes until no model
+improves or the maximum number of passes is reached.
+
+```text
+for pass in range(max_passes):
+    changed = false
+
+    for model in active models:
+        try every threshold for model while holding all other thresholds fixed
+        keep the best value if it improves the policy key
+        changed = changed or an improvement was kept
+
+    if not changed:
+        break
+
+return current policy
+```
