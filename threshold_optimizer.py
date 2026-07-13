@@ -29,7 +29,7 @@ from itertools import product
 from pathlib import Path
 from time import perf_counter
 from typing import Mapping, Sequence
-
+from tqdm import *
 import numpy as np
 
 from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
@@ -43,7 +43,7 @@ from utils.labels import GLOBAL_CLASS_NAMES
 
 
 DEFAULT_TARGET_ACCURACY = 0.95
-DEFAULT_QUANTILE_POINTS = 2
+DEFAULT_QUANTILE_POINTS = 50
 DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS = 500_000
 # A deployment policy must be selected against the fallback that will really
 # run. The paper's perfect, 10-second surrogate remains available explicitly.
@@ -425,7 +425,7 @@ def split_empirical_outcomes(
     split_strategy: str = "blocked_per_run",
     random_seed: int = 0,
 ) -> tuple[dict, dict, dict]:
-    """Split outcomes into optimization and holdout partitions.
+    """Split outcomes into validation and holdout partitions.
 
     ``blocked_per_run`` is the default because consecutive M3N-VC segments
     are strongly correlated.  It assigns the final fraction of each run to
@@ -466,20 +466,20 @@ def split_empirical_outcomes(
             selected = rng.choice(run_sample_ids, size=holdout_count, replace=False)
         holdout_mask[selected] = True
         per_run[str(run_id)] = {
-            "optimization": int(len(run_sample_ids) - holdout_count),
+            "validation": int(len(run_sample_ids) - holdout_count),
             "holdout": int(holdout_count),
         }
 
-    optimization_ids = sample_ids[~holdout_mask]
+    validation_ids = sample_ids[~holdout_mask]
     holdout_ids = sample_ids[holdout_mask]
     return (
-        _subset_empirical_payload(payload, optimization_ids),
+        _subset_empirical_payload(payload, validation_ids),
         _subset_empirical_payload(payload, holdout_ids),
         {
             "strategy": split_strategy,
             "random_seed": int(random_seed),
             "holdout_fraction": float(holdout_fraction),
-            "optimization_samples": int(len(optimization_ids)),
+            "validation_samples": int(len(validation_ids)),
             "holdout_samples": int(len(holdout_ids)),
             "per_run": per_run,
         },
@@ -494,71 +494,71 @@ def build_holdout_evaluators(
     split_strategy: str = "blocked_per_run",
     random_seed: int = 0,
 ) -> tuple[FixedLayoutThresholdEvaluator, FixedLayoutThresholdEvaluator, dict]:
-    """Build train/test evaluators without letting holdout outcomes pick layout.
+    """Build validation/holdout evaluators without letting holdout outcomes pick layout.
 
-    The cascade topology is synthesized from the optimization split only, then
+    The cascade topology is synthesized from the validation split only, then
     replayed unchanged on the holdout split.  This is stricter than merely
     holding out threshold tuning, because it also prevents topology selection
     from using held-out accept/reject outcomes.
     """
     payload = load_empirical_outcomes(path)
-    optimization_payload, holdout_payload, split = split_empirical_outcomes(
+    validation_payload, holdout_payload, split = split_empirical_outcomes(
         payload,
         holdout_fraction=holdout_fraction,
         split_strategy=split_strategy,
         random_seed=random_seed,
     )
 
-    optimization_optimizer = HierarchyOptimizer(
-        optimization_payload,
+    validation_optimizer = HierarchyOptimizer(
+        validation_payload,
         detector_mode=detector_mode,
         detector_cost_ms=detector_cost_ms,
     )
-    optimization_cascade = optimization_optimizer.synthesize()
+    validation_cascade = validation_optimizer.synthesize()
     holdout_optimizer = HierarchyOptimizer(
         holdout_payload,
         detector_mode=detector_mode,
         detector_cost_ms=detector_cost_ms,
     )
 
-    optimization_evaluator = FixedLayoutThresholdEvaluator(
-        optimization_optimizer,
-        optimization_cascade,
+    validation_evaluator = FixedLayoutThresholdEvaluator(
+        validation_optimizer,
+        validation_cascade,
     )
     holdout_evaluator = FixedLayoutThresholdEvaluator(
         holdout_optimizer,
-        optimization_cascade,
+        validation_cascade,
     )
-    if optimization_evaluator.tunable_ids != holdout_evaluator.tunable_ids:
-        raise RuntimeError("Optimization and holdout evaluators have incompatible layouts.")
+    if validation_evaluator.tunable_ids != holdout_evaluator.tunable_ids:
+        raise RuntimeError("Validation and holdout evaluators have incompatible layouts.")
 
-    split["initial_layout"] = list(optimization_cascade.initial)
+    split["initial_layout"] = list(validation_cascade.initial)
     split["specialized_layout"] = {
         f"{router_id}:{group}": list(chain)
-        for (router_id, group), chain in optimization_cascade.specialized.items()
+        for (router_id, group), chain in validation_cascade.specialized.items()
     }
-    return optimization_evaluator, holdout_evaluator, split
+    return validation_evaluator, holdout_evaluator, split
 
 
 def _holdout_summary(
-    optimization_metrics: Mapping[str, object],
+    validation_metrics: Mapping[str, object],
     holdout_evaluator: FixedLayoutThresholdEvaluator,
     target_accuracy: float,
 ) -> dict:
-    holdout_metrics = holdout_evaluator.evaluate(optimization_metrics["thresholds"])
+    holdout_metrics = holdout_evaluator.evaluate(validation_metrics["thresholds"])
     return {
-        "optimization": dict(optimization_metrics),
+        "validation": dict(validation_metrics),
         "holdout": holdout_metrics,
-        "accuracy_gap": float(optimization_metrics["accuracy"]) - float(holdout_metrics["accuracy"]),
+        "accuracy_gap": float(validation_metrics["accuracy"]) - float(holdout_metrics["accuracy"]),
         "cost_gap_ms": float(holdout_metrics["expected_cost"])
-        - float(optimization_metrics["expected_cost"]),
+        - float(validation_metrics["expected_cost"]),
         "holdout_feasible": bool(holdout_metrics["accuracy"] >= target_accuracy),
     }
 
 
 def optimize_and_evaluate_holdout(
     path: str | Path = DEFAULT_OUTPUT_PATH,
-    target_accuracy: float = DEFAULT_TARGET_ACCURACY,
+    target_accuracy: float | None = DEFAULT_TARGET_ACCURACY,
     *,
     method: str = "anneal",
     detector_mode: str = DEFAULT_DETECTOR_MODE,
@@ -570,11 +570,11 @@ def optimize_and_evaluate_holdout(
     annealing_iterations: int = 2_000,
     random_seed: int = 0,
 ) -> dict:
-    """Optimize on one partition and report the frozen policy on another."""
+    """Optimize on validation data and report the frozen policy on holdout."""
     if method not in {"evaluate", "exhaustive", "anneal", "benchmark"}:
         raise ValueError("method must be evaluate, exhaustive, anneal, or benchmark.")
 
-    optimization_evaluator, holdout_evaluator, split = build_holdout_evaluators(
+    validation_evaluator, holdout_evaluator, split = build_holdout_evaluators(
         path,
         detector_mode=detector_mode,
         detector_cost_ms=detector_cost_ms,
@@ -582,17 +582,26 @@ def optimize_and_evaluate_holdout(
         split_strategy=split_strategy,
         random_seed=random_seed,
     )
+    baseline_validation = validation_evaluator.evaluate()
+    resolved_target_accuracy = (
+        float(baseline_validation["accuracy"])
+        if target_accuracy is None
+        else float(target_accuracy)
+    )
     baseline = _holdout_summary(
-        optimization_evaluator.evaluate(),
+        baseline_validation,
         holdout_evaluator,
-        target_accuracy,
+        resolved_target_accuracy,
     )
     result: dict = {
-        "target_accuracy": float(target_accuracy),
+        "target_accuracy": resolved_target_accuracy,
+        "target_accuracy_source": (
+            "baseline_validation" if target_accuracy is None else "explicit"
+        ),
         "detector_mode": detector_mode,
         "detector": {
-            "id": optimization_evaluator.optimizer.detector_outcome_id,
-            "cost_ms": float(optimization_evaluator.optimizer.detector_cost),
+            "id": validation_evaluator.optimizer.detector_outcome_id,
+            "cost_ms": float(validation_evaluator.optimizer.detector_cost),
         },
         "split": split,
         "baseline": baseline,
@@ -602,32 +611,32 @@ def optimize_and_evaluate_holdout(
 
     if method == "exhaustive":
         optimized = optimize_fixed_layout_thresholds_exhaustive(
-            optimization_evaluator,
-            target_accuracy,
+            validation_evaluator,
+            resolved_target_accuracy,
             quantile_points=quantile_points,
             max_combinations=max_combinations,
         )
         result["exhaustive"] = _holdout_summary(
-            optimized, holdout_evaluator, target_accuracy
+            optimized, holdout_evaluator, resolved_target_accuracy
         )
         return result
 
     if method == "anneal":
         optimized = optimize_fixed_layout_thresholds_simulated_annealing(
-            optimization_evaluator,
-            target_accuracy,
+            validation_evaluator,
+            resolved_target_accuracy,
             quantile_points=quantile_points,
             n_iterations=annealing_iterations,
             random_seed=random_seed,
         )
         result["annealing"] = _holdout_summary(
-            optimized, holdout_evaluator, target_accuracy
+            optimized, holdout_evaluator, resolved_target_accuracy
         )
         return result
 
     comparison = benchmark_threshold_optimizers(
-        optimization_evaluator,
-        target_accuracy,
+        validation_evaluator,
+        resolved_target_accuracy,
         quantile_points=quantile_points,
         max_combinations=max_combinations,
         annealing_iterations=annealing_iterations,
@@ -639,10 +648,10 @@ def optimize_and_evaluate_holdout(
         "annealing_runtime_speedup": comparison["annealing_runtime_speedup"],
     }
     result["exhaustive"] = _holdout_summary(
-        comparison["exhaustive"], holdout_evaluator, target_accuracy
+        comparison["exhaustive"], holdout_evaluator, resolved_target_accuracy
     )
     result["annealing"] = _holdout_summary(
-        comparison["annealing"], holdout_evaluator, target_accuracy
+        comparison["annealing"], holdout_evaluator, resolved_target_accuracy
     )
     return result
 
@@ -906,41 +915,46 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     initial_temperature = max(1.0, evaluator.maximum_path_cost * 0.25)
     final_temperature = max(1e-6, initial_temperature * 1e-3)
 
-    for iteration in range(n_iterations):
-        progress = iteration / max(n_iterations - 1, 1)
-        temperature = initial_temperature * (final_temperature / initial_temperature) ** progress
-        candidate_id = str(rng.choice(candidate_ids))
-        grid = threshold_grids[candidate_id]
-        current_index = current_indices[candidate_id]
-        proposal_indices = dict(current_indices)
 
-        if len(grid) > 1 and rng.random() < 0.8:
-            max_step = max(1, int(round((1.0 - progress) * (len(grid) - 1))))
-            step = int(rng.integers(-max_step, max_step + 1))
-            if step == 0:
-                step = 1 if current_index < len(grid) - 1 else -1
-            proposal_indices[candidate_id] = int(np.clip(current_index + step, 0, len(grid) - 1))
-        else:
-            proposal_indices[candidate_id] = int(rng.integers(0, len(grid)))
+    with trange(n_iterations, desc="Simulated annealing") as t_iter:
 
-        if proposal_indices[candidate_id] == current_index:
-            continue
+        for iteration in t_iter:
+            progress = iteration / max(n_iterations - 1, 1)
+            temperature = initial_temperature * (final_temperature / initial_temperature) ** progress
+            candidate_id = str(rng.choice(candidate_ids))
+            grid = threshold_grids[candidate_id]
+            current_index = current_indices[candidate_id]
+            proposal_indices = dict(current_indices)
 
-        proposal_metrics = evaluator.evaluate(
-            policy_from_indices(proposal_indices), include_route_counts=False
-        )
-        evaluations += 1
-        proposal_energy = energy(proposal_metrics)
-        energy_delta = proposal_energy - current_energy
-        if energy_delta <= 0.0 or rng.random() < math.exp(-energy_delta / temperature):
-            current_indices = proposal_indices
-            current_metrics = proposal_metrics
-            current_energy = proposal_energy
-            accepted_moves += 1
+            if len(grid) > 1 and rng.random() < 0.8:
+                max_step = max(1, int(round((1.0 - progress) * (len(grid) - 1))))
+                step = int(rng.integers(-max_step, max_step + 1))
+                if step == 0:
+                    step = 1 if current_index < len(grid) - 1 else -1
+                proposal_indices[candidate_id] = int(np.clip(current_index + step, 0, len(grid) - 1))
+            else:
+                proposal_indices[candidate_id] = int(rng.integers(0, len(grid)))
 
-        if _policy_key(proposal_metrics, target_accuracy) < _policy_key(best_metrics, target_accuracy):
-            best_metrics = proposal_metrics
-            best_indices = proposal_indices
+            if proposal_indices[candidate_id] == current_index:
+                continue
+
+            proposal_metrics = evaluator.evaluate(
+                policy_from_indices(proposal_indices), include_route_counts=False
+            )
+            evaluations += 1
+            proposal_energy = energy(proposal_metrics)
+            energy_delta = proposal_energy - current_energy
+            if energy_delta <= 0.0 or rng.random() < math.exp(-energy_delta / temperature):
+                current_indices = proposal_indices
+                current_metrics = proposal_metrics
+                current_energy = proposal_energy
+                accepted_moves += 1
+
+            if _policy_key(proposal_metrics, target_accuracy) < _policy_key(best_metrics, target_accuracy):
+                best_metrics = proposal_metrics
+                best_indices = proposal_indices
+
+                t_iter.set_postfix(loss=proposal_energy, status="Active")
 
     annealing_elapsed = perf_counter() - started
     polished = coordinate_descent_thresholds(
@@ -1044,7 +1058,14 @@ def main() -> None:
         choices=("benchmark", "exhaustive", "anneal", "evaluate"),
         default="benchmark",
     )
-    parser.add_argument("--target-accuracy", type=float, default=DEFAULT_TARGET_ACCURACY)
+    parser.add_argument(
+        "--target-accuracy",
+        default=str(DEFAULT_TARGET_ACCURACY),
+        help=(
+            "Required accuracy in [0, 1], or 'baseline' to use the frozen "
+            "baseline validation accuracy."
+        ),
+    )
     parser.add_argument(
         "--detector-mode",
         choices=("paper", "trained"),
@@ -1085,7 +1106,7 @@ def main() -> None:
         type=float,
         default=None,
         help=(
-            "Optimize on the earlier portion of every run and report the frozen "
+            "Select a policy on the earlier validation portion of every run and report the frozen "
             "policy on this held-out fraction."
         ),
     )
@@ -1100,12 +1121,22 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    if args.target_accuracy == "baseline":
+        target_accuracy: float | None = None
+    else:
+        try:
+            target_accuracy = float(args.target_accuracy)
+        except ValueError:
+            parser.error("--target-accuracy must be a number in [0, 1] or 'baseline'.")
+        if not 0.0 <= target_accuracy <= 1.0:
+            parser.error("--target-accuracy must be between 0 and 1.")
+
     quantile_points = None if args.all_observed_thresholds else args.quantile_points
     if args.holdout_fraction is not None:
         _print_result(
             optimize_and_evaluate_holdout(
                 args.outcomes,
-                args.target_accuracy,
+                target_accuracy,
                 method=args.method,
                 detector_mode=args.detector_mode,
                 detector_cost_ms=args.detector_cost_ms,
@@ -1129,6 +1160,10 @@ def main() -> None:
     print(f"fixed specialized layout: {evaluator.cascade.specialized}")
     print(f"tunable models: {list(evaluator.tunable_ids)}")
 
+    if target_accuracy is None:
+        target_accuracy = float(evaluator.evaluate(include_route_counts=False)["accuracy"])
+        print(f"target accuracy: baseline validation accuracy = {target_accuracy:.6f}")
+
     if args.method == "evaluate":
         _print_result(evaluator.evaluate(), args.output)
         return
@@ -1137,7 +1172,7 @@ def main() -> None:
         _print_result(
             optimize_fixed_layout_thresholds_exhaustive(
                 evaluator,
-                args.target_accuracy,
+                target_accuracy,
                 quantile_points=quantile_points,
                 max_combinations=args.max_combinations,
             ),
@@ -1149,7 +1184,7 @@ def main() -> None:
         _print_result(
             optimize_fixed_layout_thresholds_simulated_annealing(
                 evaluator,
-                args.target_accuracy,
+                target_accuracy,
                 quantile_points=quantile_points,
                 n_iterations=args.iterations,
                 random_seed=args.seed,
@@ -1161,7 +1196,7 @@ def main() -> None:
     _print_result(
         benchmark_threshold_optimizers(
             evaluator,
-            args.target_accuracy,
+            target_accuracy,
             quantile_points=quantile_points,
             max_combinations=args.max_combinations,
             annealing_iterations=args.iterations,

@@ -317,6 +317,13 @@ def save_scene_paired_arrays(
     run_labels = load_scene_run_labels(str(data_dir))
     print(f"  loaded {len(run_labels)} run labels for scene '{scene}' from "
           f"{data_dir / 'run_ids.parquet'}")
+    if not run_labels:
+        raise ValueError(
+            f"{scene!r} has no single-target runs in {data_dir / 'run_ids.parquet'}. "
+            "This preprocessing pipeline and the current Ki cascade require one "
+            "global label per segment; i22 contains only multi-target runs. "
+            "A multi-label cascade/evaluator is required before i22 can be processed."
+        )
 
     mic_files = sorted(data_dir.glob("*_mic.parquet"))
     if not mic_files:

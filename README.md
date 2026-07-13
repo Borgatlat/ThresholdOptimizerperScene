@@ -98,7 +98,7 @@ exhaustive mode intentionally rejects oversized searches. Increase
 grid.
 
 With `--holdout-fraction`, the hierarchy is synthesized and thresholds are
-optimized from the optimization partition only, then the frozen policy is
+selected from the validation partition only, then the frozen policy is
 replayed on the holdout partition. `blocked_per_run` is the default split: it
 uses each run's final contiguous segment block for holdout rather than mixing
 nearby windows randomly. The current h24 table has one class per run, so this
@@ -108,6 +108,33 @@ Every final baseline, optimized, and holdout report includes
 `per_class_accuracy`, `macro_accuracy`, and `worst_class_accuracy`. A class
 with no evaluated samples is reported with `accuracy: null` rather than being
 silently included as correct or incorrect.
+
+## Paper-Kdet Per-Scene Experiments
+
+`optimize_all_scenes.py` runs independent threshold experiments for every
+cached scene outcome file. It uses the paper's perfect, 10,000 ms `Kdet`
+assumption and sets each scene's target to that scene's baseline **validation**
+accuracy. The baseline policy is part of every threshold grid, so each run has
+at least one validation-feasible starting policy. Results are written to
+`checkpoints/paper_kdet_baseline_target/` rather than the trained-Kdet reports.
+
+```bash
+# Run every available cached scene. Missing outcomes, such as i22, are skipped.
+python optimize_all_scenes.py
+
+# Run a selected subset or use a denser threshold grid.
+python optimize_all_scenes.py --scenes a06 h08 s31 --quantile-points 25
+```
+
+Generate two figures per completed scene, plus a machine-readable collection
+of the plotted values:
+
+```bash
+python plot_paper_kdet_results.py
+```
+
+Figures are saved in `checkpoints/figures/paper_kdet_baseline_target/` and
+the values are saved in `checkpoints/paper_kdet_baseline_target/plot_data.json`.
 
 ## Live Runtime Benchmark
 
@@ -142,7 +169,9 @@ matching the existing per-Ki profiler.
 
 - **Missing checkpoints**: run `python verify_setup.py`; weights live in `checkpoints/K*.pt`.
 - **Scene skipped (data not found)**: download that scene from M3N-VC and place under `datasets/<scene>/`.
-- **i22 multi-target runs**: segments without a single-vehicle label in `run_ids.parquet` are skipped by design.
+- **i22 multi-target runs**: i22 currently has no single-vehicle runs. The
+  single-label Ki cascade cannot process it; it needs a multi-label cascade
+  and evaluator rather than an arbitrary choice of one vehicle per segment.
 - **Memory on large scenes**: processing is file-by-file; use `--scenes` to run one scene at a time.
 
 ## Algorithm for Threshold Optimization
@@ -281,3 +310,7 @@ for pass in range(max_passes):
 
 return current policy
 ```
+
+# Notes and Limitations
+- Performance differs quite a bit. It performs worse when we use a real deterministic classifier compared to the 10000ms one referenced in the paper
+- Accuracy differs between validation and holdout set.

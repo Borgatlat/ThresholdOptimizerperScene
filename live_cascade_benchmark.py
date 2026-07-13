@@ -123,17 +123,20 @@ def _policy_section(metrics: Mapping[str, object], policy: str, partition: str) 
     if not isinstance(section, Mapping):
         raise ValueError(f"Metrics entry {key!r} is not an object.")
     if partition != "all" and "thresholds" not in section:
-        if partition not in section or not isinstance(section[partition], Mapping):
+        saved_partition = partition
+        if partition == "validation" and "validation" not in section:
+            saved_partition = "optimization"  # Legacy report compatibility.
+        if saved_partition not in section or not isinstance(section[saved_partition], Mapping):
             raise KeyError(
                 f"Metrics policy {key!r} has no {partition!r} thresholds. "
                 "Choose a partition saved by the threshold optimizer."
-        )
-        section = section[partition]
+            )
+        section = section[saved_partition]
     elif partition == "all" and "thresholds" not in section:
         # A holdout experiment keeps the learned thresholds inside its saved
         # partition. Use holdout first because it is the deployment-facing
-        # policy, then fall back to the optimization partition.
-        for saved_partition in ("holdout", "optimization"):
+        # policy, then fall back to the validation partition.
+        for saved_partition in ("holdout", "validation", "optimization"):
             candidate = section.get(saved_partition)
             if isinstance(candidate, Mapping) and "thresholds" in candidate:
                 section = candidate
@@ -341,9 +344,9 @@ def _select_partition_sample_ids(
 
     if partition == "holdout":
         return sample_ids[holdout]
-    if partition == "optimization":
+    if partition == "validation":
         return sample_ids[~holdout]
-    raise ValueError("partition must be all, optimization, holdout, or auto.")
+    raise ValueError("partition must be all, validation, holdout, or auto.")
 
 
 def load_live_inputs(
@@ -623,7 +626,7 @@ def main() -> None:
     parser.add_argument("--scene", default=None, help="Infer from outcomes when omitted.")
     parser.add_argument(
         "--partition",
-        choices=("auto", "all", "optimization", "holdout"),
+        choices=("auto", "all", "validation", "holdout"),
         default="auto",
         help=(
             "Use the same saved partition as the threshold policy. With --scene, "
