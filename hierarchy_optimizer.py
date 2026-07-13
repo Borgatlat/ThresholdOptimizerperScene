@@ -472,19 +472,47 @@ def print_cascade(
     return optimizer, cascade
 
 
-def evaluate_empirical_cascade(
+def compare_kdet_costs(
     path: str | Path = DEFAULT_OUTPUT_PATH,
-    detector_mode: str = "paper",
-    detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
-) -> dict:
-    optimizer, cascade = optimize_empirical_hierarchy(path, detector_mode, detector_cost_ms)
-    metrics = optimizer.evaluate_cascade(cascade)
-    metrics["dp_expected_cost"] = cascade.expected_cost
-    metrics["detector_mode"] = detector_mode
-    return metrics
+    detector_costs_ms: list[float] = (10.85, 100, 250, 1000, 10_000),
+) -> dict[float, Cascade]:
+    """Print h24's DP-optimal cascade structure side by side for several
+    candidate synthetic Kdet costs, so you can eyeball how much richer the
+    chain gets as the assumed Kdet cost increases -- instead of debating
+    it in the abstract or committing to one value blind.
+
+    10.85 is included as a reference point: that's the REAL measured Kdet
+    cost (detector_mode="trained"), i.e. what the DP would choose if Kdet
+    weren't artificially inflated at all -- usually a very short chain,
+    useful as a baseline to see how much the synthetic values are actually
+    buying you in chain depth.
+    """
+    results: dict[float, Cascade] = {}
+    for cost in detector_costs_ms:
+        print(f"\n{'=' * 60}")
+        print(f"detector_cost_ms = {cost}")
+        print(f"{'=' * 60}")
+        optimizer, cascade = optimize_empirical_hierarchy(path, "paper", cost)
+        print(f"expected_cost: {cascade.expected_cost:.4f} ms")
+        print("initial:")
+        for candidate_id in cascade.initial:
+            print("  ", optimizer.describe(candidate_id))
+        print("specialized:")
+        for (router_id, group), chain in cascade.specialized.items():
+            print(f"  {router_id} group={group}: {chain}")
+        results[cost] = cascade
+
+    print(f"\n{'-' * 60}")
+    print("SUMMARY: chain length (initial, excluding detector) per Kdet cost")
+    print(f"{'-' * 60}")
+    for cost, cascade in results.items():
+        initial_len = len([c for c in cascade.initial if c != cascade.detector])
+        spec_lens = {k: len(v) for k, v in cascade.specialized.items()}
+        print(f"  cost={cost:>8}ms: initial_len={initial_len}, specialized_lens={spec_lens}, "
+              f"expected_cost={cascade.expected_cost:.2f}ms")
+
+    return results
 
 
 if __name__ == "__main__":
-    optimizer, cascade = print_cascade()
-    print("evaluation:")
-    print(optimizer.evaluate_cascade(cascade))
+    print_cascade()
