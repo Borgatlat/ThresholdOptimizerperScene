@@ -53,6 +53,7 @@ import numpy as np
 import pandas as pd
 
 from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
+from utils.labels import GLOBAL_CLASS_NAMES, INTERMEDIATE_CLASS_NAMES
 
 PAPER_DETECTOR_COST_MS = 10_000.0
 
@@ -84,6 +85,11 @@ class HierarchyOptimizer:
         self.outcomes = payload["outcomes"]
         self.labels = payload["labels"]
         self.sample_count = len(self.labels)
+        self.detector_mode = detector_mode
+        self.detector_outcome_id = payload.get("detector", {}).get("id", "Kdet")
+        self.true_global = self.labels["true_global_label"].map(
+            {name: idx for idx, name in enumerate(GLOBAL_CLASS_NAMES)}
+        ).to_numpy(dtype=int)
 
         self.global_ids = tuple(self.candidates[self.candidates["kind"] == "global"].index)
         self.identifier_ids = tuple(self.candidates[self.candidates["kind"] == "identifier"].index)
@@ -105,10 +111,14 @@ class HierarchyOptimizer:
         # K0/K1 predict into INTERMEDIATE_CLASS_NAMES order; group names here
         # ("suv", "coupe") must match that same shared label schema produced
         # by cascade/empirical_outcomes.py's _map_intermediate.
-        from utils.labels import INTERMEDIATE_CLASS_NAMES
-
         self._group_to_intermediate_idx = {
             name: idx for idx, name in enumerate(INTERMEDIATE_CLASS_NAMES) if name in self.groups
+        }
+        self._intermediate_idx_to_group = {
+            idx: name for idx, name in enumerate(INTERMEDIATE_CLASS_NAMES)
+        }
+        self._global_name_to_idx = {
+            name: idx for idx, name in enumerate(GLOBAL_CLASS_NAMES)
         }
 
         self.accepted = {}
@@ -347,6 +357,91 @@ class HierarchyOptimizer:
             "wcet": row["wcet"],
             "threshold": row["threshold"],
         }
+
+    def evaluate_cascade(self, cascade: Cascade) -> dict:
+        """Replay a synthesized cascade against the empirical outcome table.
+
+        This is the end-to-end check that the DP itself intentionally does
+        not compute: for each sample, follow the initial chain, route through
+        a specialized branch when an identifier accepts, and finally fall back
+        to Kdet/the paper detector if every prior classifier returns IDK.
+        """
+        correct = 0
+        total_cost = 0.0
+        route_counts: dict[str, int] = {}
+
+        for sample_id, true_label in enumerate(self.true_global):
+            prediction, cost, ending_id = self._predict_one(cascade, sample_id)
+            correct += int(prediction == true_label)
+            total_cost += cost
+            route_counts[ending_id] = route_counts.get(ending_id, 0) + 1
+
+        total = int(self.sample_count)
+        return {
+            "accuracy": correct / total if total else 0.0,
+            "expected_cost": total_cost / total if total else 0.0,
+            "correct": correct,
+            "total": total,
+            "route_counts": route_counts,
+        }
+
+    def _predict_one(self, cascade: Cascade, sample_id: int) -> tuple[int, float, str]:
+        cost = 0.0
+
+        for candidate_id in cascade.initial:
+            if candidate_id == self.detector_id:
+                return self._detector_prediction(sample_id, cost)
+
+            cost += self._cost(candidate_id)
+            if not self.accepted[candidate_id][sample_id]:
+                continue
+
+            prediction = int(self.prediction[candidate_id][sample_id])
+            if candidate_id in self.identifier_ids:
+                group = self._intermediate_idx_to_group.get(prediction)
+                if group in self.groups:
+                    chain = cascade.specialized.get(
+                        (candidate_id, group),
+                        [self.detector_id],
+                    )
+                    return self._predict_specialized_chain(chain, sample_id, cost)
+                if group in self._global_name_to_idx:
+                    return self._global_name_to_idx[group], cost, candidate_id
+                return self._detector_prediction(sample_id, cost)
+
+            return prediction, cost, candidate_id
+
+        return self._detector_prediction(sample_id, cost)
+
+    def _predict_specialized_chain(
+        self,
+        chain: list[str],
+        sample_id: int,
+        cost: float,
+    ) -> tuple[int, float, str]:
+        for candidate_id in chain:
+            if candidate_id == self.detector_id:
+                return self._detector_prediction(sample_id, cost)
+
+            cost += self._cost(candidate_id)
+            if self.accepted[candidate_id][sample_id]:
+                return int(self.prediction[candidate_id][sample_id]), cost, candidate_id
+
+        return self._detector_prediction(sample_id, cost)
+
+    def _detector_prediction(self, sample_id: int, cost: float) -> tuple[int, float, str]:
+        cost += self.detector_cost
+        if self.detector_mode == "paper":
+            return int(self.true_global[sample_id]), cost, self.detector_id
+        if self.detector_outcome_id not in self.prediction:
+            raise ValueError(
+                f"Trained detector outcomes are missing: {self.detector_outcome_id!r}"
+            )
+        return (
+            int(self.prediction[self.detector_outcome_id][sample_id]),
+            cost,
+            self.detector_outcome_id,
+        )
 
 
 def optimize_empirical_hierarchy(

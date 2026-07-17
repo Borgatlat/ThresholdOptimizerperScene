@@ -3,3 +3,5 @@ pandas
 pyarrow
 torch
 scikit-learn
+tqdm
+matplotlib

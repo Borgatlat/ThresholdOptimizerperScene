@@ -1,0 +1,42 @@
+{
+  "detector_mode": "paper",
+  "method": "anneal",
+  "scenes": {
+    "a06": {
+      "outcomes": "checkpoints/empirical_outcomes_a06.pkl",
+      "report": "checkpoints/paper_kdet_baseline_target/a06.json",
+      "status": "ok",
+      "target_accuracy": 0.7665837082416005
+    },
+    "h08": {
+      "outcomes": "checkpoints/empirical_outcomes_h08.pkl",
+      "report": "checkpoints/paper_kdet_baseline_target/h08.json",
+      "status": "ok",
+      "target_accuracy": 0.9070994764397906
+    },
+    "h24": {
+      "outcomes": "checkpoints/empirical_outcomes.pkl",
+      "report": "checkpoints/paper_kdet_baseline_target/h24.json",
+      "status": "ok",
+      "target_accuracy": 0.9654615881213686
+    },
+    "i22": {
+      "outcomes": "checkpoints/empirical_outcomes_i22.pkl",
+      "reason": "empirical outcomes file not found",
+      "status": "skipped"
+    },
+    "i29": {
+      "outcomes": "checkpoints/empirical_outcomes_i29.pkl",
+      "report": "checkpoints/paper_kdet_baseline_target/i29.json",
+      "status": "ok",
+      "target_accuracy": 0.7274615802270957
+    },
+    "s31": {
+      "outcomes": "checkpoints/empirical_outcomes_s31.pkl",
+      "report": "checkpoints/paper_kdet_baseline_target/s31.json",
+      "status": "ok",
+      "target_accuracy": 0.7843536065085822
+    }
+  },
+  "target_accuracy_source": "baseline_validation"
+}
