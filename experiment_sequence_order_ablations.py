@@ -476,22 +476,27 @@ def write_comparison_md(summary: dict, output_dir: Path) -> Path:
         "All orders for a given (scene, detector_mode) share the same "
         "`blocked_per_run` holdout. DP order is always included.",
         "",
-        "| scene | detector | #orders | DP order | DP cost | best label | best order | "
-        "best cost | Δcost vs DP | #cheaper | #near DP (±1%) |",
-        "|---|---|---:|---|---:|---|---|---:|---:|---:|---:|",
+        "Ranking: feasible policies first, then lower holdout cost. "
+        "Reference orders (`ref_*`) may change membership (not only permutation).",
+        "",
+        "| scene | detector | #orders | DP order | DP cost | DP feas | best label | "
+        "best order | best cost | best feas | Δcost vs DP | #feas cheaper | #near DP |",
+        "|---|---|---:|---|---:|---|---|---|---:|---|---:|---:|---:|",
     ]
     for row in rows:
         md.append(
-            "| {scene} | {det} | {n} | `{dp}` | {dpc} | {bl} | `{bo}` | {bc} | "
-            "{dc} | {cheaper} | {near} |".format(
+            "| {scene} | {det} | {n} | `{dp}` | {dpc} | {dpf} | {bl} | `{bo}` | {bc} | "
+            "{bf} | {dc} | {cheaper} | {near} |".format(
                 scene=row["scene"],
                 det=row["detector_mode"],
                 n=row["n_orders"],
                 dp="→".join(row["dp_order"]),
                 dpc=_fmt(row["dp_holdout_cost_ms"]),
+                dpf=row["dp_feasible"],
                 bl=row["best_label"],
                 bo="→".join(row["best_order"]),
                 bc=_fmt(row["best_holdout_cost_ms"]),
+                bf=row["best_feasible"],
                 dc=_fmt(row["delta_cost_best_vs_dp_ms"]),
                 cheaper=row["n_feasible_cheaper_than_dp"],
                 near=row["n_feasible_near_dp_1pct"],
@@ -500,6 +505,13 @@ def write_comparison_md(summary: dict, output_dir: Path) -> Path:
 
     n_dp_best = sum(1 for r in rows if r["best_label"] == "dp_order")
     n_alt_best = len(rows) - n_dp_best
+    n_feas_win = sum(
+        1
+        for r in rows
+        if r["best_label"] != "dp_order"
+        and r["best_feasible"]
+        and float(r["delta_cost_best_vs_dp_ms"]) < -1e-9
+    )
     md.extend(
         [
             "",
@@ -507,10 +519,13 @@ def write_comparison_md(summary: dict, output_dir: Path) -> Path:
             "",
             f"Across {len(rows)} (scene, detector) settings:",
             f"- DP order ranked best in **{n_dp_best}** settings",
-            f"- Some other order beat DP on holdout cost in **{n_alt_best}** settings",
+            f"- Some other order ranked above DP in **{n_alt_best}** settings",
+            f"- Of those, **{n_feas_win}** were feasible *and* cheaper than DP",
             "",
-            "Δcost < 0 means the best non-default ranking beat DP (cheaper). "
-            "Many near-DP orders ⇒ order is weakly identified after annealing.",
+            "Δcost < 0 means the ranked-best policy was cheaper than DP. "
+            "When both DP and best are infeasible, treat cost wins cautiously "
+            "(they may buy speed by missing the accuracy target). "
+            "Many near-DP feasible orders ⇒ order is weakly identified after annealing.",
             "",
         ]
     )
