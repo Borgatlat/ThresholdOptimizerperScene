@@ -1,0 +1,705 @@
+{
+  "runs": {
+    "paper_acc_0.90": {
+      "annealing": {
+        "accuracy_gap": -0.007160498969158047,
+        "cost_gap_ms": -0.05202223988360277,
+        "holdout_accuracy": 0.9083870967741936,
+        "holdout_cost_ms": 6.2735663132069845,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9049999357285462,
+        "holdout_route_counts": {
+          "K0": 25,
+          "K3": 312,
+          "K4": 667,
+          "K6": 546
+        },
+        "holdout_speedup_vs_baseline": 202.24425924764648,
+        "holdout_worst_class_accuracy": 0.8010899182561307,
+        "thresholds": {
+          "K0": 0.7988758683204651,
+          "K1": 0.6367648158754621,
+          "K2": 0.9799265350614275,
+          "K3": 0.0,
+          "K4": 0.8524788192340306,
+          "K6": 0.0
+        },
+        "validation_accuracy": 0.9012265978050356,
+        "validation_cost_ms": 6.325588553090587
+      },
+      "baseline": {
+        "accuracy_gap": -0.0035706699431474753,
+        "cost_gap_ms": -9.164963346136574,
+        "holdout_accuracy": 0.9690322580645161,
+        "holdout_cost_ms": 1268.7927718555352,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9680146276604393,
+        "holdout_route_counts": {
+          "K0": 8,
+          "K2": 20,
+          "K3": 462,
+          "K4": 528,
+          "K6": 337,
+          "detector": 195
+        },
+        "holdout_speedup_vs_baseline": 1.0,
+        "holdout_worst_class_accuracy": 0.9427792915531336,
+        "thresholds": {
+          "K0": 0.95,
+          "K1": 0.95,
+          "K2": 0.9,
+          "K3": 0.9,
+          "K4": 0.95,
+          "K6": 0.95
+        },
+        "validation_accuracy": 0.9654615881213686,
+        "validation_cost_ms": 1277.9577352016718
+      },
+      "detector_mode": "paper",
+      "report": "checkpoints/threshold_experiments/targets_h24/paper_acc_0.90.json",
+      "split": {
+        "holdout_samples": 1550,
+        "initial_layout": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "layout_source": "validation_dp",
+        "specialized_layout": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        },
+        "strategy": "blocked_per_run",
+        "validation_samples": 6196
+      },
+      "status": "ok",
+      "target_accuracy": 0.9,
+      "target_accuracy_source": "explicit"
+    },
+    "paper_acc_0.95": {
+      "annealing": {
+        "accuracy_gap": 0.003032341364876401,
+        "cost_gap_ms": -9.931134843400116,
+        "holdout_accuracy": 0.9470967741935484,
+        "holdout_cost_ms": 305.31752042080603,
+        "holdout_feasible": false,
+        "holdout_macro_accuracy": 0.9451271042539491,
+        "holdout_route_counts": {
+          "K2": 1,
+          "K3": 1450,
+          "K4": 7,
+          "K6": 47,
+          "detector": 45
+        },
+        "holdout_speedup_vs_baseline": 4.155650059344163,
+        "holdout_worst_class_accuracy": 0.8801089918256131,
+        "thresholds": {
+          "K0": 0.999996542930603,
+          "K1": 0.834751078060695,
+          "K2": 0.9487942116601127,
+          "K3": 0.6029707193374634,
+          "K4": 0.0,
+          "K6": 0.0
+        },
+        "validation_accuracy": 0.9501291155584248,
+        "validation_cost_ms": 315.24865526420615
+      },
+      "baseline": {
+        "accuracy_gap": -0.0035706699431474753,
+        "cost_gap_ms": -9.164963346136574,
+        "holdout_accuracy": 0.9690322580645161,
+        "holdout_cost_ms": 1268.7927718555352,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9680146276604393,
+        "holdout_route_counts": {
+          "K0": 8,
+          "K2": 20,
+          "K3": 462,
+          "K4": 528,
+          "K6": 337,
+          "detector": 195
+        },
+        "holdout_speedup_vs_baseline": 1.0,
+        "holdout_worst_class_accuracy": 0.9427792915531336,
+        "thresholds": {
+          "K0": 0.95,
+          "K1": 0.95,
+          "K2": 0.9,
+          "K3": 0.9,
+          "K4": 0.95,
+          "K6": 0.95
+        },
+        "validation_accuracy": 0.9654615881213686,
+        "validation_cost_ms": 1277.9577352016718
+      },
+      "detector_mode": "paper",
+      "report": "checkpoints/threshold_experiments/targets_h24/paper_acc_0.95.json",
+      "split": {
+        "holdout_samples": 1550,
+        "initial_layout": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "layout_source": "validation_dp",
+        "specialized_layout": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        },
+        "strategy": "blocked_per_run",
+        "validation_samples": 6196
+      },
+      "status": "ok",
+      "target_accuracy": 0.95,
+      "target_accuracy_source": "explicit"
+    },
+    "paper_acc_0.98": {
+      "annealing": {
+        "accuracy_gap": -0.00436764614006957,
+        "cost_gap_ms": -61.01636039855907,
+        "holdout_accuracy": 0.984516129032258,
+        "holdout_cost_ms": 1478.1918898004112,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9840634133178106,
+        "holdout_route_counts": {
+          "K2": 8,
+          "K3": 816,
+          "K4": 276,
+          "K6": 223,
+          "detector": 227
+        },
+        "holdout_speedup_vs_baseline": 0.8583410453069462,
+        "holdout_worst_class_accuracy": 0.972972972972973,
+        "thresholds": {
+          "K0": 0.9944222569465637,
+          "K1": 0.9868801832199097,
+          "K2": 0.9627681629998344,
+          "K3": 0.8982217822756086,
+          "K4": 0.996650755405426,
+          "K6": 0.9793515631130764
+        },
+        "validation_accuracy": 0.9801484828921885,
+        "validation_cost_ms": 1539.2082501989703
+      },
+      "baseline": {
+        "accuracy_gap": -0.0035706699431474753,
+        "cost_gap_ms": -9.164963346136574,
+        "holdout_accuracy": 0.9690322580645161,
+        "holdout_cost_ms": 1268.7927718555352,
+        "holdout_feasible": false,
+        "holdout_macro_accuracy": 0.9680146276604393,
+        "holdout_route_counts": {
+          "K0": 8,
+          "K2": 20,
+          "K3": 462,
+          "K4": 528,
+          "K6": 337,
+          "detector": 195
+        },
+        "holdout_speedup_vs_baseline": 1.0,
+        "holdout_worst_class_accuracy": 0.9427792915531336,
+        "thresholds": {
+          "K0": 0.95,
+          "K1": 0.95,
+          "K2": 0.9,
+          "K3": 0.9,
+          "K4": 0.95,
+          "K6": 0.95
+        },
+        "validation_accuracy": 0.9654615881213686,
+        "validation_cost_ms": 1277.9577352016718
+      },
+      "detector_mode": "paper",
+      "report": "checkpoints/threshold_experiments/targets_h24/paper_acc_0.98.json",
+      "split": {
+        "holdout_samples": 1550,
+        "initial_layout": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "layout_source": "validation_dp",
+        "specialized_layout": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        },
+        "strategy": "blocked_per_run",
+        "validation_samples": 6196
+      },
+      "status": "ok",
+      "target_accuracy": 0.98,
+      "target_accuracy_source": "explicit"
+    },
+    "paper_baseline": {
+      "annealing": {
+        "accuracy_gap": -0.0016351860721797173,
+        "cost_gap_ms": -82.97885384158235,
+        "holdout_accuracy": 0.9670967741935483,
+        "holdout_cost_ms": 697.6040755889691,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9659332358130803,
+        "holdout_route_counts": {
+          "K2": 6,
+          "K3": 1128,
+          "K4": 213,
+          "K6": 97,
+          "detector": 106
+        },
+        "holdout_speedup_vs_baseline": 1.8187863521071408,
+        "holdout_worst_class_accuracy": 0.9264305177111717,
+        "thresholds": {
+          "K0": 0.9992000460624695,
+          "K1": 0.9365274906158447,
+          "K2": 0.9396532348224095,
+          "K3": 0.7307737725121635,
+          "K4": 0.9588181291307721,
+          "K6": 0.9994381581033979
+        },
+        "validation_accuracy": 0.9654615881213686,
+        "validation_cost_ms": 780.5829294305514
+      },
+      "baseline": {
+        "accuracy_gap": -0.0035706699431474753,
+        "cost_gap_ms": -9.164963346136574,
+        "holdout_accuracy": 0.9690322580645161,
+        "holdout_cost_ms": 1268.7927718555352,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9680146276604393,
+        "holdout_route_counts": {
+          "K0": 8,
+          "K2": 20,
+          "K3": 462,
+          "K4": 528,
+          "K6": 337,
+          "detector": 195
+        },
+        "holdout_speedup_vs_baseline": 1.0,
+        "holdout_worst_class_accuracy": 0.9427792915531336,
+        "thresholds": {
+          "K0": 0.95,
+          "K1": 0.95,
+          "K2": 0.9,
+          "K3": 0.9,
+          "K4": 0.95,
+          "K6": 0.95
+        },
+        "validation_accuracy": 0.9654615881213686,
+        "validation_cost_ms": 1277.9577352016718
+      },
+      "detector_mode": "paper",
+      "report": "checkpoints/threshold_experiments/targets_h24/paper_baseline.json",
+      "split": {
+        "holdout_samples": 1550,
+        "initial_layout": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "layout_source": "validation_dp",
+        "specialized_layout": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        },
+        "strategy": "blocked_per_run",
+        "validation_samples": 6196
+      },
+      "status": "ok",
+      "target_accuracy": 0.9654615881213686,
+      "target_accuracy_source": "baseline_validation"
+    },
+    "trained_acc_0.90": {
+      "annealing": {
+        "accuracy_gap": -0.008451238051604637,
+        "cost_gap_ms": -0.019289966152943983,
+        "holdout_accuracy": 0.9090322580645162,
+        "holdout_cost_ms": 6.2735663132069845,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9056700881698159,
+        "holdout_route_counts": {
+          "K0": 25,
+          "K3": 312,
+          "K4": 673,
+          "K6": 540
+        },
+        "holdout_speedup_vs_baseline": 2.059736589685198,
+        "holdout_worst_class_accuracy": 0.7983651226158038,
+        "thresholds": {
+          "K0": 0.7988758683204651,
+          "K3": 0.0,
+          "K4": 0.8359688690730503,
+          "K6": 0.5390289000102452
+        },
+        "validation_accuracy": 0.9005810200129115,
+        "validation_cost_ms": 6.2928562793599285
+      },
+      "baseline": {
+        "accuracy_gap": -0.017950602886357414,
+        "cost_gap_ms": -0.34923784676372804,
+        "holdout_accuracy": 0.944516129032258,
+        "holdout_cost_ms": 12.921894083128896,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9424255879274062,
+        "holdout_route_counts": {
+          "K0": 8,
+          "K3": 462,
+          "K4": 528,
+          "K6": 335,
+          "Kdet": 217
+        },
+        "holdout_speedup_vs_baseline": 1.0,
+        "holdout_worst_class_accuracy": 0.896457765667575,
+        "thresholds": {
+          "K0": 0.95,
+          "K3": 0.9,
+          "K4": 0.95,
+          "K6": 0.95
+        },
+        "validation_accuracy": 0.9265655261459006,
+        "validation_cost_ms": 13.271131929892624
+      },
+      "detector_mode": "trained",
+      "report": "checkpoints/threshold_experiments/targets_h24/trained_acc_0.90.json",
+      "split": {
+        "holdout_samples": 1550,
+        "initial_layout": [
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "layout_source": "validation_dp",
+        "specialized_layout": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ]
+        },
+        "strategy": "blocked_per_run",
+        "validation_samples": 6196
+      },
+      "status": "ok",
+      "target_accuracy": 0.9,
+      "target_accuracy_source": "explicit"
+    },
+    "trained_acc_0.95": {
+      "annealing": {
+        "accuracy_gap": -0.0016530956496386695,
+        "cost_gap_ms": -0.19465279182121265,
+        "holdout_accuracy": 0.9393548387096774,
+        "holdout_cost_ms": 15.220536505242794,
+        "holdout_feasible": false,
+        "holdout_macro_accuracy": 0.9372361358143406,
+        "holdout_route_counts": {
+          "K3": 1411,
+          "K4": 20,
+          "K6": 58,
+          "Kdet": 61
+        },
+        "holdout_speedup_vs_baseline": 0.8489775691335112,
+        "holdout_worst_class_accuracy": 0.8719346049046321,
+        "thresholds": {
+          "K0": 0.999988215310233,
+          "K3": 0.6029707193374634,
+          "K4": 0.5000462532043457,
+          "K6": 0.927655645779201
+        },
+        "validation_accuracy": 0.9377017430600387,
+        "validation_cost_ms": 15.415189297064007
+      },
+      "baseline": {
+        "accuracy_gap": -0.017950602886357414,
+        "cost_gap_ms": -0.34923784676372804,
+        "holdout_accuracy": 0.944516129032258,
+        "holdout_cost_ms": 12.921894083128896,
+        "holdout_feasible": false,
+        "holdout_macro_accuracy": 0.9424255879274062,
+        "holdout_route_counts": {
+          "K0": 8,
+          "K3": 462,
+          "K4": 528,
+          "K6": 335,
+          "Kdet": 217
+        },
+        "holdout_speedup_vs_baseline": 1.0,
+        "holdout_worst_class_accuracy": 0.896457765667575,
+        "thresholds": {
+          "K0": 0.95,
+          "K3": 0.9,
+          "K4": 0.95,
+          "K6": 0.95
+        },
+        "validation_accuracy": 0.9265655261459006,
+        "validation_cost_ms": 13.271131929892624
+      },
+      "detector_mode": "trained",
+      "report": "checkpoints/threshold_experiments/targets_h24/trained_acc_0.95.json",
+      "split": {
+        "holdout_samples": 1550,
+        "initial_layout": [
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "layout_source": "validation_dp",
+        "specialized_layout": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ]
+        },
+        "strategy": "blocked_per_run",
+        "validation_samples": 6196
+      },
+      "status": "ok",
+      "target_accuracy": 0.95,
+      "target_accuracy_source": "explicit"
+    },
+    "trained_acc_0.98": {
+      "annealing": {
+        "accuracy_gap": -0.0016530956496386695,
+        "cost_gap_ms": -0.19465279182121265,
+        "holdout_accuracy": 0.9393548387096774,
+        "holdout_cost_ms": 15.220536505242794,
+        "holdout_feasible": false,
+        "holdout_macro_accuracy": 0.9372361358143406,
+        "holdout_route_counts": {
+          "K3": 1411,
+          "K4": 20,
+          "K6": 58,
+          "Kdet": 61
+        },
+        "holdout_speedup_vs_baseline": 0.8489775691335112,
+        "holdout_worst_class_accuracy": 0.8719346049046321,
+        "thresholds": {
+          "K0": 0.999988215310233,
+          "K3": 0.6029707193374634,
+          "K4": 0.5000462532043457,
+          "K6": 0.927655645779201
+        },
+        "validation_accuracy": 0.9377017430600387,
+        "validation_cost_ms": 15.415189297064007
+      },
+      "baseline": {
+        "accuracy_gap": -0.017950602886357414,
+        "cost_gap_ms": -0.34923784676372804,
+        "holdout_accuracy": 0.944516129032258,
+        "holdout_cost_ms": 12.921894083128896,
+        "holdout_feasible": false,
+        "holdout_macro_accuracy": 0.9424255879274062,
+        "holdout_route_counts": {
+          "K0": 8,
+          "K3": 462,
+          "K4": 528,
+          "K6": 335,
+          "Kdet": 217
+        },
+        "holdout_speedup_vs_baseline": 1.0,
+        "holdout_worst_class_accuracy": 0.896457765667575,
+        "thresholds": {
+          "K0": 0.95,
+          "K3": 0.9,
+          "K4": 0.95,
+          "K6": 0.95
+        },
+        "validation_accuracy": 0.9265655261459006,
+        "validation_cost_ms": 13.271131929892624
+      },
+      "detector_mode": "trained",
+      "report": "checkpoints/threshold_experiments/targets_h24/trained_acc_0.98.json",
+      "split": {
+        "holdout_samples": 1550,
+        "initial_layout": [
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "layout_source": "validation_dp",
+        "specialized_layout": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ]
+        },
+        "strategy": "blocked_per_run",
+        "validation_samples": 6196
+      },
+      "status": "ok",
+      "target_accuracy": 0.98,
+      "target_accuracy_source": "explicit"
+    },
+    "trained_baseline": {
+      "annealing": {
+        "accuracy_gap": -0.005692538370228428,
+        "cost_gap_ms": -0.4214690246489763,
+        "holdout_accuracy": 0.932258064516129,
+        "holdout_cost_ms": 8.82849887473351,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9298554656310541,
+        "holdout_route_counts": {
+          "K0": 13,
+          "K3": 501,
+          "K4": 573,
+          "K6": 418,
+          "Kdet": 45
+        },
+        "holdout_speedup_vs_baseline": 1.4636569893111013,
+        "holdout_worst_class_accuracy": 0.8555858310626703,
+        "thresholds": {
+          "K0": 0.90748188325337,
+          "K3": 0.6029707193374634,
+          "K4": 0.9303704925945827,
+          "K6": 0.8820360813822065
+        },
+        "validation_accuracy": 0.9265655261459006,
+        "validation_cost_ms": 9.249967899382487
+      },
+      "baseline": {
+        "accuracy_gap": -0.017950602886357414,
+        "cost_gap_ms": -0.34923784676372804,
+        "holdout_accuracy": 0.944516129032258,
+        "holdout_cost_ms": 12.921894083128896,
+        "holdout_feasible": true,
+        "holdout_macro_accuracy": 0.9424255879274062,
+        "holdout_route_counts": {
+          "K0": 8,
+          "K3": 462,
+          "K4": 528,
+          "K6": 335,
+          "Kdet": 217
+        },
+        "holdout_speedup_vs_baseline": 1.0,
+        "holdout_worst_class_accuracy": 0.896457765667575,
+        "thresholds": {
+          "K0": 0.95,
+          "K3": 0.9,
+          "K4": 0.95,
+          "K6": 0.95
+        },
+        "validation_accuracy": 0.9265655261459006,
+        "validation_cost_ms": 13.271131929892624
+      },
+      "detector_mode": "trained",
+      "report": "checkpoints/threshold_experiments/targets_h24/trained_baseline.json",
+      "split": {
+        "holdout_samples": 1550,
+        "initial_layout": [
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "layout_source": "validation_dp",
+        "specialized_layout": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ]
+        },
+        "strategy": "blocked_per_run",
+        "validation_samples": 6196
+      },
+      "status": "ok",
+      "target_accuracy": 0.9265655261459006,
+      "target_accuracy_source": "baseline_validation"
+    }
+  },
+  "suite": "targets"
+}
