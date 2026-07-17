@@ -161,7 +161,9 @@ def _eligible_mask(payload: dict, candidate_id: str) -> np.ndarray:
     if kind != "specialized":
         return np.ones(n, dtype=bool)
     group = payload["candidates"].set_index("id").loc[candidate_id, "group"]
-    return (labels["true_intermediate_label"].to_numpy() == group).to_numpy(dtype=bool)
+    # ``== group`` already yields a numpy bool array — do not call ``.to_numpy()``
+    # again (that method exists on pandas Series, not on ndarray).
+    return labels["true_intermediate_label"].to_numpy() == group
 
 
 def _confidence_and_pred(payload: dict, candidate_id: str) -> tuple[np.ndarray, np.ndarray]:
@@ -542,36 +544,45 @@ def write_comparison_md(summary: dict, output_dir: Path) -> Path:
             )
         )
 
-    # Count how often joint is the unique cheapest feasible method.
-    joint_wins = 0
-    indep_beats_joint = 0
+    # Count wins among *feasible* policies only.  Raw cost wins from
+    # indep_precision / fixed-P(IDK) often just refuse to accept (cheap but
+    # accuracy collapses) — those must not count as beating joint.
+    joint_cheapest_feasible = 0
+    indep_cheaper_feasible = 0
     compared = 0
-    for key, report in summary.get("runs", {}).items():
+    for _key, report in summary.get("runs", {}).items():
         if report.get("status") != "ok":
             continue
         compared += 1
         joint = report["methods"]["joint_anneal"]
         joint_cost = float(joint["holdout"]["expected_cost"])
-        best_indep_cost = min(
-            float(report["methods"][m]["holdout"]["expected_cost"])
+        joint_feas = bool(joint["holdout_feasible"])
+        feas_indep = [
+            report["methods"][m]
             for m in METHODS
-            if m.startswith("indep_")
-        )
-        if joint_cost < best_indep_cost - 1e-9:
-            joint_wins += 1
+            if m.startswith("indep_") and report["methods"][m]["holdout_feasible"]
+        ]
+        if not feas_indep:
+            if joint_feas:
+                joint_cheapest_feasible += 1
+            continue
+        best_indep_cost = min(float(b["holdout"]["expected_cost"]) for b in feas_indep)
+        if joint_feas and joint_cost <= best_indep_cost + 1e-9:
+            joint_cheapest_feasible += 1
         if best_indep_cost < joint_cost - 1e-9:
-            indep_beats_joint += 1
+            indep_cheaper_feasible += 1
 
     md.extend(
         [
             "",
             "## Verdict",
             "",
-            f"Across {compared} (scene, detector) settings:",
-            f"- Joint cheaper than every independent method in **{joint_wins}** settings",
-            f"- Some independent method cheaper than joint in **{indep_beats_joint}** settings",
+            f"Across {compared} (scene, detector) settings (feasible policies only):",
+            f"- Joint is cheapest feasible (or sole feasible) in **{joint_cheapest_feasible}** settings",
+            f"- Some *feasible* independent method beats joint on cost in **{indep_cheaper_feasible}** settings",
             "",
             "Δcost vs joint < 0 means that method is cheaper than joint anneal. "
+            "Ignore infeasible cheap runs (they miss the accuracy target). "
             "Independent methods never see cascade cost while choosing thresholds.",
             "",
         ]

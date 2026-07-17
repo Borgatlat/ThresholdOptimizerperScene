@@ -1,0 +1,255 @@
+{
+  "detector_mode": "trained",
+  "layout": {
+    "detector": "detector",
+    "expected_cost_dp": 24.81824791461164,
+    "initial": [
+      "K0",
+      "detector"
+    ],
+    "specialized": {
+      "K0:coupe": [
+        "K6",
+        "K2",
+        "detector"
+      ],
+      "K0:suv": [
+        "K4",
+        "detector"
+      ]
+    }
+  },
+  "methods": {
+    "collection": {
+      "delta_acc_vs_joint": -0.013597733711048166,
+      "delta_cost_vs_joint_ms": 9.687281064175952,
+      "holdout": {
+        "accuracy": 0.2395656279508971,
+        "expected_cost": 25.15470805208499,
+        "macro_accuracy": 0.238865921038388,
+        "route_counts": {
+          "K0": 929,
+          "K2": 30,
+          "K4": 713,
+          "K6": 472,
+          "Kdet": 8446
+        },
+        "worst_class_accuracy": 0.16045958795562598
+      },
+      "holdout_feasible": false,
+      "holdout_speedup_vs_collection": 1.0,
+      "method": "collection",
+      "thresholds": {
+        "K0": 0.95,
+        "K2": 0.9,
+        "K4": 0.95,
+        "K6": 0.95
+      },
+      "validation": {
+        "accuracy": 0.3049267014470858,
+        "expected_cost": 24.818247914611632
+      }
+    },
+    "indep_p_idk_fixed": {
+      "delta_acc_vs_joint": -0.00453257790368275,
+      "delta_cost_vs_joint_ms": -7.2699202419364966,
+      "holdout": {
+        "accuracy": 0.2486307837582625,
+        "expected_cost": 8.197506745972543,
+        "macro_accuracy": 0.24788060751221125,
+        "route_counts": {
+          "K0": 3009,
+          "K2": 81,
+          "K4": 4207,
+          "K6": 1467,
+          "Kdet": 1826
+        },
+        "worst_class_accuracy": 0.17591125198098256
+      },
+      "holdout_feasible": false,
+      "holdout_speedup_vs_collection": 3.068580341753737,
+      "method": "indep_p_idk_fixed",
+      "thresholds": {
+        "K0": 0.5672056674957275,
+        "K2": 0.45653778314590454,
+        "K4": 0.6406160593032837,
+        "K6": 0.6171167254447937
+      },
+      "validation": {
+        "accuracy": 0.29442175586034325,
+        "expected_cost": 8.156593105509636
+      }
+    },
+    "indep_p_idk_match": {
+      "delta_acc_vs_joint": -0.013597733711048166,
+      "delta_cost_vs_joint_ms": 9.687281064175952,
+      "holdout": {
+        "accuracy": 0.2395656279508971,
+        "expected_cost": 25.15470805208499,
+        "macro_accuracy": 0.238865921038388,
+        "route_counts": {
+          "K0": 929,
+          "K2": 30,
+          "K4": 713,
+          "K6": 472,
+          "Kdet": 8446
+        },
+        "worst_class_accuracy": 0.16045958795562598
+      },
+      "holdout_feasible": false,
+      "holdout_speedup_vs_collection": 1.0,
+      "method": "indep_p_idk_match",
+      "thresholds": {
+        "K0": 0.9500011134152146,
+        "K2": 0.8999893759263394,
+        "K4": 0.9499945859786275,
+        "K6": 0.9500023479969603
+      },
+      "validation": {
+        "accuracy": 0.3049267014470858,
+        "expected_cost": 24.818247914611632
+      }
+    },
+    "indep_precision": {
+      "delta_acc_vs_joint": -0.009254013220018897,
+      "delta_cost_vs_joint_ms": 14.808038580929477,
+      "holdout": {
+        "accuracy": 0.24390934844192635,
+        "expected_cost": 30.275465568838516,
+        "macro_accuracy": 0.24326050853812536,
+        "route_counts": {
+          "K0": 1,
+          "K2": 4,
+          "K4": 3,
+          "Kdet": 10582
+        },
+        "worst_class_accuracy": 0.1600633914421553
+      },
+      "holdout_feasible": false,
+      "holdout_speedup_vs_collection": 0.8308611471189351,
+      "method": "indep_precision",
+      "thresholds": {
+        "K0": 0.9999697208404541,
+        "K2": 0.9999680519104004,
+        "K4": 0.999962329864502,
+        "K6": 1.0000000000000002
+      },
+      "validation": {
+        "accuracy": 0.30924671277826304,
+        "expected_cost": 30.279413484410178
+      }
+    },
+    "indep_precision_match": {
+      "delta_acc_vs_joint": -0.014542020774315406,
+      "delta_cost_vs_joint_ms": 9.315934550495147,
+      "holdout": {
+        "accuracy": 0.23862134088762985,
+        "expected_cost": 24.783361538404186,
+        "macro_accuracy": 0.23791884916164946,
+        "route_counts": {
+          "K0": 929,
+          "K2": 3,
+          "K4": 738,
+          "K6": 586,
+          "Kdet": 8334
+        },
+        "worst_class_accuracy": 0.16085578446909668
+      },
+      "holdout_feasible": false,
+      "holdout_speedup_vs_collection": 1.0149837023966812,
+      "method": "indep_precision_match",
+      "thresholds": {
+        "K0": 0.9500039219856262,
+        "K2": 0.8989924192428589,
+        "K4": 0.9466479420661926,
+        "K6": 0.6965962648391724
+      },
+      "validation": {
+        "accuracy": 0.30412407639102,
+        "expected_cost": 24.300381391103052
+      }
+    },
+    "joint_anneal": {
+      "anneal_validation_feasible": true,
+      "delta_acc_vs_joint": 0.0,
+      "delta_cost_vs_joint_ms": 0.0,
+      "holdout": {
+        "accuracy": 0.25316336166194525,
+        "expected_cost": 15.46742698790904,
+        "macro_accuracy": 0.2522998383516278,
+        "route_counts": {
+          "K0": 3434,
+          "K4": 3020,
+          "K6": 61,
+          "Kdet": 4075
+        },
+        "worst_class_accuracy": 0.16323296354992076
+      },
+      "holdout_feasible": false,
+      "holdout_speedup_vs_collection": 1.6263020392304774,
+      "method": "joint_anneal",
+      "thresholds": {
+        "K0": 0.0,
+        "K2": 0.9999990463256837,
+        "K4": 0.9090003724000892,
+        "K6": 0.9999986886978149
+      },
+      "validation": {
+        "accuracy": 0.30499752130497393,
+        "expected_cost": 18.670368457829408
+      }
+    }
+  },
+  "outcomes_path": "checkpoints/empirical_outcomes_i29.pkl",
+  "scene": "i29",
+  "split": {
+    "holdout_fraction": 0.2,
+    "holdout_samples": 10590,
+    "per_run": {
+      "run0": {
+        "holdout": 654,
+        "validation": 2618
+      },
+      "run1": {
+        "holdout": 1957,
+        "validation": 7826
+      },
+      "run2": {
+        "holdout": 566,
+        "validation": 2263
+      },
+      "run3": {
+        "holdout": 2209,
+        "validation": 8838
+      },
+      "run4": {
+        "holdout": 638,
+        "validation": 2553
+      },
+      "run5": {
+        "holdout": 1886,
+        "validation": 7546
+      },
+      "run6": {
+        "holdout": 640,
+        "validation": 2559
+      },
+      "run7": {
+        "holdout": 2040,
+        "validation": 8158
+      }
+    },
+    "random_seed": 0,
+    "strategy": "blocked_per_run",
+    "validation_samples": 42361
+  },
+  "status": "ok",
+  "target_accuracy": 0.3049267014470858,
+  "target_accuracy_source": "collection_validation",
+  "tunable_ids": [
+    "K0",
+    "K6",
+    "K2",
+    "K4"
+  ]
+}
