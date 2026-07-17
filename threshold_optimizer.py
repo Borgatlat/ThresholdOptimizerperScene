@@ -383,14 +383,21 @@ def build_fixed_layout_evaluator(
     path: str | Path = DEFAULT_OUTPUT_PATH,
     detector_mode: str = DEFAULT_DETECTOR_MODE,
     detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
+    cascade: Cascade | None = None,
 ) -> FixedLayoutThresholdEvaluator:
-    """Synthesize the current layout, then prepare it for threshold replay."""
-    optimizer, cascade = optimize_empirical_hierarchy(
+    """Prepare threshold replay for a cascade layout.
+
+    If ``cascade`` is None, synthesize the DP-optimal layout from the
+    empirical outcomes.  Passing an explicit ``Cascade`` lets experiments
+    freeze alternate topologies (global-only, 3-stage linear, etc.) while
+    still replaying against the same cached confidence table.
+    """
+    optimizer, synthesized = optimize_empirical_hierarchy(
         path,
         detector_mode=detector_mode,
         detector_cost_ms=detector_cost_ms,
     )
-    return FixedLayoutThresholdEvaluator(optimizer, cascade)
+    return FixedLayoutThresholdEvaluator(optimizer, cascade or synthesized)
 
 
 def _subset_empirical_payload(payload: dict, sample_ids: np.ndarray) -> dict:
@@ -493,13 +500,15 @@ def build_holdout_evaluators(
     holdout_fraction: float = 0.20,
     split_strategy: str = "blocked_per_run",
     random_seed: int = 0,
+    cascade: Cascade | None = None,
 ) -> tuple[FixedLayoutThresholdEvaluator, FixedLayoutThresholdEvaluator, dict]:
     """Build validation/holdout evaluators without letting holdout outcomes pick layout.
 
-    The cascade topology is synthesized from the validation split only, then
-    replayed unchanged on the holdout split.  This is stricter than merely
-    holding out threshold tuning, because it also prevents topology selection
-    from using held-out accept/reject outcomes.
+    The cascade topology is synthesized from the validation split only (unless
+    an explicit ``cascade`` is provided), then replayed unchanged on the
+    holdout split.  This is stricter than merely holding out threshold tuning,
+    because it also prevents topology selection from using held-out
+    accept/reject outcomes.
     """
     payload = load_empirical_outcomes(path)
     validation_payload, holdout_payload, split = split_empirical_outcomes(
@@ -514,7 +523,9 @@ def build_holdout_evaluators(
         detector_mode=detector_mode,
         detector_cost_ms=detector_cost_ms,
     )
-    validation_cascade = validation_optimizer.synthesize()
+    # Explicit cascade = experiment-chosen topology. Otherwise DP picks it
+    # from validation only (holdout never influences structure).
+    validation_cascade = cascade if cascade is not None else validation_optimizer.synthesize()
     holdout_optimizer = HierarchyOptimizer(
         holdout_payload,
         detector_mode=detector_mode,
@@ -537,6 +548,7 @@ def build_holdout_evaluators(
         f"{router_id}:{group}": list(chain)
         for (router_id, group), chain in validation_cascade.specialized.items()
     }
+    split["layout_source"] = "explicit" if cascade is not None else "validation_dp"
     return validation_evaluator, holdout_evaluator, split
 
 
@@ -569,6 +581,7 @@ def optimize_and_evaluate_holdout(
     max_combinations: int = DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS,
     annealing_iterations: int = 2_000,
     random_seed: int = 0,
+    cascade: Cascade | None = None,
 ) -> dict:
     """Optimize on validation data and report the frozen policy on holdout."""
     if method not in {"evaluate", "exhaustive", "anneal", "benchmark"}:
@@ -581,6 +594,7 @@ def optimize_and_evaluate_holdout(
         holdout_fraction=holdout_fraction,
         split_strategy=split_strategy,
         random_seed=random_seed,
+        cascade=cascade,
     )
     baseline_validation = validation_evaluator.evaluate()
     resolved_target_accuracy = (
