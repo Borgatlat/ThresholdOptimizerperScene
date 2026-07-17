@@ -465,9 +465,12 @@ def write_comparison_md(summary: dict, output_dir: Path) -> Path:
             )
         )
 
-    # Verdict paragraph: count wins.
+    # Verdict paragraph: count wins, but flag accuracy regressions.
+    # A cheaper cascade that drops accuracy a lot is NOT an unqualified win
+    # (see a06/paper in the table — big cost drop, ~8pp accuracy loss).
     wins_cost = 0
     wins_acc = 0
+    pareto_or_equal = 0  # cheaper (or equal cost) AND accuracy not worse
     compared = 0
     for row in rows:
         if row["method"] == "one_shot":
@@ -475,10 +478,15 @@ def write_comparison_md(summary: dict, output_dir: Path) -> Path:
         if row["cost_delta_vs_one_shot_ms"] is None:
             continue
         compared += 1
-        if float(row["cost_delta_vs_one_shot_ms"]) < -1e-9:
+        d_cost = float(row["cost_delta_vs_one_shot_ms"])
+        d_acc = float(row["acc_delta_vs_one_shot"] or 0.0)
+        if d_cost < -1e-9:
             wins_cost += 1
-        if row["acc_delta_vs_one_shot"] is not None and float(row["acc_delta_vs_one_shot"]) > 1e-9:
+        if d_acc > 1e-9:
             wins_acc += 1
+        # "Does not hurt accuracy" + "cost no worse" ≈ weakly dominates one-shot.
+        if d_cost <= 1e-9 and d_acc >= -1e-9:
+            pareto_or_equal += 1
 
     md.extend(
         [
@@ -488,8 +496,12 @@ def write_comparison_md(summary: dict, output_dir: Path) -> Path:
             f"Among {compared} alternating runs (N=2 and N=3, both detector modes / scenes):",
             f"- **{wins_cost}** lowered holdout expected cost vs one-shot",
             f"- **{wins_acc}** raised holdout accuracy vs one-shot",
+            f"- **{pareto_or_equal}** were weakly better or equal on both "
+            "(cost ≤ one-shot and accuracy ≥ one-shot)",
             "",
             "Δcost < 0 means alternating is cheaper; Δacc > 0 means more accurate.",
+            "Watch for cost wins that buy speed by sacrificing accuracy "
+            "(e.g. a06/paper).",
             "",
         ]
     )
