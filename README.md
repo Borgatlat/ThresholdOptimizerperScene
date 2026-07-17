@@ -331,3 +331,46 @@ python experiment_threshold_variants.py --suites layouts targets transfer
 ```
 
 See `checkpoints/threshold_experiments/MASTER_SUMMARY.md` for the latest table.
+
+### Paper figures
+
+```bash
+python plot_threshold_experiments.py
+```
+
+PNGs (300 DPI, serif, print-safe colors) land in
+`checkpoints/figures/threshold_experiments/`:
+
+| Figure | Content |
+|--------|---------|
+| `fig0_main_summary.png` | 4-panel teaser (layouts, speedup, transfer, trained-Kdet) |
+| `fig1_layouts_accuracy_cost.png` | Accuracy + cost bars by cascade layout |
+| `fig2_layouts_pareto.png` | Accuracy–efficiency arrows (baseline → optimized) |
+| `fig3_layouts_speedup.png` | Speedup ranking by layout |
+| `fig4_targets_accuracy_cost.png` | Target accuracy sweep (paper vs trained Kdet) |
+| `fig5_scenes_trained_kdet.png` | Per-scene trained-Kdet retune |
+| `fig6_transfer_zero_shot_vs_retune.png` | h24 layout transfer |
+| `fig7_layouts_by_scene_heatmaps.png` | Layout × scene accuracy/speedup |
+| `fig8_search_settings.png` | Grid density / holdout-split sensitivity |
+
+### Promising next threshold-optimizer experiments
+
+These stay in “thresholds + topology” land (no scene-switching yet):
+
+1. **Per-scene joint bank** — optimize thresholds independently on each scene’s
+   outcomes; store `scene → {Ki: H_i}` (fills `scene_threshold_bank.json`).
+2. **Shared structure, per-scene thresholds** — freeze one topology (e.g. h24
+   DP-optimal), retune only thresholds per scene (partially done in transfer).
+3. **Alternating structure ↔ thresholds** — (a) DP synthesize, (b) tune
+   thresholds, (c) rebuild empirical accept tables at new thresholds, (d)
+   re-synthesize cascade; repeat.
+4. **Sequence-order ablations** — exhaust small permutations of initial-chain
+   order (K0/K2/K3…) with the same threshold tuner.
+5. **Independent vs joint thresholds** — calibrate each Ki alone (precision /
+   P(IDK) matching) vs the current joint end-to-end anneal.
+6. **Constraint variants** — optimize under macro-accuracy or worst-class
+   accuracy floors, not only micro accuracy.
+7. **Detector-cost sensitivity** — paper Kdet cost sweep (1e2…1e4 ms) with
+   threshold retune after each structure change.
+8. **Train/tune/test across scenes** — tune on scene A, select on B, report on C
+   (stronger generalization claim than single-scene holdout).
