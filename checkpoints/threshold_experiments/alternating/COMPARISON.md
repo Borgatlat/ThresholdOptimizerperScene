@@ -42,6 +42,8 @@ All methods for a given (scene, detector_mode) share the **same** `blocked_per_r
 Among 20 alternating runs (N=2 and N=3, both detector modes / scenes):
 - **18** lowered holdout expected cost vs one-shot
 - **10** raised holdout accuracy vs one-shot
+- **13** were weakly better or equal on both (cost ≤ one-shot and accuracy ≥ one-shot)
 
 Δcost < 0 means alternating is cheaper; Δacc > 0 means more accurate.
+Watch for cost wins that buy speed by sacrificing accuracy (e.g. a06/paper).
 
