@@ -302,7 +302,7 @@ def independent_thresholds(
         confidence, prediction = _confidence_and_pred(validation_payload, candidate_id)
         true_label = _true_label_vector(validation_payload, candidate_id)
         eligible = _eligible_mask(validation_payload, candidate_id)
-        coll_t, coll_prec, coll_p_idk = collection_precision_and_p_idk(
+        _coll_t, coll_prec, coll_p_idk = collection_precision_and_p_idk(
             validation_payload, candidate_id
         )
 
