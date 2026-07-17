@@ -41,6 +41,14 @@
     {
       "file": "checkpoints/figures/threshold_experiments/fig8_search_settings.png",
       "name": "fig8_search_settings.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig9_per_scene_thresholds.png",
+      "name": "fig9_per_scene_thresholds.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig10_per_scene_threshold_values.png",
+      "name": "fig10_per_scene_threshold_values.png"
     }
   ]
 }
