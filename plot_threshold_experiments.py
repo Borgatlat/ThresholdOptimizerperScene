@@ -524,6 +524,116 @@ def fig_main_summary(results_dir: Path, figures_dir: Path) -> Path:
     return _save(fig, figures_dir / "fig0_main_summary.png")
 
 
+def fig_per_scene_thresholds(results_dir: Path, figures_dir: Path) -> Path | None:
+    """Per-scene threshold bank: structure-flexible vs shared-h24 wiring."""
+    root = results_dir / "per_scene_thresholds"
+    comparison_path = root / "COMPARISON.json"
+    if not comparison_path.is_file():
+        print(f"Skipping per-scene figures (missing {comparison_path})")
+        return None
+
+    table = _load(comparison_path)["table"]
+    # Prefer paper Kdet for the main paper figure (matches prior suites).
+    paper_rows = [r for r in table if r.get("detector_mode") == "paper"]
+    if not paper_rows:
+        paper_rows = table
+
+    scenes = [s for s in SCENE_ORDER if any(r["scene"] == s for r in paper_rows)]
+    modes = []
+    for r in paper_rows:
+        if r["mode"] not in modes:
+            modes.append(r["mode"])
+
+    mode_labels = {
+        "per_scene_structure": "Per-scene structure + thresholds",
+        "shared_h24_structure": "Shared h24 structure, per-scene thresholds",
+    }
+    mode_colors = {
+        "per_scene_structure": C_OPT,
+        "shared_h24_structure": C_PAPER,
+    }
+
+    fig, axes = plt.subplots(1, 3, figsize=(12.8, 4.0), constrained_layout=True)
+    x = np.arange(len(scenes))
+    width = 0.36 if len(modes) <= 2 else 0.25
+
+    for ax, field, title, ylabel, is_pct in (
+        (axes[0], "opt_holdout_acc", "(a) Holdout accuracy", "Accuracy (%)", True),
+        (axes[1], "opt_holdout_cost_ms", "(b) Expected cost", "Cost (ms)", False),
+        (axes[2], "holdout_speedup_vs_baseline", "(c) Speedup vs baseline", "Speedup (×)", False),
+    ):
+        for i, mode in enumerate(modes):
+            vals = []
+            for scene in scenes:
+                match = next(
+                    (r for r in paper_rows if r["scene"] == scene and r["mode"] == mode),
+                    None,
+                )
+                v = match.get(field) if match else None
+                if v is None:
+                    vals.append(0.0)
+                else:
+                    vals.append(100 * float(v) if is_pct else float(v))
+            offset = (i - (len(modes) - 1) / 2) * width
+            ax.bar(
+                x + offset,
+                vals,
+                width,
+                color=mode_colors.get(mode, C_BASE),
+                label=mode_labels.get(mode, mode),
+                zorder=3,
+            )
+        ax.set_xticks(x, scenes)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.yaxis.grid(True, color=C_GRID, linewidth=0.7, zorder=0)
+        if field == "holdout_speedup_vs_baseline":
+            ax.axhline(1.0, color=C_TEXT, lw=0.9, linestyle="--", alpha=0.55)
+        if field == "opt_holdout_acc":
+            ax.set_ylim(0, 100)
+        ax.legend(frameon=False, fontsize=8)
+
+    fig.suptitle("Per-scene threshold bank (paper Kdet, baseline-accuracy target)", y=1.03)
+    return _save(fig, figures_dir / "fig9_per_scene_thresholds.png")
+
+
+def fig_per_scene_threshold_heatmap(results_dir: Path, figures_dir: Path) -> Path | None:
+    """Heatmap of optimized H_i values in the per-scene bank."""
+    bank_path = (
+        results_dir
+        / "per_scene_thresholds"
+        / "scene_threshold_bank_paper.json"
+    )
+    if not bank_path.is_file():
+        # Fall back to mode-qualified name.
+        alt = results_dir / "per_scene_thresholds" / "scene_threshold_bank_per_scene_structure_paper.json"
+        bank_path = alt if alt.is_file() else bank_path
+    if not bank_path.is_file():
+        print(f"Skipping threshold heatmap (missing bank at {bank_path})")
+        return None
+
+    bank = _load(bank_path)["threshold_bank"]
+    kis = ["K0", "K1", "K2", "K3", "K4", "K5", "K6"]
+    scenes = [s for s in SCENE_ORDER if s in bank]
+    data = np.array([[float(bank[s][k]) for k in kis] for s in scenes])
+
+    fig, ax = plt.subplots(figsize=(7.2, 3.8), constrained_layout=True)
+    im = ax.imshow(data, cmap="YlOrBr", aspect="auto", vmin=0.0, vmax=1.0)
+    ax.set_xticks(np.arange(len(kis)), kis)
+    ax.set_yticks(np.arange(len(scenes)), scenes)
+    ax.set_xlabel("Classifier")
+    ax.set_ylabel("Scene")
+    ax.set_title("Optimized per-scene confidence thresholds (paper Kdet)")
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            val = data[i, j]
+            text_color = "white" if val > 0.62 else C_TEXT
+            ax.text(j, i, f"{val:.2f}", ha="center", va="center", color=text_color, fontsize=8)
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar.set_label("Threshold Hᵢ", fontsize=9)
+    return _save(fig, figures_dir / "fig10_per_scene_threshold_values.png")
+
+
 def write_plot_manifest(figures_dir: Path, paths: list[Path]) -> Path:
     payload = {
         "description": "Publication figures for threshold-optimizer experiments.",
@@ -563,6 +673,12 @@ def main() -> None:
         fig_layouts_by_scene_heatmaps(args.results_dir, args.figures_dir),
         fig_search_settings(args.results_dir, args.figures_dir),
     ]
+    for optional in (
+        fig_per_scene_thresholds(args.results_dir, args.figures_dir),
+        fig_per_scene_threshold_heatmap(args.results_dir, args.figures_dir),
+    ):
+        if optional is not None:
+            paths.append(optional)
     write_plot_manifest(args.figures_dir, paths)
 
     if args.show_paths:
