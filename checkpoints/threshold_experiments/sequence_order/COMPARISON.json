@@ -1,0 +1,260 @@
+{
+  "table": [
+    {
+      "best_feasible": false,
+      "best_holdout_acc": 0.5886294027565084,
+      "best_holdout_cost_ms": 2745.0073549539275,
+      "best_label": "perm_K2>K3>K0>K1",
+      "best_order": [
+        "K2",
+        "K3",
+        "K0",
+        "K1"
+      ],
+      "delta_acc_best_vs_dp": -0.050535987748851485,
+      "delta_cost_best_vs_dp_ms": -629.1888999183716,
+      "detector_mode": "paper",
+      "dp_feasible": false,
+      "dp_holdout_acc": 0.6391653905053599,
+      "dp_holdout_cost_ms": 3374.196254872299,
+      "dp_order": [
+        "K0",
+        "K3",
+        "K2",
+        "K1"
+      ],
+      "n_feasible_cheaper_than_dp": 0,
+      "n_feasible_near_dp_1pct": 0,
+      "n_orders": 29,
+      "scene": "a06"
+    },
+    {
+      "best_feasible": true,
+      "best_holdout_acc": 0.39452526799387444,
+      "best_holdout_cost_ms": 8.919122775801188,
+      "best_label": "ref_K0>K3",
+      "best_order": [
+        "K0",
+        "K3"
+      ],
+      "delta_acc_best_vs_dp": 0.05206738131699851,
+      "delta_cost_best_vs_dp_ms": -0.5386318979645086,
+      "detector_mode": "trained",
+      "dp_feasible": false,
+      "dp_holdout_acc": 0.34245788667687593,
+      "dp_holdout_cost_ms": 9.457754673765697,
+      "dp_order": [
+        "K0"
+      ],
+      "n_feasible_cheaper_than_dp": 1,
+      "n_feasible_near_dp_1pct": 1,
+      "n_orders": 6,
+      "scene": "a06"
+    },
+    {
+      "best_feasible": true,
+      "best_holdout_acc": 0.9137064343163539,
+      "best_holdout_cost_ms": 2296.8530321329276,
+      "best_label": "perm_K2>K0>K3>K1",
+      "best_order": [
+        "K2",
+        "K0",
+        "K3",
+        "K1"
+      ],
+      "delta_acc_best_vs_dp": -0.0018431635388740375,
+      "delta_cost_best_vs_dp_ms": -45.523794514361725,
+      "detector_mode": "paper",
+      "dp_feasible": true,
+      "dp_holdout_acc": 0.9155495978552279,
+      "dp_holdout_cost_ms": 2342.3768266472894,
+      "dp_order": [
+        "K0",
+        "K3",
+        "K2",
+        "K1"
+      ],
+      "n_feasible_cheaper_than_dp": 5,
+      "n_feasible_near_dp_1pct": 9,
+      "n_orders": 29,
+      "scene": "h08"
+    },
+    {
+      "best_feasible": true,
+      "best_holdout_acc": 0.7640750670241286,
+      "best_holdout_cost_ms": 10.617247313299382,
+      "best_label": "ref_K0>K3",
+      "best_order": [
+        "K0",
+        "K3"
+      ],
+      "delta_acc_best_vs_dp": 0.00217828418230559,
+      "delta_cost_best_vs_dp_ms": -5.354230926765675,
+      "detector_mode": "trained",
+      "dp_feasible": true,
+      "dp_holdout_acc": 0.761896782841823,
+      "dp_holdout_cost_ms": 15.971478240065057,
+      "dp_order": [
+        "K0"
+      ],
+      "n_feasible_cheaper_than_dp": 5,
+      "n_feasible_near_dp_1pct": 5,
+      "n_orders": 6,
+      "scene": "h08"
+    },
+    {
+      "best_feasible": true,
+      "best_holdout_acc": 0.9670967741935483,
+      "best_holdout_cost_ms": 702.9873902106885,
+      "best_label": "swap_1_2",
+      "best_order": [
+        "K0",
+        "K2",
+        "K3",
+        "K1"
+      ],
+      "delta_acc_best_vs_dp": -0.00064516129032266,
+      "delta_cost_best_vs_dp_ms": -2.000920428073755,
+      "detector_mode": "paper",
+      "dp_feasible": true,
+      "dp_holdout_acc": 0.967741935483871,
+      "dp_holdout_cost_ms": 704.9883106387623,
+      "dp_order": [
+        "K0",
+        "K3",
+        "K2",
+        "K1"
+      ],
+      "n_feasible_cheaper_than_dp": 1,
+      "n_feasible_near_dp_1pct": 4,
+      "n_orders": 29,
+      "scene": "h24"
+    },
+    {
+      "best_feasible": true,
+      "best_holdout_acc": 0.9309677419354838,
+      "best_holdout_cost_ms": 8.895497747046512,
+      "best_label": "dp_order",
+      "best_order": [
+        "K0",
+        "K3"
+      ],
+      "delta_acc_best_vs_dp": 0.0,
+      "delta_cost_best_vs_dp_ms": 0.0,
+      "detector_mode": "trained",
+      "dp_feasible": true,
+      "dp_holdout_acc": 0.9309677419354838,
+      "dp_holdout_cost_ms": 8.895497747046512,
+      "dp_order": [
+        "K0",
+        "K3"
+      ],
+      "n_feasible_cheaper_than_dp": 0,
+      "n_feasible_near_dp_1pct": 0,
+      "n_orders": 6,
+      "scene": "h24"
+    },
+    {
+      "best_feasible": true,
+      "best_holdout_acc": 0.7317280453257791,
+      "best_holdout_cost_ms": 5635.338344706685,
+      "best_label": "perm_K0>K1>K2>K3",
+      "best_order": [
+        "K0",
+        "K1",
+        "K2",
+        "K3"
+      ],
+      "delta_acc_best_vs_dp": -0.011709159584513684,
+      "delta_cost_best_vs_dp_ms": -148.61649828459213,
+      "detector_mode": "paper",
+      "dp_feasible": true,
+      "dp_holdout_acc": 0.7434372049102927,
+      "dp_holdout_cost_ms": 5783.9548429912775,
+      "dp_order": [
+        "K0",
+        "K2",
+        "K3",
+        "K1"
+      ],
+      "n_feasible_cheaper_than_dp": 20,
+      "n_feasible_near_dp_1pct": 23,
+      "n_orders": 29,
+      "scene": "i29"
+    },
+    {
+      "best_feasible": false,
+      "best_holdout_acc": 0.2563739376770538,
+      "best_holdout_cost_ms": 7.428251976412828,
+      "best_label": "ref_K0>K3",
+      "best_order": [
+        "K0",
+        "K3"
+      ],
+      "delta_acc_best_vs_dp": 0.003210576015108546,
+      "delta_cost_best_vs_dp_ms": -8.039175011496212,
+      "detector_mode": "trained",
+      "dp_feasible": false,
+      "dp_holdout_acc": 0.25316336166194525,
+      "dp_holdout_cost_ms": 15.46742698790904,
+      "dp_order": [
+        "K0"
+      ],
+      "n_feasible_cheaper_than_dp": 0,
+      "n_feasible_near_dp_1pct": 0,
+      "n_orders": 6,
+      "scene": "i29"
+    },
+    {
+      "best_feasible": true,
+      "best_holdout_acc": 0.7795634920634921,
+      "best_holdout_cost_ms": 4004.2470441700198,
+      "best_label": "perm_K0>K1>K2>K3",
+      "best_order": [
+        "K0",
+        "K1",
+        "K2",
+        "K3"
+      ],
+      "delta_acc_best_vs_dp": -0.003373015873015861,
+      "delta_cost_best_vs_dp_ms": -101.68608517641132,
+      "detector_mode": "paper",
+      "dp_feasible": false,
+      "dp_holdout_acc": 0.7829365079365079,
+      "dp_holdout_cost_ms": 4105.933129346431,
+      "dp_order": [
+        "K0",
+        "K3",
+        "K2",
+        "K1"
+      ],
+      "n_feasible_cheaper_than_dp": 2,
+      "n_feasible_near_dp_1pct": 2,
+      "n_orders": 29,
+      "scene": "s31"
+    },
+    {
+      "best_feasible": true,
+      "best_holdout_acc": 0.49067460317460315,
+      "best_holdout_cost_ms": 11.834854716333096,
+      "best_label": "ref_K0>K3",
+      "best_order": [
+        "K0",
+        "K3"
+      ],
+      "delta_acc_best_vs_dp": -0.005555555555555591,
+      "delta_cost_best_vs_dp_ms": -11.273055546897735,
+      "detector_mode": "trained",
+      "dp_feasible": true,
+      "dp_holdout_acc": 0.49623015873015874,
+      "dp_holdout_cost_ms": 23.10791026323083,
+      "dp_order": [
+        "K0"
+      ],
+      "n_feasible_cheaper_than_dp": 3,
+      "n_feasible_near_dp_1pct": 3,
+      "n_orders": 6,
+      "scene": "s31"
+    }
+  ]
+}
