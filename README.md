@@ -353,14 +353,26 @@ PNGs (300 DPI, serif, print-safe colors) land in
 | `fig7_layouts_by_scene_heatmaps.png` | Layout × scene accuracy/speedup |
 | `fig8_search_settings.png` | Grid density / holdout-split sensitivity |
 
+### Per-scene threshold bank
+
+```bash
+python experiment_per_scene_thresholds.py
+python plot_threshold_experiments.py   # regenerates fig9 / fig10 too
+```
+
+Writes:
+- `checkpoints/scene_threshold_bank_{paper,trained}.json` (detector-ready bank)
+- `checkpoints/threshold_experiments/per_scene_thresholds/COMPARISON.md`
+- figures `fig9_per_scene_thresholds.png`, `fig10_per_scene_threshold_values.png`
+
+Two modes: **per-scene structure+thresholds** vs **shared h24 structure + per-scene thresholds**.
+
 ### Promising next threshold-optimizer experiments
 
 These stay in “thresholds + topology” land (no scene-switching yet):
 
-1. **Per-scene joint bank** — optimize thresholds independently on each scene’s
-   outcomes; store `scene → {Ki: H_i}` (fills `scene_threshold_bank.json`).
-2. **Shared structure, per-scene thresholds** — freeze one topology (e.g. h24
-   DP-optimal), retune only thresholds per scene (partially done in transfer).
+1. ~~**Per-scene joint bank**~~ — done (`experiment_per_scene_thresholds.py`).
+2. ~~**Shared structure, per-scene thresholds**~~ — done (same script, `shared_h24_structure` mode).
 3. **Alternating structure ↔ thresholds** — (a) DP synthesize, (b) tune
    thresholds, (c) rebuild empirical accept tables at new thresholds, (d)
    re-synthesize cascade; repeat.
