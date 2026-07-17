@@ -314,3 +314,20 @@ return current policy
 # Notes and Limitations
 - Performance differs quite a bit. It performs worse when we use a real deterministic classifier compared to the 10000ms one referenced in the paper
 - Accuracy differs between validation and holdout set.
+
+## Threshold-optimizer experiment variants
+
+`experiment_threshold_variants.py` sweeps the threshold optimizer across
+**layouts**, **accuracy targets**, **detector modes**, **scenes**, **search
+settings**, and **h24→scene transfer**. It does **not** train per-scene
+classifiers or run scene switching (those are separate, later experiments).
+
+```bash
+# Full suite (writes checkpoints/threshold_experiments/)
+python experiment_threshold_variants.py
+
+# Subset
+python experiment_threshold_variants.py --suites layouts targets transfer
+```
+
+See `checkpoints/threshold_experiments/MASTER_SUMMARY.md` for the latest table.
