@@ -1,0 +1,732 @@
+{
+  "table": [
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 22.611869082647196,
+      "detector_cost_ms": 100.0,
+      "feasible": true,
+      "holdout_acc": 0.9664516129032258,
+      "holdout_cost_ms": 18.276961307374446,
+      "label": "paper_100",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h24",
+      "speedup": 1.2371788013537943
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 41.67638521167945,
+      "detector_cost_ms": 250.0,
+      "feasible": true,
+      "holdout_acc": 0.9664516129032258,
+      "holdout_cost_ms": 29.1156709847938,
+      "label": "paper_250",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h24",
+      "speedup": 1.431407341889724
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 73.45057876006655,
+      "detector_cost_ms": 500.0,
+      "feasible": true,
+      "holdout_acc": 0.9670967741935483,
+      "holdout_cost_ms": 46.361827935178525,
+      "label": "paper_500",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h24",
+      "speedup": 1.5842899650713202
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 136.99896585684075,
+      "detector_cost_ms": 1000.0,
+      "feasible": true,
+      "holdout_acc": 0.9670967741935483,
+      "holdout_cost_ms": 81.20053761259788,
+      "label": "paper_1000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h24",
+      "speedup": 1.6871682119945226
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 325.244384758761,
+      "detector_cost_ms": 2500.0,
+      "feasible": true,
+      "holdout_acc": 0.9670967741935483,
+      "holdout_cost_ms": 183.57258840235542,
+      "label": "paper_2500",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h24",
+      "speedup": 1.7717481002440765
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 639.7605137910191,
+      "detector_cost_ms": 5000.0,
+      "feasible": true,
+      "holdout_acc": 0.9670967741935483,
+      "holdout_cost_ms": 354.5403303378393,
+      "label": "paper_5000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h24",
+      "speedup": 1.8044788111451107
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 1268.7927718555352,
+      "detector_cost_ms": 10000.0,
+      "feasible": true,
+      "holdout_acc": 0.9670967741935483,
+      "holdout_cost_ms": 696.4758142088072,
+      "label": "paper_10000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h24",
+      "speedup": 1.821732709120527
+    },
+    {
+      "chain_len": 2,
+      "collection_holdout_cost_ms": 12.921894083128896,
+      "detector_cost_ms": 28.28079699887894,
+      "feasible": true,
+      "holdout_acc": 0.9341935483870968,
+      "holdout_cost_ms": 9.371816090246918,
+      "label": "trained_ref",
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "mode": "trained",
+      "scene": "h24",
+      "speedup": 1.3788036340764818
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 42.80198494596973,
+      "detector_cost_ms": 100.0,
+      "feasible": true,
+      "holdout_acc": 0.9135388739946381,
+      "holdout_cost_ms": 37.84714823277862,
+      "label": "paper_100",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h08",
+      "speedup": 1.1309170424866999
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 86.71116725159976,
+      "detector_cost_ms": 250.0,
+      "feasible": true,
+      "holdout_acc": 0.9155495978552279,
+      "holdout_cost_ms": 74.07882686455171,
+      "label": "paper_250",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h08",
+      "speedup": 1.1705256538436475
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 159.89313776098314,
+      "detector_cost_ms": 500.0,
+      "feasible": true,
+      "holdout_acc": 0.9158847184986595,
+      "holdout_cost_ms": 133.51391925456994,
+      "label": "paper_500",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h08",
+      "speedup": 1.1975765422338935
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 306.2570787797499,
+      "detector_cost_ms": 1000.0,
+      "feasible": true,
+      "holdout_acc": 0.9160522788203753,
+      "holdout_cost_ms": 251.20016078084524,
+      "label": "paper_1000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h08",
+      "speedup": 1.219175488693011
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 746.5586130020582,
+      "detector_cost_ms": 2500.0,
+      "feasible": true,
+      "holdout_acc": 0.9147117962466488,
+      "holdout_cost_ms": 597.6176470521143,
+      "label": "paper_2500",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h08",
+      "speedup": 1.2492245111646707
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 1477.5405164873127,
+      "detector_cost_ms": 5000.0,
+      "feasible": true,
+      "holdout_acc": 0.9152144772117963,
+      "holdout_cost_ms": 1177.8343069666596,
+      "label": "paper_5000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h08",
+      "speedup": 1.254455323425332
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 2939.504323457822,
+      "detector_cost_ms": 10000.0,
+      "feasible": true,
+      "holdout_acc": 0.9153820375335121,
+      "holdout_cost_ms": 2339.0167071064034,
+      "label": "paper_10000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "h08",
+      "speedup": 1.2567265186806988
+    },
+    {
+      "chain_len": 1,
+      "collection_holdout_cost_ms": 20.610792824000384,
+      "detector_cost_ms": 28.28079699887894,
+      "feasible": true,
+      "holdout_acc": 0.761896782841823,
+      "holdout_cost_ms": 15.83979500847386,
+      "label": "trained_ref",
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "mode": "trained",
+      "scene": "h08",
+      "speedup": 1.3012032550278694
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 60.8378233973804,
+      "detector_cost_ms": 100.0,
+      "feasible": false,
+      "holdout_acc": 0.7833333333333333,
+      "holdout_cost_ms": 57.5375502818572,
+      "label": "paper_100",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "s31",
+      "speedup": 1.0573585962446483
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 128.267830127503,
+      "detector_cost_ms": 250.0,
+      "feasible": false,
+      "holdout_acc": 0.7833333333333333,
+      "holdout_cost_ms": 118.32164307909572,
+      "label": "paper_250",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "s31",
+      "speedup": 1.0840605893357858
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 240.66862377829665,
+      "detector_cost_ms": 500.0,
+      "feasible": false,
+      "holdout_acc": 0.7843253968253968,
+      "holdout_cost_ms": 219.26581440962775,
+      "label": "paper_500",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "s31",
+      "speedup": 1.097611246086381
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 465.470211079884,
+      "detector_cost_ms": 1000.0,
+      "feasible": true,
+      "holdout_acc": 0.7861111111111111,
+      "holdout_cost_ms": 427.9753388854246,
+      "label": "paper_1000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "s31",
+      "speedup": 1.0876098896074415
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 1140.7315782341745,
+      "detector_cost_ms": 2500.0,
+      "feasible": false,
+      "holdout_acc": 0.783531746031746,
+      "holdout_cost_ms": 1022.93900355304,
+      "label": "paper_2500",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "s31",
+      "speedup": 1.1151511226690918
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 2262.259356011952,
+      "detector_cost_ms": 5000.0,
+      "feasible": false,
+      "holdout_acc": 0.7833333333333333,
+      "holdout_cost_ms": 2023.934886586977,
+      "label": "paper_5000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "s31",
+      "speedup": 1.117753031979635
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 4505.314911567509,
+      "detector_cost_ms": 10000.0,
+      "feasible": false,
+      "holdout_acc": 0.7803571428571429,
+      "holdout_cost_ms": 4014.913832422463,
+      "label": "paper_10000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "s31",
+      "speedup": 1.1221448578011335
+    },
+    {
+      "chain_len": 1,
+      "collection_holdout_cost_ms": 24.423705986209537,
+      "detector_cost_ms": 28.28079699887894,
+      "feasible": true,
+      "holdout_acc": 0.49563492063492065,
+      "holdout_cost_ms": 22.900813126346623,
+      "label": "trained_ref",
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "mode": "trained",
+      "scene": "s31",
+      "speedup": 1.0664995103650217
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 55.76774844760271,
+      "detector_cost_ms": 100.0,
+      "feasible": false,
+      "holdout_acc": 0.6096860643185299,
+      "holdout_cost_ms": 45.07479055538831,
+      "label": "paper_100",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "a06",
+      "speedup": 1.2372270122714113
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 112.33359837103303,
+      "detector_cost_ms": 250.0,
+      "feasible": false,
+      "holdout_acc": 0.6276799387442573,
+      "holdout_cost_ms": 96.3442593209613,
+      "label": "paper_250",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "a06",
+      "speedup": 1.1659604751000767
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 207.25418289895282,
+      "detector_cost_ms": 500.0,
+      "feasible": false,
+      "holdout_acc": 0.6079632465543645,
+      "holdout_cost_ms": 166.6529965968343,
+      "label": "paper_500",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "a06",
+      "speedup": 1.2436271002095487
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 394.9456070949712,
+      "detector_cost_ms": 1000.0,
+      "feasible": false,
+      "holdout_acc": 0.6684532924961715,
+      "holdout_cost_ms": 394.8854534320297,
+      "label": "paper_1000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "a06",
+      "speedup": 1.0001523319292183
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 958.0198796830264,
+      "detector_cost_ms": 2500.0,
+      "feasible": false,
+      "holdout_acc": 0.6785987748851455,
+      "holdout_cost_ms": 999.0758029455692,
+      "label": "paper_2500",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "a06",
+      "speedup": 0.9589060978741574
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 1896.4770006631184,
+      "detector_cost_ms": 5000.0,
+      "feasible": false,
+      "holdout_acc": 0.6745788667687596,
+      "holdout_cost_ms": 1929.7708203917966,
+      "label": "paper_5000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "a06",
+      "speedup": 0.982747267511321
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 3773.391242623302,
+      "detector_cost_ms": 10000.0,
+      "feasible": false,
+      "holdout_acc": 0.6642419601837672,
+      "holdout_cost_ms": 3713.209242050208,
+      "label": "paper_10000",
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "a06",
+      "speedup": 1.0162075435694717
+    },
+    {
+      "chain_len": 1,
+      "collection_holdout_cost_ms": 27.301226459563527,
+      "detector_cost_ms": 28.28079699887894,
+      "feasible": false,
+      "holdout_acc": 0.34245788667687593,
+      "holdout_cost_ms": 9.457754673765697,
+      "label": "trained_ref",
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "mode": "trained",
+      "scene": "a06",
+      "speedup": 2.886649886922186
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 76.33855734534309,
+      "detector_cost_ms": 100.0,
+      "feasible": true,
+      "holdout_acc": 0.7430594900849858,
+      "holdout_cost_ms": 74.4613833135528,
+      "label": "paper_100",
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "i29",
+      "speedup": 1.0252100343594963
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 165.7294921895357,
+      "detector_cost_ms": 250.0,
+      "feasible": true,
+      "holdout_acc": 0.7404154863078376,
+      "holdout_cost_ms": 161.17436134600732,
+      "label": "paper_250",
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "i29",
+      "speedup": 1.0282621305615072
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 314.7143835965234,
+      "detector_cost_ms": 500.0,
+      "feasible": true,
+      "holdout_acc": 0.749480642115203,
+      "holdout_cost_ms": 308.7824224971835,
+      "label": "paper_500",
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "i29",
+      "speedup": 1.019210812103121
+    },
+    {
+      "chain_len": 3,
+      "collection_holdout_cost_ms": 612.6841664104988,
+      "detector_cost_ms": 1000.0,
+      "feasible": true,
+      "holdout_acc": 0.7366383380547686,
+      "holdout_cost_ms": 588.850886290661,
+      "label": "paper_1000",
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "i29",
+      "speedup": 1.0404742196619086
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 1508.7995138992565,
+      "detector_cost_ms": 2500.0,
+      "feasible": true,
+      "holdout_acc": 0.7475920679886685,
+      "holdout_cost_ms": 1478.4174397104252,
+      "label": "paper_2500",
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "i29",
+      "speedup": 1.0205504030003745
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 2996.2877103109654,
+      "detector_cost_ms": 5000.0,
+      "feasible": true,
+      "holdout_acc": 0.7351274787535411,
+      "holdout_cost_ms": 2857.2406626890665,
+      "label": "paper_5000",
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "i29",
+      "speedup": 1.0486648007770671
+    },
+    {
+      "chain_len": 4,
+      "collection_holdout_cost_ms": 5971.264103134385,
+      "detector_cost_ms": 10000.0,
+      "feasible": true,
+      "holdout_acc": 0.7322946175637394,
+      "holdout_cost_ms": 5638.781283930401,
+      "label": "paper_10000",
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "mode": "paper",
+      "scene": "i29",
+      "speedup": 1.0589635955825252
+    },
+    {
+      "chain_len": 1,
+      "collection_holdout_cost_ms": 25.15470805208499,
+      "detector_cost_ms": 28.28079699887894,
+      "feasible": false,
+      "holdout_acc": 0.24022662889518415,
+      "holdout_cost_ms": 24.86456188400959,
+      "label": "trained_ref",
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "mode": "trained",
+      "scene": "i29",
+      "speedup": 1.0116690641656547
+    }
+  ]
+}
