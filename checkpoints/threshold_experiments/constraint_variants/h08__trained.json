@@ -1,0 +1,230 @@
+{
+  "collection_baselines_validation": {
+    "macro": 0.7232392519039594,
+    "micro": 0.7249424083769633,
+    "worst_class": 0.6502412129565817
+  },
+  "detector_mode": "trained",
+  "layout": {
+    "detector": "detector",
+    "expected_cost_dp": 21.524061334046635,
+    "initial": [
+      "K0",
+      "detector"
+    ],
+    "specialized": {
+      "K0:coupe": [
+        "K6",
+        "K3",
+        "detector"
+      ],
+      "K0:suv": [
+        "K4",
+        "K3",
+        "detector"
+      ]
+    }
+  },
+  "outcomes_path": "checkpoints/empirical_outcomes_h08.pkl",
+  "scene": "h08",
+  "split": {
+    "holdout_fraction": 0.2,
+    "holdout_samples": 5968,
+    "per_run": {
+      "run0": {
+        "holdout": 1123,
+        "validation": 4493
+      },
+      "run1": {
+        "holdout": 426,
+        "validation": 1704
+      },
+      "run2": {
+        "holdout": 1115,
+        "validation": 4459
+      },
+      "run3": {
+        "holdout": 380,
+        "validation": 1522
+      },
+      "run4": {
+        "holdout": 1102,
+        "validation": 4406
+      },
+      "run5": {
+        "holdout": 372,
+        "validation": 1487
+      },
+      "run6": {
+        "holdout": 1088,
+        "validation": 4354
+      },
+      "run7": {
+        "holdout": 362,
+        "validation": 1450
+      }
+    },
+    "random_seed": 0,
+    "strategy": "blocked_per_run",
+    "validation_samples": 23875
+  },
+  "status": "ok",
+  "variants": {
+    "collection": {
+      "annealed": false,
+      "constraint_metric": null,
+      "delta_vs_micro_baseline": {
+        "cost_ms": 4.666930595639808,
+        "macro": 0.012209159453403506,
+        "micro": 0.012734584450402209,
+        "worst_class": -0.008965517241379395
+      },
+      "floor": null,
+      "holdout": {
+        "expected_cost": 20.610792824000384,
+        "macro": 0.7727619039447213,
+        "micro": 0.7742962466487936,
+        "worst_class": 0.6737931034482758
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 1.0,
+      "status": "ok",
+      "thresholds": {
+        "K0": 0.95,
+        "K3": 0.9,
+        "K4": 0.95,
+        "K6": 0.95
+      },
+      "validation": {
+        "expected_cost": 21.524061334046635,
+        "macro": 0.7232392519039594,
+        "micro": 0.7249424083769633,
+        "worst_class": 0.6502412129565817
+      },
+      "validation_feasible": true
+    },
+    "macro_0.95": {
+      "baseline_metric_value": 0.7232392519039594,
+      "constraint_metric": "macro",
+      "floor": 0.95,
+      "reason": "collection macro=0.7232 < requested floor 0.9500",
+      "status": "skipped"
+    },
+    "macro_baseline": {
+      "anneal_feasible": true,
+      "annealed": true,
+      "constraint_metric": "macro",
+      "delta_vs_micro_baseline": {
+        "cost_ms": -0.4214924748523252,
+        "macro": 0.0001957701488793928,
+        "micro": 0.00016756032171583168,
+        "worst_class": 0.002068965517241339
+      },
+      "floor": 0.7232392519039594,
+      "holdout": {
+        "expected_cost": 15.52236975350825,
+        "macro": 0.7607485146401972,
+        "micro": 0.7617292225201072,
+        "worst_class": 0.6848275862068965
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 1.3278122574900064,
+      "status": "ok",
+      "thresholds": {
+        "K0": 0.7185531599181039,
+        "K3": 0.0,
+        "K4": 0.9998990297317505,
+        "K6": 0.9598111327813597
+      },
+      "validation": {
+        "expected_cost": 15.989377133621876,
+        "macro": 0.7233008442454958,
+        "micro": 0.7242303664921466,
+        "worst_class": 0.6865772950958765
+      },
+      "validation_feasible": true
+    },
+    "micro_0.95": {
+      "baseline_metric_value": 0.7249424083769633,
+      "constraint_metric": "micro",
+      "floor": 0.95,
+      "reason": "collection micro=0.7249 < requested floor 0.9500",
+      "status": "skipped"
+    },
+    "micro_baseline": {
+      "anneal_feasible": true,
+      "annealed": true,
+      "constraint_metric": "micro",
+      "delta_vs_micro_baseline": {
+        "cost_ms": 0.0,
+        "macro": 0.0,
+        "micro": 0.0,
+        "worst_class": 0.0
+      },
+      "floor": 0.7249424083769633,
+      "holdout": {
+        "expected_cost": 15.943862228360576,
+        "macro": 0.7605527444913178,
+        "micro": 0.7615616621983914,
+        "worst_class": 0.6827586206896552
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 1.2927101682638966,
+      "status": "ok",
+      "thresholds": {
+        "K0": 0.7633440543194207,
+        "K3": 0.0,
+        "K4": 0.9994713639726445,
+        "K6": 0.9598111327813597
+      },
+      "validation": {
+        "expected_cost": 16.433811201169924,
+        "macro": 0.723951723124812,
+        "micro": 0.7249424083769633,
+        "worst_class": 0.6850500593924995
+      },
+      "validation_feasible": true
+    },
+    "worst_0.90": {
+      "baseline_metric_value": 0.6502412129565817,
+      "constraint_metric": "worst_class",
+      "floor": 0.9,
+      "reason": "collection worst_class=0.6502 < requested floor 0.9000",
+      "status": "skipped"
+    },
+    "worst_baseline": {
+      "anneal_feasible": true,
+      "annealed": true,
+      "constraint_metric": "worst_class",
+      "delta_vs_micro_baseline": {
+        "cost_ms": -7.227454122854963,
+        "macro": -0.031429588855219515,
+        "micro": -0.03150134048257369,
+        "worst_class": 0.004137931034482678
+      },
+      "floor": 0.6502412129565817,
+      "holdout": {
+        "expected_cost": 8.716408105505613,
+        "macro": 0.7291231556360983,
+        "micro": 0.7300603217158177,
+        "worst_class": 0.6868965517241379
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 2.364597042098319,
+      "status": "ok",
+      "thresholds": {
+        "K0": 0.0,
+        "K3": 0.2607153058052063,
+        "K4": 0.9832795432635716,
+        "K6": 0.673388414236964
+      },
+      "validation": {
+        "expected_cost": 9.136305787079097,
+        "macro": 0.6942814787412634,
+        "micro": 0.6950785340314136,
+        "worst_class": 0.6502630239266927
+      },
+      "validation_feasible": true
+    }
+  }
+}
