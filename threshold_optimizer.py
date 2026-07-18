@@ -725,9 +725,61 @@ def _validate_grids(
     return validated
 
 
-def _policy_key(metrics: Mapping[str, float], target_accuracy: float) -> tuple[float, ...]:
-    """Constrained ordering: feasible policies first, then lower runtime."""
-    accuracy = float(metrics["accuracy"])
+# Which accuracy number the annealer treats as the hard floor.
+#   micro       — overall P(correct); can hide a crushed rare class
+#   macro       — mean of per-class accuracies; each class counts equally
+#   worst_class — min per-class accuracy; the fairness / safety floor
+#
+# Why worst-class can force HIGHER cost than micro: protecting a hard/rare
+# class often means refusing aggressive early accepts (raise thresholds or
+# keep expensive later Kis in the path), so expected runtime goes up.
+CONSTRAINT_METRICS = ("micro", "macro", "worst_class")
+
+
+def _normalize_constraint_metric(constraint_metric: str) -> str:
+    if constraint_metric not in CONSTRAINT_METRICS:
+        raise ValueError(
+            f"constraint_metric must be one of {CONSTRAINT_METRICS}, "
+            f"got {constraint_metric!r}"
+        )
+    return constraint_metric
+
+
+def _constraint_value(metrics: Mapping[str, float], constraint_metric: str) -> float:
+    """Read the constrained accuracy from an evaluate() metrics dict."""
+    metric = _normalize_constraint_metric(constraint_metric)
+    if metric == "micro":
+        return float(metrics["accuracy"])
+    if metric == "macro":
+        if "macro_accuracy" not in metrics:
+            raise KeyError(
+                "metrics missing macro_accuracy; call evaluate(..., "
+                "include_class_metrics=True) when constraint_metric='macro'."
+            )
+        return float(metrics["macro_accuracy"])
+    if "worst_class_accuracy" not in metrics:
+        raise KeyError(
+            "metrics missing worst_class_accuracy; call evaluate(..., "
+            "include_class_metrics=True) when constraint_metric='worst_class'."
+        )
+    return float(metrics["worst_class_accuracy"])
+
+
+def _needs_class_metrics(constraint_metric: str) -> bool:
+    return _normalize_constraint_metric(constraint_metric) in {"macro", "worst_class"}
+
+
+def _policy_key(
+    metrics: Mapping[str, float],
+    target_accuracy: float,
+    constraint_metric: str = "micro",
+) -> tuple[float, ...]:
+    """Constrained ordering: feasible policies first, then lower runtime.
+
+    ``constraint_metric`` chooses which accuracy number must clear
+    ``target_accuracy``.  Default ``micro`` preserves historical behavior.
+    """
+    accuracy = _constraint_value(metrics, constraint_metric)
     cost = float(metrics["expected_cost"])
     if accuracy >= target_accuracy:
         return (0.0, cost, -accuracy)
@@ -739,13 +791,19 @@ def _result(
     target_accuracy: float,
     evaluations: int,
     elapsed_seconds: float,
+    *,
+    constraint_metric: str = "micro",
     **extra: object,
 ) -> dict:
+    metric = _normalize_constraint_metric(constraint_metric)
+    constrained = _constraint_value(metrics, metric)
     result = dict(metrics)
     result.update(
         {
-            "feasible": bool(metrics["accuracy"] >= target_accuracy),
+            "feasible": bool(constrained >= target_accuracy),
             "target_accuracy": float(target_accuracy),
+            "constraint_metric": metric,
+            "constraint_value": float(constrained),
             "evaluations": int(evaluations),
             "elapsed_seconds": float(elapsed_seconds),
         }
@@ -761,10 +819,13 @@ def optimize_fixed_layout_thresholds_exhaustive(
     grids: Mapping[str, Sequence[float]] | None = None,
     quantile_points: int | None = DEFAULT_QUANTILE_POINTS,
     max_combinations: int = DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS,
+    constraint_metric: str = "micro",
 ) -> dict:
     """Find the exact best policy in a discrete Cartesian threshold grid."""
     if not 0.0 <= target_accuracy <= 1.0:
         raise ValueError("target_accuracy must be between 0 and 1.")
+    metric = _normalize_constraint_metric(constraint_metric)
+    need_class = _needs_class_metrics(metric)
     threshold_grids = _validate_grids(evaluator, grids, quantile_points)
     grid_sizes = {candidate_id: len(values) for candidate_id, values in threshold_grids.items()}
     combinations = math.prod(grid_sizes.values())
@@ -782,9 +843,15 @@ def optimize_fixed_layout_thresholds_exhaustive(
     started = perf_counter()
     for values in product(*(threshold_grids[candidate_id] for candidate_id in candidate_ids)):
         policy = dict(zip(candidate_ids, values, strict=True))
-        metrics = evaluator.evaluate(policy, include_route_counts=False)
+        metrics = evaluator.evaluate(
+            policy,
+            include_route_counts=False,
+            include_class_metrics=need_class,
+        )
         evaluations += 1
-        if best_metrics is None or _policy_key(metrics, target_accuracy) < _policy_key(best_metrics, target_accuracy):
+        if best_metrics is None or _policy_key(metrics, target_accuracy, metric) < _policy_key(
+            best_metrics, target_accuracy, metric
+        ):
             best_metrics = metrics
 
     assert best_metrics is not None
@@ -794,6 +861,7 @@ def optimize_fixed_layout_thresholds_exhaustive(
         target_accuracy,
         evaluations,
         perf_counter() - started,
+        constraint_metric=metric,
         method="exhaustive",
         combinations=int(combinations),
         grid_sizes=grid_sizes,
@@ -808,6 +876,7 @@ def coordinate_descent_thresholds(
     quantile_points: int | None = DEFAULT_QUANTILE_POINTS,
     initial_thresholds: Mapping[str, float] | None = None,
     max_passes: int = 25,
+    constraint_metric: str = "micro",
 ) -> dict:
     """Optimize one threshold at a time until no grid coordinate improves.
 
@@ -817,6 +886,8 @@ def coordinate_descent_thresholds(
     """
     if max_passes < 1:
         raise ValueError("max_passes must be at least 1.")
+    metric = _normalize_constraint_metric(constraint_metric)
+    need_class = _needs_class_metrics(metric)
     threshold_grids = _validate_grids(evaluator, grids, quantile_points)
     current = evaluator._normalise_thresholds(initial_thresholds)
     # Snap a caller-provided continuous initial policy to the discrete grid.
@@ -829,7 +900,11 @@ def coordinate_descent_thresholds(
         for candidate_id, value in current.items()
     }
     started = perf_counter()
-    current_metrics = evaluator.evaluate(current, include_route_counts=False)
+    current_metrics = evaluator.evaluate(
+        current,
+        include_route_counts=False,
+        include_class_metrics=need_class,
+    )
     evaluations = 1
     passes = 0
 
@@ -844,9 +919,15 @@ def coordinate_descent_thresholds(
                     continue
                 proposal = dict(current)
                 proposal[candidate_id] = float(value)
-                metrics = evaluator.evaluate(proposal, include_route_counts=False)
+                metrics = evaluator.evaluate(
+                    proposal,
+                    include_route_counts=False,
+                    include_class_metrics=need_class,
+                )
                 evaluations += 1
-                if _policy_key(metrics, target_accuracy) < _policy_key(coordinate_best, target_accuracy):
+                if _policy_key(metrics, target_accuracy, metric) < _policy_key(
+                    coordinate_best, target_accuracy, metric
+                ):
                     coordinate_best = metrics
                     coordinate_value = float(value)
             if coordinate_value != current[candidate_id]:
@@ -862,6 +943,7 @@ def coordinate_descent_thresholds(
         target_accuracy,
         evaluations,
         perf_counter() - started,
+        constraint_metric=metric,
         method="coordinate_descent",
         passes=passes,
     )
@@ -877,17 +959,26 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     random_seed: int = 0,
     coordinate_descent_passes: int = 25,
     accuracy_penalty: float | None = None,
+    constraint_metric: str = "micro",
 ) -> dict:
     """Anneal on a discrete threshold grid, then polish with coordinate descent.
 
     The energy is a Lagrangian-style runtime plus an accuracy-shortfall
     penalty.  The returned winner is still selected by the hard constraint:
     a feasible policy always beats an infeasible one regardless of energy.
+
+    ``constraint_metric`` (default ``micro``) chooses which accuracy number
+    must meet ``target_accuracy``:
+      - micro: overall accuracy (historical default)
+      - macro: mean per-class accuracy
+      - worst_class: minimum per-class accuracy
     """
     if not 0.0 <= target_accuracy <= 1.0:
         raise ValueError("target_accuracy must be between 0 and 1.")
     if n_iterations < 1:
         raise ValueError("n_iterations must be at least 1.")
+    metric = _normalize_constraint_metric(constraint_metric)
+    need_class = _needs_class_metrics(metric)
     threshold_grids = _validate_grids(evaluator, grids, quantile_points)
     candidate_ids = evaluator.tunable_ids
     grid_indices = {
@@ -913,13 +1004,16 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
         }
 
     def energy(metrics: Mapping[str, float]) -> float:
-        shortfall = max(0.0, target_accuracy - float(metrics["accuracy"]))
+        # Shortfall uses the *constrained* metric, not always micro.
+        shortfall = max(0.0, target_accuracy - _constraint_value(metrics, metric))
         return float(metrics["expected_cost"]) + accuracy_penalty * shortfall
 
     started = perf_counter()
     current_indices = dict(grid_indices)
     current_metrics = evaluator.evaluate(
-        policy_from_indices(current_indices), include_route_counts=False
+        policy_from_indices(current_indices),
+        include_route_counts=False,
+        include_class_metrics=need_class,
     )
     current_energy = energy(current_metrics)
     best_metrics = current_metrics
@@ -953,7 +1047,9 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
                 continue
 
             proposal_metrics = evaluator.evaluate(
-                policy_from_indices(proposal_indices), include_route_counts=False
+                policy_from_indices(proposal_indices),
+                include_route_counts=False,
+                include_class_metrics=need_class,
             )
             evaluations += 1
             proposal_energy = energy(proposal_metrics)
@@ -964,7 +1060,9 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
                 current_energy = proposal_energy
                 accepted_moves += 1
 
-            if _policy_key(proposal_metrics, target_accuracy) < _policy_key(best_metrics, target_accuracy):
+            if _policy_key(proposal_metrics, target_accuracy, metric) < _policy_key(
+                best_metrics, target_accuracy, metric
+            ):
                 best_metrics = proposal_metrics
                 best_indices = proposal_indices
 
@@ -977,15 +1075,19 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
         grids=threshold_grids,
         initial_thresholds=policy_from_indices(best_indices),
         max_passes=coordinate_descent_passes,
+        constraint_metric=metric,
     )
     best_before_polish = _result(
         evaluator.evaluate(best_metrics["thresholds"]),
         target_accuracy,
         evaluations,
         annealing_elapsed,
+        constraint_metric=metric,
         method="simulated_annealing",
     )
-    if _policy_key(polished, target_accuracy) < _policy_key(best_before_polish, target_accuracy):
+    if _policy_key(polished, target_accuracy, metric) < _policy_key(
+        best_before_polish, target_accuracy, metric
+    ):
         winner = dict(polished)
     else:
         winner = best_before_polish
@@ -993,6 +1095,7 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     winner.update(
         {
             "method": "simulated_annealing_plus_coordinate_descent",
+            "constraint_metric": metric,
             "annealing_iterations": int(n_iterations),
             "annealing_evaluations": int(evaluations),
             "annealing_elapsed_seconds": float(annealing_elapsed),
