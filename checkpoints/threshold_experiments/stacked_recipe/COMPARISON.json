@@ -1,0 +1,1372 @@
+{
+  "table": [
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.6749617151607963,
+      "holdout_cost": 3923.8950238118155,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "a06",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": -0.06891271056661563,
+      "d_cost": -958.7860431254139,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.6060490045941807,
+      "holdout_cost": 2965.1089806864015,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "a06",
+      "speedup_vs_base": 1.3233560888893405,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.06757274119448697,
+      "d_cost": -959.3323252549017,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.6073889739663093,
+      "holdout_cost": 2964.562698556914,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "a06",
+      "speedup_vs_base": 1.3235999446805036,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.6749617151607963,
+      "holdout_cost": 3923.8950238118155,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "a06",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.0750382848392036,
+      "d_cost": -3620.4845208209813,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.5999234303215927,
+      "holdout_cost": 303.410502990834,
+      "layout": [
+        "K0",
+        "K3",
+        "K1",
+        "K2",
+        "detector"
+      ],
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "a06",
+      "speedup_vs_base": 12.93262752980689,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.06163859111791725,
+      "d_cost": -3604.068060095922,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.613323124042879,
+      "holdout_cost": 319.8269637158932,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "a06",
+      "speedup_vs_base": 12.268806163877622,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.06891271056661563,
+      "d_cost": -958.7860431254139,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.6060490045941807,
+      "holdout_cost": 2965.1089806864015,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "a06",
+      "speedup_vs_base": 1.3233560888893405,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.06757274119448697,
+      "d_cost": -959.3323252549017,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.6073889739663093,
+      "holdout_cost": 2964.562698556914,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "a06",
+      "speedup_vs_base": 1.3235999446805036,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": false,
+      "holdout_acc": 0.34245788667687593,
+      "holdout_cost": 9.457754673765697,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "a06",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.014548238897396593,
+      "d_cost": -2.7907567460081104,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.32790964777947934,
+      "holdout_cost": 6.666997927757587,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "a06",
+      "speedup_vs_base": 1.4185927123794335,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.024693721286370596,
+      "d_cost": -4.744618582960843,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.31776416539050534,
+      "holdout_cost": 4.713136090804854,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "a06",
+      "speedup_vs_base": 2.006679733313326,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": false,
+      "holdout_acc": 0.34245788667687593,
+      "holdout_cost": 9.457754673765697,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "a06",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "a06",
+      "status": "skipped"
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "a06",
+      "status": "skipped"
+    },
+    {
+      "d_acc": -0.014548238897396593,
+      "d_cost": -2.7907567460081104,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.32790964777947934,
+      "holdout_cost": 6.666997927757587,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "a06",
+      "speedup_vs_base": 1.4185927123794335,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.024693721286370596,
+      "d_cost": -4.744618582960843,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.31776416539050534,
+      "holdout_cost": 4.713136090804854,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "a06",
+      "speedup_vs_base": 2.006679733313326,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.9153820375335121,
+      "holdout_cost": 2339.018876098194,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "h08",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.015750670241286957,
+      "d_cost": -320.5403270445677,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.8996313672922251,
+      "holdout_cost": 2018.4785490536265,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "h08",
+      "speedup_vs_base": 1.1588029395679507,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.02362600536193038,
+      "d_cost": -498.46525965029537,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.8917560321715817,
+      "holdout_cost": 1840.5536164478988,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "h08",
+      "speedup_vs_base": 1.2708235474347593,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.0033512064343164116,
+      "d_cost": 20.02164280578063,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.9120308310991957,
+      "holdout_cost": 2359.0405189039748,
+      "layout": [
+        "K2",
+        "K0",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "h08",
+      "speedup_vs_base": 0.9915128024951929,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.015918230563002678,
+      "d_cost": -2120.5456996064363,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.8994638069705094,
+      "holdout_cost": 218.47317649175784,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "h08",
+      "speedup_vs_base": 10.706206197292309,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.015750670241286957,
+      "d_cost": -2120.6946792632984,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.8996313672922251,
+      "holdout_cost": 218.32419683489553,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "h08",
+      "speedup_vs_base": 10.713511878241526,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": -0.020609919571045632,
+      "d_cost": -281.11067510659177,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.8947721179624665,
+      "holdout_cost": 2057.9082009916024,
+      "layout": [
+        "K2",
+        "K0",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "h08",
+      "speedup_vs_base": 1.1366002015887486,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.026642091152815017,
+      "d_cost": -536.5260822882719,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.8887399463806971,
+      "holdout_cost": 1802.4927938099222,
+      "layout": [
+        "K2",
+        "K0",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "h08",
+      "speedup_vs_base": 1.297657823726562,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.761896782841823,
+      "holdout_cost": 15.83979500847386,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "h08",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.025469168900804307,
+      "d_cost": -6.095899020583991,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.7364276139410187,
+      "holdout_cost": 9.74389598788987,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "h08",
+      "speedup_vs_base": 1.6256120783883812,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": -0.03250670241286868,
+      "d_cost": -7.4913164908326415,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.7293900804289544,
+      "holdout_cost": 8.348478517641219,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "h08",
+      "speedup_vs_base": 1.8973271566792316,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.761896782841823,
+      "holdout_cost": 15.83979500847386,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "h08",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "h08",
+      "status": "skipped"
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "h08",
+      "status": "skipped"
+    },
+    {
+      "d_acc": -0.025469168900804307,
+      "d_cost": -6.095899020583991,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.7364276139410187,
+      "holdout_cost": 9.74389598788987,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "h08",
+      "speedup_vs_base": 1.6256120783883812,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.03250670241286868,
+      "d_cost": -7.4913164908326415,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.7293900804289544,
+      "holdout_cost": 8.348478517641219,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "h08",
+      "speedup_vs_base": 1.8973271566792316,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.9664516129032258,
+      "holdout_cost": 718.4370051201136,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "h24",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.023225806451612874,
+      "d_cost": -517.047810069686,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.9432258064516129,
+      "holdout_cost": 201.3891950504276,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "h24",
+      "speedup_vs_base": 3.567405912418578,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.030322580645161246,
+      "d_cost": -639.0630272173521,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.9361290322580645,
+      "holdout_cost": 79.37397790276145,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "h24",
+      "speedup_vs_base": 9.051291419465558,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.001290322580645209,
+      "d_cost": -12.553945468103848,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.967741935483871,
+      "holdout_cost": 705.8830596520097,
+      "layout": [
+        "K2",
+        "K0",
+        "K1",
+        "K3",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "h24",
+      "speedup_vs_base": 1.017784738274202,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.020645161290322567,
+      "d_cost": -677.9315433206212,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.9458064516129032,
+      "holdout_cost": 40.50546179949231,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "h24",
+      "speedup_vs_base": 17.73679334101848,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.020645161290322567,
+      "d_cost": -681.3282650520333,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.9458064516129032,
+      "holdout_cost": 37.108740068080216,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "h24",
+      "speedup_vs_base": 19.36031791437971,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": -0.023870967741935423,
+      "d_cost": -491.6606138528779,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.9425806451612904,
+      "holdout_cost": 226.7763912672357,
+      "layout": [
+        "K2",
+        "K0",
+        "K1",
+        "K3",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "h24",
+      "speedup_vs_base": 3.1680414398758985,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.029677419354838697,
+      "d_cost": -524.7451037076778,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.9367741935483871,
+      "holdout_cost": 193.69190141243575,
+      "layout": [
+        "K2",
+        "K0",
+        "K1",
+        "K3",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "h24",
+      "speedup_vs_base": 3.709174208529852,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.932258064516129,
+      "holdout_cost": 9.45114138527593,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "h24",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.01741935483870971,
+      "d_cost": -2.8013967765198506,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.9148387096774193,
+      "holdout_cost": 6.649744608756079,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "h24",
+      "speedup_vs_base": 1.4212788522481148,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.02580645161290318,
+      "d_cost": -3.316597485641438,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.9064516129032258,
+      "holdout_cost": 6.134543899634492,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "h24",
+      "speedup_vs_base": 1.5406428806938763,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.932258064516129,
+      "holdout_cost": 9.45114138527593,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "h24",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "h24",
+      "status": "skipped"
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "h24",
+      "status": "skipped"
+    },
+    {
+      "d_acc": -0.01741935483870971,
+      "d_cost": -2.8013967765198506,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.9148387096774193,
+      "holdout_cost": 6.649744608756079,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "h24",
+      "speedup_vs_base": 1.4212788522481148,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.02580645161290318,
+      "d_cost": -3.316597485641438,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.9064516129032258,
+      "holdout_cost": 6.134543899634492,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "h24",
+      "speedup_vs_base": 1.5406428806938763,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7464589235127479,
+      "holdout_cost": 5813.288473076628,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "i29",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.040321057601510835,
+      "d_cost": -503.6472764723867,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.7061378659112371,
+      "holdout_cost": 5309.6411966042415,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "i29",
+      "speedup_vs_base": 1.0948552374489056,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.04098205854579795,
+      "d_cost": -475.82066160430804,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.70547686496695,
+      "holdout_cost": 5337.46781147232,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "i29",
+      "speedup_vs_base": 1.0891472657842698,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.001038715769594023,
+      "d_cost": 24.86763826170136,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7454202077431539,
+      "holdout_cost": 5838.1561113383295,
+      "layout": [
+        "K2",
+        "K3",
+        "K1",
+        "K0",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "i29",
+      "speedup_vs_base": 0.995740497892236,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.02747875354107654,
+      "d_cost": -5254.268832565802,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7189801699716714,
+      "holdout_cost": 559.0196405108259,
+      "layout": [
+        "K3",
+        "K0",
+        "K2",
+        "detector"
+      ],
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "i29",
+      "speedup_vs_base": 10.399077334321403,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": -0.03644948064211517,
+      "d_cost": -5260.544097604217,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.7100094428706327,
+      "holdout_cost": 552.7443754724112,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "i29",
+      "speedup_vs_base": 10.517137271832418,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.03286118980169972,
+      "d_cost": -437.5983032579743,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7135977337110482,
+      "holdout_cost": 5375.690169818654,
+      "layout": [
+        "K2",
+        "K3",
+        "K1",
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "i29",
+      "speedup_vs_base": 1.0814031853462895,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.0380547686496695,
+      "d_cost": -511.4478398890251,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7084041548630784,
+      "holdout_cost": 5301.840633187603,
+      "layout": [
+        "K2",
+        "K3",
+        "K1",
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "i29",
+      "speedup_vs_base": 1.0964660907926103,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": false,
+      "holdout_acc": 0.25316336166194525,
+      "holdout_cost": 15.46742698790904,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "i29",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.000566572237960361,
+      "d_cost": -12.038973023655956,
+      "detector_mode": "trained",
+      "feas": false,
+      "holdout_acc": 0.2525967894239849,
+      "holdout_cost": 3.4284539642530834,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "i29",
+      "speedup_vs_base": 4.511487436955784,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": -0.000566572237960361,
+      "d_cost": -12.038973023655956,
+      "detector_mode": "trained",
+      "feas": false,
+      "holdout_acc": 0.2525967894239849,
+      "holdout_cost": 3.4284539642530834,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "i29",
+      "speedup_vs_base": 4.511487436955784,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": false,
+      "holdout_acc": 0.25316336166194525,
+      "holdout_cost": 15.46742698790904,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "i29",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "i29",
+      "status": "skipped"
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "i29",
+      "status": "skipped"
+    },
+    {
+      "d_acc": -0.000566572237960361,
+      "d_cost": -12.038973023655956,
+      "detector_mode": "trained",
+      "feas": false,
+      "holdout_acc": 0.2525967894239849,
+      "holdout_cost": 3.4284539642530834,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "i29",
+      "speedup_vs_base": 4.511487436955784,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.000566572237960361,
+      "d_cost": -12.038973023655956,
+      "detector_mode": "trained",
+      "feas": false,
+      "holdout_acc": 0.2525967894239849,
+      "holdout_cost": 3.4284539642530834,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "i29",
+      "speedup_vs_base": 4.511487436955784,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.7811507936507937,
+      "holdout_cost": 4043.2902163288554,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "s31",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.014880952380952328,
+      "d_cost": -284.26879324940955,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7662698412698413,
+      "holdout_cost": 3759.021423079446,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "s31",
+      "speedup_vs_base": 1.0756230841101544,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.02341269841269844,
+      "d_cost": -377.232647474802,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7577380952380952,
+      "holdout_cost": 3666.0575688540534,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "s31",
+      "speedup_vs_base": 1.1028987244171178,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.0035714285714285587,
+      "d_cost": 36.65707886842665,
+      "detector_mode": "paper",
+      "feas": false,
+      "holdout_acc": 0.7775793650793651,
+      "holdout_cost": 4079.947295197282,
+      "layout": [
+        "K2",
+        "K3",
+        "K0",
+        "K1",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "s31",
+      "speedup_vs_base": 0.9910153057830974,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.020436507936507975,
+      "d_cost": -3653.99892726507,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7607142857142857,
+      "holdout_cost": 389.2912890637853,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "s31",
+      "speedup_vs_base": 10.386284846117794,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": -0.015476190476190421,
+      "d_cost": -3649.6351862606734,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7656746031746032,
+      "holdout_cost": 393.6550300681819,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "s31",
+      "speedup_vs_base": 10.271150899884473,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.013492063492063444,
+      "d_cost": -253.75978864220542,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7676587301587302,
+      "holdout_cost": 3789.53042768665,
+      "layout": [
+        "K2",
+        "K3",
+        "K0",
+        "K1",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "s31",
+      "speedup_vs_base": 1.0669633859615464,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.02341269841269844,
+      "d_cost": -365.1267634928581,
+      "detector_mode": "paper",
+      "feas": true,
+      "holdout_acc": 0.7577380952380952,
+      "holdout_cost": 3678.1634528359973,
+      "layout": [
+        "K2",
+        "K3",
+        "K0",
+        "K1",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "s31",
+      "speedup_vs_base": 1.099268770454269,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.4976190476190476,
+      "holdout_cost": 23.20125948526552,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "baseline_protect",
+      "scene": "s31",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.017261904761904756,
+      "d_cost": -5.386555140434734,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.48035714285714287,
+      "holdout_cost": 17.814704344830787,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "budget_only_2pp",
+      "scene": "s31",
+      "speedup_vs_base": 1.3023656770367746,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.027976190476190488,
+      "d_cost": -7.882748062513,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.46964285714285714,
+      "holdout_cost": 15.31851142275252,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "budget_only_3pp",
+      "scene": "s31",
+      "speedup_vs_base": 1.5145896911892358,
+      "status": "ok",
+      "winner": true
+    },
+    {
+      "d_acc": 0.0,
+      "d_cost": 0.0,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.4976190476190476,
+      "holdout_cost": 23.20125948526552,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "order_only",
+      "scene": "s31",
+      "speedup_vs_base": 1.0,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "scene": "s31",
+      "status": "skipped"
+    },
+    {
+      "detector_mode": "trained",
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "scene": "s31",
+      "status": "skipped"
+    },
+    {
+      "d_acc": -0.017261904761904756,
+      "d_cost": -5.386555140434734,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.48035714285714287,
+      "holdout_cost": 17.814704344830787,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_2pp",
+      "scene": "s31",
+      "speedup_vs_base": 1.3023656770367746,
+      "status": "ok",
+      "winner": false
+    },
+    {
+      "d_acc": -0.027976190476190488,
+      "d_cost": -7.882748062513,
+      "detector_mode": "trained",
+      "feas": true,
+      "holdout_acc": 0.46964285714285714,
+      "holdout_cost": 15.31851142275252,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "recipe": "stacked_order_budget_3pp",
+      "scene": "s31",
+      "speedup_vs_base": 1.5145896911892358,
+      "status": "ok",
+      "winner": false
+    }
+  ]
+}

@@ -793,7 +793,23 @@ def write_comparison_md(summary: dict, output_dir: Path) -> Path:
         f"If that fraction is low, stacking did **not** help beyond the best "
         f"individual lever on that split — a valid negative result."
     )
-    md.append("")
+    md.extend(
+        [
+            "",
+            "### How to read this",
+            "",
+            "- **Paper + lower Kdet stacks (G/H)** change the *accounted* detector "
+            "cost (10_000 → 1_000 ms) and often the DP chain length. Large "
+            "speedups here are expected; compare them to single levers at the "
+            "*same* Kdet when asking whether order/budget stacking alone helps.",
+            "- **Order + budget stacks (E/F)** keep Kdet fixed. If they tie "
+            "budget-only (common when order search picks DP), stacking did not "
+            "add value beyond the accuracy-budget lever.",
+            "- **Trained** skips G/H (measured Kdet, not synthetic). On this run, "
+            "order search usually kept DP order, so E/F matched B/C.",
+            "",
+        ]
+    )
 
     path = output_dir / "COMPARISON.md"
     path.write_text("\n".join(md) + "\n")

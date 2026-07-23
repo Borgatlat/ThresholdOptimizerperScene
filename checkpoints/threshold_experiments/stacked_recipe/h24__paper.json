@@ -1,0 +1,1189 @@
+{
+  "default_detector_cost_ms": 10000.0,
+  "detector_mode": "paper",
+  "dp_layout_default_cost": {
+    "detector": "detector",
+    "expected_cost_dp": 1277.957735201672,
+    "initial": [
+      "K0",
+      "K3",
+      "K2",
+      "K1",
+      "detector"
+    ],
+    "specialized": {
+      "K0:coupe": [
+        "K6",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "K0:suv": [
+        "K4",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "K1:coupe": [
+        "K6",
+        "detector"
+      ],
+      "K1:suv": [
+        "detector"
+      ]
+    }
+  },
+  "recipes": {
+    "baseline_protect": {
+      "anneal_feasible": true,
+      "baseline_micro_validation": 0.9654615881213686,
+      "budget": 0.0,
+      "collection_holdout": {
+        "accuracy": 0.9690322580645161,
+        "expected_cost": 1268.7927718555352,
+        "macro_accuracy": 0.9680146276604393,
+        "worst_class_accuracy": 0.9427792915531336
+      },
+      "collection_validation": {
+        "accuracy": 0.9654615881213686,
+        "expected_cost": 1277.9577352016718
+      },
+      "delta_vs_baseline_protect": {
+        "accuracy": 0.0,
+        "cost_ms": 0.0,
+        "speedup": 1.0
+      },
+      "detector_mode": "paper",
+      "floor": 0.9654615881213686,
+      "holdout": {
+        "accuracy": 0.9664516129032258,
+        "expected_cost": 718.4370051201136,
+        "macro_accuracy": 0.9652575601374047,
+        "route_counts": {
+          "K2": 1,
+          "K3": 1356,
+          "K4": 20,
+          "K6": 64,
+          "detector": 109
+        },
+        "worst_class_accuracy": 0.9264305177111717
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 1.7660459620164042,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "recipe": "baseline_protect",
+      "requested_detector_cost_ms": 10000.0,
+      "thresholds": {
+        "K0": 0.999988215310233,
+        "K1": 0.9845568878310067,
+        "K2": 0.9905403086117336,
+        "K3": 0.7307737725121635,
+        "K4": 0.0,
+        "K6": 0.5747831208365304
+      },
+      "validation": {
+        "accuracy": 0.9654615881213686,
+        "expected_cost": 791.776343992543,
+        "feasible": true,
+        "macro_accuracy": 0.9640301293083003,
+        "worst_class_accuracy": 0.9285228046289993
+      }
+    },
+    "budget_only_2pp": {
+      "anneal_feasible": true,
+      "baseline_micro_validation": 0.9654615881213686,
+      "budget": 0.02,
+      "collection_holdout": {
+        "accuracy": 0.9690322580645161,
+        "expected_cost": 1268.7927718555352,
+        "macro_accuracy": 0.9680146276604393,
+        "worst_class_accuracy": 0.9427792915531336
+      },
+      "collection_validation": {
+        "accuracy": 0.9654615881213686,
+        "expected_cost": 1277.9577352016718
+      },
+      "delta_vs_baseline_protect": {
+        "accuracy": -0.023225806451612874,
+        "cost_ms": -517.047810069686,
+        "speedup": 3.567405912418578
+      },
+      "detector_mode": "paper",
+      "floor": 0.9454615881213686,
+      "holdout": {
+        "accuracy": 0.9432258064516129,
+        "expected_cost": 201.3891950504276,
+        "macro_accuracy": 0.9412532622750097,
+        "route_counts": {
+          "K1": 4,
+          "K2": 7,
+          "K3": 1349,
+          "K4": 38,
+          "K6": 123,
+          "detector": 29
+        },
+        "worst_class_accuracy": 0.8746594005449592
+      },
+      "holdout_feasible": false,
+      "holdout_speedup_vs_collection": 6.300202806500275,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "recipe": "budget_only_2pp",
+      "requested_detector_cost_ms": 10000.0,
+      "thresholds": {
+        "K0": 0.9999580383300781,
+        "K1": 0.5867183293615069,
+        "K2": 0.8734378388949803,
+        "K3": 0.6029707193374634,
+        "K4": 0.9588181291307721,
+        "K6": 0.8156615921429226
+      },
+      "validation": {
+        "accuracy": 0.9456100710135571,
+        "expected_cost": 245.25954740569554,
+        "feasible": true,
+        "macro_accuracy": 0.9436480479786156,
+        "worst_class_accuracy": 0.8835942818243703
+      }
+    },
+    "budget_only_3pp": {
+      "anneal_feasible": true,
+      "baseline_micro_validation": 0.9654615881213686,
+      "budget": 0.03,
+      "collection_holdout": {
+        "accuracy": 0.9690322580645161,
+        "expected_cost": 1268.7927718555352,
+        "macro_accuracy": 0.9680146276604393,
+        "worst_class_accuracy": 0.9427792915531336
+      },
+      "collection_validation": {
+        "accuracy": 0.9654615881213686,
+        "expected_cost": 1277.9577352016718
+      },
+      "delta_vs_baseline_protect": {
+        "accuracy": -0.030322580645161246,
+        "cost_ms": -639.0630272173521,
+        "speedup": 9.051291419465558
+      },
+      "detector_mode": "paper",
+      "floor": 0.9354615881213686,
+      "holdout": {
+        "accuracy": 0.9361290322580645,
+        "expected_cost": 79.37397790276145,
+        "macro_accuracy": 0.9339312937703013,
+        "route_counts": {
+          "K2": 16,
+          "K3": 1515,
+          "K6": 9,
+          "detector": 10
+        },
+        "worst_class_accuracy": 0.8610354223433242
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 15.984996662380876,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "recipe": "budget_only_3pp",
+      "requested_detector_cost_ms": 10000.0,
+      "thresholds": {
+        "K0": 1.0,
+        "K1": 0.6607722299439567,
+        "K2": 0.625724332673209,
+        "K3": 0.5286086031368801,
+        "K4": 0.8134878022330148,
+        "K6": 0.5747831208365304
+      },
+      "validation": {
+        "accuracy": 0.9356036152356358,
+        "expected_cost": 77.79875230440918,
+        "feasible": true,
+        "macro_accuracy": 0.93330258064021,
+        "worst_class_accuracy": 0.8645336963921034
+      }
+    },
+    "collection": {
+      "annealed": false,
+      "budget": null,
+      "floor": null,
+      "holdout": {
+        "accuracy": 0.9690322580645161,
+        "expected_cost": 1268.7927718555352,
+        "macro_accuracy": 0.9680146276604393,
+        "worst_class_accuracy": 0.9427792915531336
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 1.0,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "recipe": "collection",
+      "thresholds": null,
+      "validation": {
+        "accuracy": 0.9654615881213686,
+        "expected_cost": 1277.9577352016718
+      }
+    },
+    "order_only": {
+      "anneal_feasible": true,
+      "baseline_micro_validation": 0.9619109102646869,
+      "budget": 0.0,
+      "collection_holdout": {
+        "accuracy": 0.9651612903225807,
+        "expected_cost": 1285.760495713908,
+        "macro_accuracy": 0.9640242498480719,
+        "worst_class_accuracy": 0.9427792915531336
+      },
+      "collection_validation": {
+        "accuracy": 0.9619109102646869,
+        "expected_cost": 1314.1555436164258
+      },
+      "delta_vs_baseline_protect": {
+        "accuracy": 0.001290322580645209,
+        "cost_ms": -12.553945468103848,
+        "speedup": 1.017784738274202
+      },
+      "detector_mode": "paper",
+      "floor": 0.9619109102646869,
+      "holdout": {
+        "accuracy": 0.967741935483871,
+        "expected_cost": 705.8830596520097,
+        "macro_accuracy": 0.966614434723162,
+        "route_counts": {
+          "K2": 82,
+          "K3": 872,
+          "K4": 258,
+          "K6": 232,
+          "detector": 106
+        },
+        "worst_class_accuracy": 0.9291553133514986
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 1.8214922119646415,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K2",
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "order_search": {
+        "candidates": [
+          {
+            "label": "dp_order",
+            "order": [
+              "K0",
+              "K3",
+              "K2",
+              "K1"
+            ],
+            "validation_accuracy": 0.9654615881213686,
+            "validation_cost": 884.5360806625464,
+            "validation_feasible": true
+          },
+          {
+            "label": "reverse",
+            "order": [
+              "K1",
+              "K2",
+              "K3",
+              "K0"
+            ],
+            "validation_accuracy": 0.9696578437701743,
+            "validation_cost": 1338.2317307957721,
+            "validation_feasible": true
+          },
+          {
+            "label": "rotate_left",
+            "order": [
+              "K3",
+              "K2",
+              "K1",
+              "K0"
+            ],
+            "validation_accuracy": 0.9691736604260813,
+            "validation_cost": 1050.7629962692322,
+            "validation_feasible": true
+          },
+          {
+            "label": "rotate_right",
+            "order": [
+              "K1",
+              "K0",
+              "K3",
+              "K2"
+            ],
+            "validation_accuracy": 0.9696578437701743,
+            "validation_cost": 1074.7335891652872,
+            "validation_feasible": true
+          },
+          {
+            "label": "swap_0_1",
+            "order": [
+              "K3",
+              "K0",
+              "K2",
+              "K1"
+            ],
+            "validation_accuracy": 0.9691736604260813,
+            "validation_cost": 958.5497159176642,
+            "validation_feasible": true
+          },
+          {
+            "label": "swap_1_2",
+            "order": [
+              "K0",
+              "K2",
+              "K3",
+              "K1"
+            ],
+            "validation_accuracy": 0.9633634602969657,
+            "validation_cost": 750.2733793087103,
+            "validation_feasible": true
+          },
+          {
+            "label": "swap_2_3",
+            "order": [
+              "K0",
+              "K3",
+              "K1",
+              "K2"
+            ],
+            "validation_accuracy": 0.9654615881213686,
+            "validation_cost": 890.5668748227135,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K0>K2>K1>K3",
+            "order": [
+              "K0",
+              "K2",
+              "K1",
+              "K3"
+            ],
+            "validation_accuracy": 0.9633634602969657,
+            "validation_cost": 935.1744793987273,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K0>K1>K3>K2",
+            "order": [
+              "K0",
+              "K1",
+              "K3",
+              "K2"
+            ],
+            "validation_accuracy": 0.9654615881213686,
+            "validation_cost": 995.4070019451153,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K0>K1>K2>K3",
+            "order": [
+              "K0",
+              "K1",
+              "K2",
+              "K3"
+            ],
+            "validation_accuracy": 0.9633634602969657,
+            "validation_cost": 928.9757986123105,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K3>K0>K1>K2",
+            "order": [
+              "K3",
+              "K0",
+              "K1",
+              "K2"
+            ],
+            "validation_accuracy": 0.9691736604260813,
+            "validation_cost": 1055.9198327711747,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K3>K2>K0>K1",
+            "order": [
+              "K3",
+              "K2",
+              "K0",
+              "K1"
+            ],
+            "validation_accuracy": 0.9691736604260813,
+            "validation_cost": 1049.186017397335,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K3>K1>K0>K2",
+            "order": [
+              "K3",
+              "K1",
+              "K0",
+              "K2"
+            ],
+            "validation_accuracy": 0.9714331826985152,
+            "validation_cost": 1099.3286527047753,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K3>K1>K2>K0",
+            "order": [
+              "K3",
+              "K1",
+              "K2",
+              "K0"
+            ],
+            "validation_accuracy": 0.9714331826985152,
+            "validation_cost": 1332.765920630911,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K2>K0>K3>K1",
+            "order": [
+              "K2",
+              "K0",
+              "K3",
+              "K1"
+            ],
+            "validation_accuracy": 0.9619109102646869,
+            "validation_cost": 740.805792944854,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K2>K0>K1>K3",
+            "order": [
+              "K2",
+              "K0",
+              "K1",
+              "K3"
+            ],
+            "validation_accuracy": 0.9619109102646869,
+            "validation_cost": 636.8052174988342,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K2>K3>K0>K1",
+            "order": [
+              "K2",
+              "K3",
+              "K0",
+              "K1"
+            ],
+            "validation_accuracy": 0.9643318269851517,
+            "validation_cost": 778.5613844253512,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K2>K3>K1>K0",
+            "order": [
+              "K2",
+              "K3",
+              "K1",
+              "K0"
+            ],
+            "validation_accuracy": 0.9644932214331827,
+            "validation_cost": 1168.5536424487402,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K2>K1>K0>K3",
+            "order": [
+              "K2",
+              "K1",
+              "K0",
+              "K3"
+            ],
+            "validation_accuracy": 0.9636862491930278,
+            "validation_cost": 1071.081050342215,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K2>K1>K3>K0",
+            "order": [
+              "K2",
+              "K1",
+              "K3",
+              "K0"
+            ],
+            "validation_accuracy": 0.9662685603615235,
+            "validation_cost": 931.6730408633267,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K1>K0>K2>K3",
+            "order": [
+              "K1",
+              "K0",
+              "K2",
+              "K3"
+            ],
+            "validation_accuracy": 0.9675597159457715,
+            "validation_cost": 839.2616242642864,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K1>K3>K0>K2",
+            "order": [
+              "K1",
+              "K3",
+              "K0",
+              "K2"
+            ],
+            "validation_accuracy": 0.973047127178825,
+            "validation_cost": 1146.1243696557285,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K1>K3>K2>K0",
+            "order": [
+              "K1",
+              "K3",
+              "K2",
+              "K0"
+            ],
+            "validation_accuracy": 0.973047127178825,
+            "validation_cost": 1140.1187124461446,
+            "validation_feasible": true
+          },
+          {
+            "label": "perm_K1>K2>K0>K3",
+            "order": [
+              "K1",
+              "K2",
+              "K0",
+              "K3"
+            ],
+            "validation_accuracy": 0.9670755326016786,
+            "validation_cost": 967.9371464060599,
+            "validation_feasible": true
+          }
+        ],
+        "selected_label": "perm_K2>K0>K1>K3",
+        "selected_order": [
+          "K2",
+          "K0",
+          "K1",
+          "K3"
+        ]
+      },
+      "recipe": "order_only",
+      "requested_detector_cost_ms": 10000.0,
+      "thresholds": {
+        "K0": 0.9916231717382159,
+        "K1": 0.999854564666748,
+        "K2": 0.999701304095132,
+        "K3": 0.7307737725121635,
+        "K4": 0.996650755405426,
+        "K6": 0.8820360813822065
+      },
+      "validation": {
+        "accuracy": 0.9619109102646869,
+        "expected_cost": 758.2450971146732,
+        "feasible": true,
+        "macro_accuracy": 0.960334250395026,
+        "worst_class_accuracy": 0.9223961878829136
+      }
+    },
+    "stacked_full_kdet1000_order_budget_2pp": {
+      "anneal_feasible": true,
+      "baseline_micro_validation": 0.9636862491930278,
+      "budget": 0.02,
+      "collection_holdout": {
+        "accuracy": 0.9670967741935483,
+        "expected_cost": 137.57592791025564,
+        "macro_accuracy": 0.9660410979300156,
+        "worst_class_accuracy": 0.9432432432432433
+      },
+      "collection_validation": {
+        "accuracy": 0.9636862491930278,
+        "expected_cost": 138.24641490232003
+      },
+      "delta_vs_baseline_protect": {
+        "accuracy": -0.020645161290322567,
+        "cost_ms": -677.9315433206212,
+        "speedup": 17.73679334101848
+      },
+      "detector_mode": "paper",
+      "floor": 0.9436862491930278,
+      "holdout": {
+        "accuracy": 0.9458064516129032,
+        "expected_cost": 40.50546179949231,
+        "macro_accuracy": 0.94386065455818,
+        "route_counts": {
+          "K0": 13,
+          "K2": 4,
+          "K3": 640,
+          "K4": 429,
+          "K6": 418,
+          "detector": 46
+        },
+        "worst_class_accuracy": 0.8801089918256131
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 3.396478445086633,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "K2",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "order_search": {
+        "candidates": [
+          {
+            "label": "dp_order",
+            "order": [
+              "K0",
+              "K3",
+              "K2"
+            ],
+            "validation_accuracy": 0.9657843770174306,
+            "validation_cost": 102.59498099307392,
+            "validation_feasible": true
+          },
+          {
+            "label": "reverse",
+            "order": [
+              "K2",
+              "K3",
+              "K0"
+            ],
+            "validation_accuracy": 0.9646546158812137,
+            "validation_cost": 92.46106202983843,
+            "validation_feasible": true
+          },
+          {
+            "label": "rotate_left",
+            "order": [
+              "K3",
+              "K2",
+              "K0"
+            ],
+            "validation_accuracy": 0.9694964493221433,
+            "validation_cost": 108.46989925372293,
+            "validation_feasible": true
+          },
+          {
+            "label": "rotate_right",
+            "order": [
+              "K2",
+              "K0",
+              "K3"
+            ],
+            "validation_accuracy": 0.9622336991607489,
+            "validation_cost": 92.02964705461947,
+            "validation_feasible": true
+          },
+          {
+            "label": "swap_0_1",
+            "order": [
+              "K3",
+              "K0",
+              "K2"
+            ],
+            "validation_accuracy": 0.9694964493221433,
+            "validation_cost": 119.84009011490502,
+            "validation_feasible": true
+          },
+          {
+            "label": "swap_1_2",
+            "order": [
+              "K0",
+              "K2",
+              "K3"
+            ],
+            "validation_accuracy": 0.9636862491930278,
+            "validation_cost": 91.86822260038025,
+            "validation_feasible": true
+          }
+        ],
+        "selected_label": "swap_1_2",
+        "selected_order": [
+          "K0",
+          "K2",
+          "K3"
+        ]
+      },
+      "recipe": "stacked_full_kdet1000_order_budget_2pp",
+      "requested_detector_cost_ms": 1000.0,
+      "thresholds": {
+        "K0": 0.90748188325337,
+        "K2": 0.9905403086117336,
+        "K3": 0.6029707193374634,
+        "K4": 0.9923662543296814,
+        "K6": 0.8820360813822065
+      },
+      "validation": {
+        "accuracy": 0.9438347320852163,
+        "expected_cost": 45.02003440736942,
+        "feasible": true,
+        "macro_accuracy": 0.9417230025812398,
+        "worst_class_accuracy": 0.8869979577944179
+      }
+    },
+    "stacked_kdet1000_budget_2pp": {
+      "anneal_feasible": true,
+      "baseline_micro_validation": 0.9657843770174306,
+      "budget": 0.02,
+      "collection_holdout": {
+        "accuracy": 0.9703225806451613,
+        "expected_cost": 136.99896585684075,
+        "macro_accuracy": 0.9693770254806029,
+        "worst_class_accuracy": 0.9482288828337875
+      },
+      "collection_validation": {
+        "accuracy": 0.9657843770174306,
+        "expected_cost": 137.68147068667713
+      },
+      "delta_vs_baseline_protect": {
+        "accuracy": -0.020645161290322567,
+        "cost_ms": -681.3282650520333,
+        "speedup": 19.36031791437971
+      },
+      "detector_mode": "paper",
+      "floor": 0.9457843770174306,
+      "holdout": {
+        "accuracy": 0.9458064516129032,
+        "expected_cost": 37.108740068080216,
+        "macro_accuracy": 0.9438824286433732,
+        "route_counts": {
+          "K2": 21,
+          "K3": 942,
+          "K4": 341,
+          "K6": 206,
+          "detector": 40
+        },
+        "worst_class_accuracy": 0.885558583106267
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 3.6918247724255937,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "requested_detector_cost_ms": 1000.0,
+      "thresholds": {
+        "K0": 0.9962268216269357,
+        "K2": 0.7019148468971252,
+        "K3": 0.6029707193374634,
+        "K4": 0.9588181291307721,
+        "K6": 0.9835507443972996
+      },
+      "validation": {
+        "accuracy": 0.9459328599096191,
+        "expected_cost": 36.78933968695394,
+        "feasible": true,
+        "macro_accuracy": 0.9438370512373955,
+        "worst_class_accuracy": 0.8856364874063989
+      }
+    },
+    "stacked_order_budget_2pp": {
+      "anneal_feasible": true,
+      "baseline_micro_validation": 0.9619109102646869,
+      "budget": 0.02,
+      "collection_holdout": {
+        "accuracy": 0.9651612903225807,
+        "expected_cost": 1285.760495713908,
+        "macro_accuracy": 0.9640242498480719,
+        "worst_class_accuracy": 0.9427792915531336
+      },
+      "collection_validation": {
+        "accuracy": 0.9619109102646869,
+        "expected_cost": 1314.1555436164258
+      },
+      "delta_vs_baseline_protect": {
+        "accuracy": -0.023870967741935423,
+        "cost_ms": -491.6606138528779,
+        "speedup": 3.1680414398758985
+      },
+      "detector_mode": "paper",
+      "floor": 0.9419109102646869,
+      "holdout": {
+        "accuracy": 0.9425806451612904,
+        "expected_cost": 226.7763912672357,
+        "macro_accuracy": 0.9405188849207556,
+        "route_counts": {
+          "K2": 406,
+          "K3": 891,
+          "K4": 186,
+          "K6": 35,
+          "detector": 32
+        },
+        "worst_class_accuracy": 0.8719346049046321
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 5.669728178180392,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K2",
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "recipe": "stacked_order_budget_2pp",
+      "requested_detector_cost_ms": 10000.0,
+      "thresholds": {
+        "K0": 0.9899035351616996,
+        "K1": 0.9998545646667482,
+        "K2": 0.9905403086117336,
+        "K3": 0.5286086031368801,
+        "K4": 0.975381212575095,
+        "K6": 0.9990090131759644
+      },
+      "validation": {
+        "accuracy": 0.9420593931568754,
+        "expected_cost": 220.81851959584128,
+        "feasible": true,
+        "macro_accuracy": 0.9398586518764138,
+        "worst_class_accuracy": 0.8740639891082369
+      }
+    },
+    "stacked_order_budget_3pp": {
+      "anneal_feasible": true,
+      "baseline_micro_validation": 0.9619109102646869,
+      "budget": 0.03,
+      "collection_holdout": {
+        "accuracy": 0.9651612903225807,
+        "expected_cost": 1285.760495713908,
+        "macro_accuracy": 0.9640242498480719,
+        "worst_class_accuracy": 0.9427792915531336
+      },
+      "collection_validation": {
+        "accuracy": 0.9619109102646869,
+        "expected_cost": 1314.1555436164258
+      },
+      "delta_vs_baseline_protect": {
+        "accuracy": -0.029677419354838697,
+        "cost_ms": -524.7451037076778,
+        "speedup": 3.709174208529852
+      },
+      "detector_mode": "paper",
+      "floor": 0.9319109102646869,
+      "holdout": {
+        "accuracy": 0.9367741935483871,
+        "expected_cost": 193.69190141243575,
+        "macro_accuracy": 0.9344947704707955,
+        "route_counts": {
+          "K0": 8,
+          "K2": 350,
+          "K3": 893,
+          "K4": 8,
+          "K6": 264,
+          "detector": 27
+        },
+        "worst_class_accuracy": 0.8528610354223434
+      },
+      "holdout_feasible": true,
+      "holdout_speedup_vs_collection": 6.638173750879175,
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K2",
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "recipe": "stacked_order_budget_3pp",
+      "requested_detector_cost_ms": 10000.0,
+      "thresholds": {
+        "K0": 0.9537723660469055,
+        "K1": 0.9929085459027972,
+        "K2": 0.9937955141067505,
+        "K3": 0.5286086031368801,
+        "K4": 0.9999666213989258,
+        "K6": 0.6114933065005711
+      },
+      "validation": {
+        "accuracy": 0.9320529373789541,
+        "expected_cost": 174.79854940849165,
+        "feasible": true,
+        "macro_accuracy": 0.9294691672871984,
+        "worst_class_accuracy": 0.8645336963921034
+      }
+    }
+  },
+  "scene": "h24",
+  "split": {
+    "holdout_fraction": 0.2,
+    "holdout_samples": 1550,
+    "per_run": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "random_seed": 0,
+    "strategy": "blocked_per_run",
+    "validation_samples": 6196
+  },
+  "stacking_vs_single_lever": {
+    "best_single_within_3pp": {
+      "holdout_accuracy": 0.9432258064516129,
+      "holdout_expected_cost": 201.3891950504276,
+      "recipe": "budget_only_2pp",
+      "speedup_vs_baseline_protect": 3.567405912418578
+    },
+    "best_stacked_within_3pp": {
+      "holdout_accuracy": 0.9458064516129032,
+      "holdout_expected_cost": 37.108740068080216,
+      "recipe": "stacked_kdet1000_budget_2pp",
+      "speedup_vs_baseline_protect": 19.36031791437971
+    },
+    "note": "Compared on the SAME holdout split. Negative result (stacking_beats_best_single=false) is acceptable.",
+    "stacking_beats_best_single": true
+  },
+  "status": "ok",
+  "winner_within_3pp_acc": {
+    "delta_vs_baseline_protect": {
+      "accuracy": -0.020645161290322567,
+      "cost_ms": -681.3282650520333,
+      "speedup": 19.36031791437971
+    },
+    "holdout_accuracy": 0.9458064516129032,
+    "holdout_expected_cost": 37.108740068080216,
+    "recipe": "stacked_kdet1000_budget_2pp"
+  }
+}
