@@ -1,0 +1,1279 @@
+{
+  "aggregate": {
+    "cells": {
+      "measured_kdet_28.2808__budget_0pp": {
+        "delta_acc_vs_protect": {
+          "mean": 0.0,
+          "n": 3,
+          "std": 0.0
+        },
+        "fraction_seeds_delta_acc_ge_neg3pp": 1.0,
+        "safe": true,
+        "speedup_vs_protect": {
+          "mean": 1.0,
+          "n": 3,
+          "std": 0.0
+        }
+      },
+      "measured_kdet_28.2808__budget_1pp": {
+        "delta_acc_vs_protect": {
+          "mean": -0.007931188561215366,
+          "n": 3,
+          "std": 0.0013439688801961547
+        },
+        "fraction_seeds_delta_acc_ge_neg3pp": 1.0,
+        "safe": true,
+        "speedup_vs_protect": {
+          "mean": 1.2550411317046497,
+          "n": 3,
+          "std": 0.011416004497302493
+        }
+      },
+      "measured_kdet_28.2808__budget_2pp": {
+        "delta_acc_vs_protect": {
+          "mean": -0.019716264521894566,
+          "n": 3,
+          "std": 0.0031137980037458652
+        },
+        "fraction_seeds_delta_acc_ge_neg3pp": 1.0,
+        "safe": true,
+        "speedup_vs_protect": {
+          "mean": 1.5968538679569522,
+          "n": 3,
+          "std": 0.004389965008938689
+        }
+      },
+      "measured_kdet_28.2808__budget_3pp": {
+        "delta_acc_vs_protect": {
+          "mean": -0.030049151027703298,
+          "n": 3,
+          "std": 0.003163001594005344
+        },
+        "fraction_seeds_delta_acc_ge_neg3pp": 0.6666666666666666,
+        "safe": false,
+        "speedup_vs_protect": {
+          "mean": 1.8736850421728437,
+          "n": 3,
+          "std": 0.01541774304690553
+        }
+      }
+    },
+    "headline": {
+      "verdict": "trained_budget_sweep_only"
+    }
+  },
+  "blocked_per_run_seed0_reference": {
+    "cells": {
+      "measured_kdet_28.2808__budget_0pp": {
+        "anneal_feasible": true,
+        "baseline_micro_validation": 0.7249424083769633,
+        "budget": 0.0,
+        "cell": "measured_kdet_28.2808__budget_0pp",
+        "collection_holdout": {
+          "accuracy": 0.7742962466487936,
+          "expected_cost": 20.610792824000384
+        },
+        "delta_vs_protect": {
+          "accuracy": 0.0,
+          "cost_ms": 0.0,
+          "speedup": 1.0
+        },
+        "detector_cost_ms": 28.28079699887894,
+        "floor": 0.7249424083769633,
+        "holdout": {
+          "accuracy": 0.7625670241286864,
+          "expected_cost": 15.981509800570413,
+          "macro_accuracy": 0.7613944830070032,
+          "worst_class_accuracy": 0.6827586206896552
+        },
+        "holdout_feasible": true,
+        "layout": {
+          "detector": "detector",
+          "expected_cost_dp": 0.0,
+          "initial": [
+            "K0",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K6",
+              "K3",
+              "detector"
+            ],
+            "K0:suv": [
+              "K4",
+              "K3",
+              "detector"
+            ]
+          }
+        },
+        "thresholds": {
+          "K0": 0.8068992605014723,
+          "K3": 0.5125768926678872,
+          "K4": 0.9946682757260848,
+          "K6": 0.9013307362186666
+        },
+        "validation": {
+          "accuracy": 0.7250261780104712,
+          "expected_cost": 16.66848426602543,
+          "feasible": true,
+          "macro_accuracy": 0.723845287414612,
+          "worst_class_accuracy": 0.6745291023247921
+        }
+      },
+      "measured_kdet_28.2808__budget_1pp": {
+        "anneal_feasible": true,
+        "baseline_micro_validation": 0.7249424083769633,
+        "budget": 0.01,
+        "cell": "measured_kdet_28.2808__budget_1pp",
+        "collection_holdout": {
+          "accuracy": 0.7742962466487936,
+          "expected_cost": 20.610792824000384
+        },
+        "delta_vs_protect": {
+          "accuracy": -0.013237265415549593,
+          "cost_ms": -3.6527994119307614,
+          "speedup": 1.2962839824104109
+        },
+        "detector_cost_ms": 28.28079699887894,
+        "floor": 0.7149424083769633,
+        "holdout": {
+          "accuracy": 0.7493297587131368,
+          "expected_cost": 12.328710388639651,
+          "macro_accuracy": 0.7484575689012328,
+          "worst_class_accuracy": 0.6772413793103448
+        },
+        "holdout_feasible": true,
+        "layout": {
+          "detector": "detector",
+          "expected_cost_dp": 0.0,
+          "initial": [
+            "K0",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K6",
+              "K3",
+              "detector"
+            ],
+            "K0:suv": [
+              "K4",
+              "K3",
+              "detector"
+            ]
+          }
+        },
+        "thresholds": {
+          "K0": 0.0,
+          "K3": 0.0,
+          "K4": 1.0,
+          "K6": 0.9598111327813597
+        },
+        "validation": {
+          "accuracy": 0.7150157068062827,
+          "expected_cost": 12.779438014977785,
+          "feasible": true,
+          "macro_accuracy": 0.7142659070160968,
+          "worst_class_accuracy": 0.6829961544892158
+        }
+      },
+      "measured_kdet_28.2808__budget_2pp": {
+        "anneal_feasible": true,
+        "baseline_micro_validation": 0.7249424083769633,
+        "budget": 0.02,
+        "cell": "measured_kdet_28.2808__budget_2pp",
+        "collection_holdout": {
+          "accuracy": 0.7742962466487936,
+          "expected_cost": 20.610792824000384
+        },
+        "delta_vs_protect": {
+          "accuracy": -0.026139410187667633,
+          "cost_ms": -6.237613812680543,
+          "speedup": 1.6401560341400314
+        },
+        "detector_cost_ms": 28.28079699887894,
+        "floor": 0.7049424083769633,
+        "holdout": {
+          "accuracy": 0.7364276139410187,
+          "expected_cost": 9.74389598788987,
+          "macro_accuracy": 0.7355799965125167,
+          "worst_class_accuracy": 0.6862068965517242
+        },
+        "holdout_feasible": true,
+        "layout": {
+          "detector": "detector",
+          "expected_cost_dp": 0.0,
+          "initial": [
+            "K0",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K6",
+              "K3",
+              "detector"
+            ],
+            "K0:suv": [
+              "K4",
+              "K3",
+              "detector"
+            ]
+          }
+        },
+        "thresholds": {
+          "K0": 0.0,
+          "K3": 0.0,
+          "K4": 0.9933533765831772,
+          "K6": 0.7976272227812786
+        },
+        "validation": {
+          "accuracy": 0.7050471204188482,
+          "expected_cost": 10.193355665503214,
+          "feasible": true,
+          "macro_accuracy": 0.7042683602796658,
+          "worst_class_accuracy": 0.6692860725631166
+        }
+      },
+      "measured_kdet_28.2808__budget_3pp": {
+        "anneal_feasible": true,
+        "baseline_micro_validation": 0.7249424083769633,
+        "budget": 0.03,
+        "cell": "measured_kdet_28.2808__budget_3pp",
+        "collection_holdout": {
+          "accuracy": 0.7742962466487936,
+          "expected_cost": 20.610792824000384
+        },
+        "delta_vs_protect": {
+          "accuracy": -0.03317694369973201,
+          "cost_ms": -7.633031282929194,
+          "speedup": 1.9143020811276918
+        },
+        "detector_cost_ms": 28.28079699887894,
+        "floor": 0.6949424083769633,
+        "holdout": {
+          "accuracy": 0.7293900804289544,
+          "expected_cost": 8.348478517641219,
+          "macro_accuracy": 0.7285169554206208,
+          "worst_class_accuracy": 0.6976588628762542
+        },
+        "holdout_feasible": true,
+        "layout": {
+          "detector": "detector",
+          "expected_cost_dp": 0.0,
+          "initial": [
+            "K0",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K6",
+              "K3",
+              "detector"
+            ],
+            "K0:suv": [
+              "K4",
+              "K3",
+              "detector"
+            ]
+          }
+        },
+        "thresholds": {
+          "K0": 0.0,
+          "K3": 0.0,
+          "K4": 0.9645540118217468,
+          "K6": 0.8367987408929941
+        },
+        "validation": {
+          "accuracy": 0.695413612565445,
+          "expected_cost": 8.805546332403948,
+          "feasible": true,
+          "macro_accuracy": 0.6946346224915181,
+          "worst_class_accuracy": 0.6378532018057181
+        }
+      }
+    },
+    "detector_mode": "trained",
+    "layout": {
+      "detector": "detector",
+      "expected_cost_dp": 0.0,
+      "initial": [
+        "K0",
+        "detector"
+      ],
+      "specialized": {
+        "K0:coupe": [
+          "K6",
+          "K3",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K3",
+          "detector"
+        ]
+      }
+    },
+    "measured_detector_cost_ms": 28.28079699887894,
+    "note": "No synthetic Kdet grid in trained mode \u2014 budget sweep only.",
+    "protect_cell": "measured_kdet_28.2808__budget_0pp",
+    "scene": "h08",
+    "seed": 0,
+    "split": {
+      "holdout_fraction": 0.2,
+      "holdout_samples": 5968,
+      "per_run": {
+        "run0": {
+          "holdout": 1123,
+          "validation": 4493
+        },
+        "run1": {
+          "holdout": 426,
+          "validation": 1704
+        },
+        "run2": {
+          "holdout": 1115,
+          "validation": 4459
+        },
+        "run3": {
+          "holdout": 380,
+          "validation": 1522
+        },
+        "run4": {
+          "holdout": 1102,
+          "validation": 4406
+        },
+        "run5": {
+          "holdout": 372,
+          "validation": 1487
+        },
+        "run6": {
+          "holdout": 1088,
+          "validation": 4354
+        },
+        "run7": {
+          "holdout": 362,
+          "validation": 1450
+        }
+      },
+      "random_seed": 0,
+      "strategy": "blocked_per_run",
+      "validation_samples": 23875
+    }
+  },
+  "budgets": [
+    0.0,
+    0.01,
+    0.02,
+    0.03
+  ],
+  "detector_mode": "trained",
+  "kdets_ms": "measured_only",
+  "per_seed": [
+    {
+      "cells": {
+        "measured_kdet_28.2808__budget_0pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7339895287958115,
+          "budget": 0.0,
+          "cell": "measured_kdet_28.2808__budget_0pp",
+          "collection_holdout": {
+            "accuracy": 0.738103217158177,
+            "expected_cost": 21.0963963194549
+          },
+          "delta_vs_protect": {
+            "accuracy": 0.0,
+            "cost_ms": 0.0,
+            "speedup": 1.0
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7339895287958115,
+          "holdout": {
+            "accuracy": 0.7357573726541555,
+            "expected_cost": 16.98814595238745,
+            "macro_accuracy": 0.7344587961623118,
+            "worst_class_accuracy": 0.6777476255088195
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.808354702531075,
+            "K3": 0.5415216891133056,
+            "K4": 0.9947367505151398,
+            "K6": 0.95
+          },
+          "validation": {
+            "accuracy": 0.7340314136125654,
+            "expected_cost": 17.055323482257915,
+            "feasible": true,
+            "macro_accuracy": 0.732836106659726,
+            "worst_class_accuracy": 0.684355616815989
+          }
+        },
+        "measured_kdet_28.2808__budget_1pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7339895287958115,
+          "budget": 0.01,
+          "cell": "measured_kdet_28.2808__budget_1pp",
+          "collection_holdout": {
+            "accuracy": 0.738103217158177,
+            "expected_cost": 21.0963963194549
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.0065348525469168806,
+            "cost_ms": -3.3532809424741306,
+            "speedup": 1.245934297115234
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7239895287958115,
+          "holdout": {
+            "accuracy": 0.7292225201072386,
+            "expected_cost": 13.634865009913318,
+            "macro_accuracy": 0.7283919315428165,
+            "worst_class_accuracy": 0.6967435549525102
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.5596358107060803,
+            "K3": 0.0,
+            "K4": 1.0,
+            "K6": 0.9306808710098267
+          },
+          "validation": {
+            "accuracy": 0.7241047120418849,
+            "expected_cost": 13.654977585096852,
+            "feasible": true,
+            "macro_accuracy": 0.723322726659574,
+            "worst_class_accuracy": 0.69710544452102
+          }
+        },
+        "measured_kdet_28.2808__budget_2pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7339895287958115,
+          "budget": 0.02,
+          "cell": "measured_kdet_28.2808__budget_2pp",
+          "collection_holdout": {
+            "accuracy": 0.738103217158177,
+            "expected_cost": 21.0963963194549
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.017593833780160884,
+            "cost_ms": -6.341351601441081,
+            "speedup": 1.5956113542173767
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7139895287958115,
+          "holdout": {
+            "accuracy": 0.7181635388739946,
+            "expected_cost": 10.646794350946367,
+            "macro_accuracy": 0.7173509794724835,
+            "worst_class_accuracy": 0.6762541806020067
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.0,
+            "K3": 0.0,
+            "K4": 0.9967045917802927,
+            "K6": 0.8262568712234497
+          },
+          "validation": {
+            "accuracy": 0.7140523560209424,
+            "expected_cost": 10.6716514715846,
+            "feasible": true,
+            "macro_accuracy": 0.7132840836657659,
+            "worst_class_accuracy": 0.6890152148470156
+          }
+        },
+        "measured_kdet_28.2808__budget_3pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7339895287958115,
+          "budget": 0.03,
+          "cell": "measured_kdet_28.2808__budget_3pp",
+          "collection_holdout": {
+            "accuracy": 0.738103217158177,
+            "expected_cost": 21.0963963194549
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.029323056300268102,
+            "cost_ms": -8.002259457962305,
+            "speedup": 1.8905364499014001
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7039895287958114,
+          "holdout": {
+            "accuracy": 0.7064343163538874,
+            "expected_cost": 8.985886494425143,
+            "macro_accuracy": 0.7055919390991309,
+            "worst_class_accuracy": 0.651505016722408
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.0,
+            "K3": 0.0,
+            "K4": 0.9774432097162519,
+            "K6": 0.805592973621524
+          },
+          "validation": {
+            "accuracy": 0.7041256544502618,
+            "expected_cost": 9.082625712607511,
+            "feasible": true,
+            "macro_accuracy": 0.7033310905939838,
+            "worst_class_accuracy": 0.6622638354790169
+          }
+        }
+      },
+      "detector_mode": "trained",
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "measured_detector_cost_ms": 28.28079699887894,
+      "note": "No synthetic Kdet grid in trained mode \u2014 budget sweep only.",
+      "protect_cell": "measured_kdet_28.2808__budget_0pp",
+      "scene": "h08",
+      "seed": 0,
+      "split": {
+        "holdout_fraction": 0.2,
+        "holdout_samples": 5968,
+        "per_run": {
+          "run0": {
+            "holdout": 1123,
+            "validation": 4493
+          },
+          "run1": {
+            "holdout": 426,
+            "validation": 1704
+          },
+          "run2": {
+            "holdout": 1115,
+            "validation": 4459
+          },
+          "run3": {
+            "holdout": 380,
+            "validation": 1522
+          },
+          "run4": {
+            "holdout": 1102,
+            "validation": 4406
+          },
+          "run5": {
+            "holdout": 372,
+            "validation": 1487
+          },
+          "run6": {
+            "holdout": 1088,
+            "validation": 4354
+          },
+          "run7": {
+            "holdout": 362,
+            "validation": 1450
+          }
+        },
+        "random_seed": 0,
+        "strategy": "random_per_run",
+        "validation_samples": 23875
+      }
+    },
+    {
+      "cells": {
+        "measured_kdet_28.2808__budget_0pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7334869109947644,
+          "budget": 0.0,
+          "cell": "measured_kdet_28.2808__budget_0pp",
+          "collection_holdout": {
+            "accuracy": 0.7401139410187667,
+            "expected_cost": 21.32211735602153
+          },
+          "delta_vs_protect": {
+            "accuracy": 0.0,
+            "cost_ms": 0.0,
+            "speedup": 1.0
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7334869109947644,
+          "holdout": {
+            "accuracy": 0.7422922252010724,
+            "expected_cost": 16.99014724442664,
+            "macro_accuracy": 0.7411922101705697,
+            "worst_class_accuracy": 0.6972413793103448
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.7179185869742413,
+            "K3": 0.5422382975111202,
+            "K4": 0.9998978498030682,
+            "K6": 0.95
+          },
+          "validation": {
+            "accuracy": 0.7334869109947644,
+            "expected_cost": 17.13444985350995,
+            "feasible": true,
+            "macro_accuracy": 0.7323278933211728,
+            "worst_class_accuracy": 0.6857339765678843
+          }
+        },
+        "measured_kdet_28.2808__budget_1pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7334869109947644,
+          "budget": 0.01,
+          "cell": "measured_kdet_28.2808__budget_1pp",
+          "collection_holdout": {
+            "accuracy": 0.7401139410187667,
+            "expected_cost": 21.32211735602153
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.009215817694369965,
+            "cost_ms": -3.4125933033500697,
+            "speedup": 1.251340802486216
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7234869109947644,
+          "holdout": {
+            "accuracy": 0.7330764075067024,
+            "expected_cost": 13.577553941076571,
+            "macro_accuracy": 0.7323254767000855,
+            "worst_class_accuracy": 0.7110344827586207
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.5579398809647074,
+            "K3": 0.0,
+            "K4": 0.9998978498030682,
+            "K6": 0.9636428684604411
+          },
+          "validation": {
+            "accuracy": 0.7235183246073298,
+            "expected_cost": 13.717065491913294,
+            "feasible": true,
+            "macro_accuracy": 0.7227055141370337,
+            "worst_class_accuracy": 0.6972777394900069
+          }
+        },
+        "measured_kdet_28.2808__budget_2pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7334869109947644,
+          "budget": 0.02,
+          "cell": "measured_kdet_28.2808__budget_2pp",
+          "collection_holdout": {
+            "accuracy": 0.7401139410187667,
+            "expected_cost": 21.32211735602153
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.023290884718498717,
+            "cost_ms": -6.382782180515438,
+            "speedup": 1.6017311690564127
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7134869109947644,
+          "holdout": {
+            "accuracy": 0.7190013404825737,
+            "expected_cost": 10.607365063911203,
+            "macro_accuracy": 0.7183192669530893,
+            "worst_class_accuracy": 0.691638795986622
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.0,
+            "K3": 0.0,
+            "K4": 0.9959139969884132,
+            "K6": 0.8446268305486562
+          },
+          "validation": {
+            "accuracy": 0.7135078534031414,
+            "expected_cost": 10.583819369076597,
+            "feasible": true,
+            "macro_accuracy": 0.7127085676827069,
+            "worst_class_accuracy": 0.6826617622471158
+          }
+        },
+        "measured_kdet_28.2808__budget_3pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7334869109947644,
+          "budget": 0.03,
+          "cell": "measured_kdet_28.2808__budget_3pp",
+          "collection_holdout": {
+            "accuracy": 0.7401139410187667,
+            "expected_cost": 21.32211735602153
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.03351206434316356,
+            "cost_ms": -7.905635036174923,
+            "speedup": 1.870232199038052
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7034869109947643,
+          "holdout": {
+            "accuracy": 0.7087801608579088,
+            "expected_cost": 9.084512208251718,
+            "macro_accuracy": 0.7080694113708478,
+            "worst_class_accuracy": 0.6655518394648829
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.0,
+            "K3": 0.0,
+            "K4": 0.9778029079339942,
+            "K6": 0.8061035409265634
+          },
+          "validation": {
+            "accuracy": 0.7035811518324607,
+            "expected_cost": 9.078678030386307,
+            "feasible": true,
+            "macro_accuracy": 0.7027544829250494,
+            "worst_class_accuracy": 0.658919913058017
+          }
+        }
+      },
+      "detector_mode": "trained",
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "measured_detector_cost_ms": 28.28079699887894,
+      "note": "No synthetic Kdet grid in trained mode \u2014 budget sweep only.",
+      "protect_cell": "measured_kdet_28.2808__budget_0pp",
+      "scene": "h08",
+      "seed": 1,
+      "split": {
+        "holdout_fraction": 0.2,
+        "holdout_samples": 5968,
+        "per_run": {
+          "run0": {
+            "holdout": 1123,
+            "validation": 4493
+          },
+          "run1": {
+            "holdout": 426,
+            "validation": 1704
+          },
+          "run2": {
+            "holdout": 1115,
+            "validation": 4459
+          },
+          "run3": {
+            "holdout": 380,
+            "validation": 1522
+          },
+          "run4": {
+            "holdout": 1102,
+            "validation": 4406
+          },
+          "run5": {
+            "holdout": 372,
+            "validation": 1487
+          },
+          "run6": {
+            "holdout": 1088,
+            "validation": 4354
+          },
+          "run7": {
+            "holdout": 362,
+            "validation": 1450
+          }
+        },
+        "random_seed": 1,
+        "strategy": "random_per_run",
+        "validation_samples": 23875
+      }
+    },
+    {
+      "cells": {
+        "measured_kdet_28.2808__budget_0pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7350785340314137,
+          "budget": 0.0,
+          "cell": "measured_kdet_28.2808__budget_0pp",
+          "collection_holdout": {
+            "accuracy": 0.7337466487935657,
+            "expected_cost": 21.547041785627627
+          },
+          "delta_vs_protect": {
+            "accuracy": 0.0,
+            "cost_ms": 0.0,
+            "speedup": 1.0
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7350785340314137,
+          "holdout": {
+            "accuracy": 0.732573726541555,
+            "expected_cost": 17.159499653600562,
+            "macro_accuracy": 0.731214109442564,
+            "worst_class_accuracy": 0.6627586206896552
+          },
+          "holdout_feasible": false,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.744304993931128,
+            "K3": 0.5420194572331953,
+            "K4": 0.9991727374037918,
+            "K6": 0.9316781661948379
+          },
+          "validation": {
+            "accuracy": 0.7351204188481676,
+            "expected_cost": 16.804320080497153,
+            "feasible": true,
+            "macro_accuracy": 0.7339952854783928,
+            "worst_class_accuracy": 0.695210199862164
+          }
+        },
+        "measured_kdet_28.2808__budget_1pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7350785340314137,
+          "budget": 0.01,
+          "cell": "measured_kdet_28.2808__budget_1pp",
+          "collection_holdout": {
+            "accuracy": 0.7337466487935657,
+            "expected_cost": 21.547041785627627
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.008042895442359255,
+            "cost_ms": -3.6251519604767424,
+            "speedup": 1.2678482955124992
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7250785340314136,
+          "holdout": {
+            "accuracy": 0.7245308310991957,
+            "expected_cost": 13.53434769312382,
+            "macro_accuracy": 0.7236994868908068,
+            "worst_class_accuracy": 0.6862068965517242
+          },
+          "holdout_feasible": false,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.5853444118889011,
+            "K3": 0.0,
+            "K4": 0.9991727374037918,
+            "K6": 0.9584479915852449
+          },
+          "validation": {
+            "accuracy": 0.7253193717277487,
+            "expected_cost": 13.53751110749908,
+            "feasible": true,
+            "macro_accuracy": 0.7244850291259394,
+            "worst_class_accuracy": 0.702019344985576
+          }
+        },
+        "measured_kdet_28.2808__budget_2pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7350785340314137,
+          "budget": 0.02,
+          "cell": "measured_kdet_28.2808__budget_2pp",
+          "collection_holdout": {
+            "accuracy": 0.7337466487935657,
+            "expected_cost": 21.547041785627627
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.0182640750670241,
+            "cost_ms": -6.3891668961181765,
+            "speedup": 1.5932190805970672
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7150785340314136,
+          "holdout": {
+            "accuracy": 0.7143096514745308,
+            "expected_cost": 10.770332757482386,
+            "macro_accuracy": 0.7135038132771442,
+            "worst_class_accuracy": 0.6834482758620689
+          },
+          "holdout_feasible": false,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.0,
+            "K3": 0.0,
+            "K4": 0.9968345542343295,
+            "K6": 0.825895365403623
+          },
+          "validation": {
+            "accuracy": 0.7150994764397905,
+            "expected_cost": 10.665723711203293,
+            "feasible": true,
+            "macro_accuracy": 0.7143266136428423,
+            "worst_class_accuracy": 0.6858384885470657
+          }
+        },
+        "measured_kdet_28.2808__budget_3pp": {
+          "anneal_feasible": true,
+          "baseline_micro_validation": 0.7350785340314137,
+          "budget": 0.03,
+          "cell": "measured_kdet_28.2808__budget_3pp",
+          "collection_holdout": {
+            "accuracy": 0.7337466487935657,
+            "expected_cost": 21.547041785627627
+          },
+          "delta_vs_protect": {
+            "accuracy": -0.027312332439678233,
+            "cost_ms": -7.935382905769648,
+            "speedup": 1.8602864775790793
+          },
+          "detector_cost_ms": 28.28079699887894,
+          "floor": 0.7050785340314136,
+          "holdout": {
+            "accuracy": 0.7052613941018767,
+            "expected_cost": 9.224116747830914,
+            "macro_accuracy": 0.7044239188681756,
+            "worst_class_accuracy": 0.6608695652173913
+          },
+          "holdout_feasible": true,
+          "layout": {
+            "detector": "detector",
+            "expected_cost_dp": 0.0,
+            "initial": [
+              "K0",
+              "detector"
+            ],
+            "specialized": {
+              "K0:coupe": [
+                "K6",
+                "K3",
+                "detector"
+              ],
+              "K0:suv": [
+                "K4",
+                "K3",
+                "detector"
+              ]
+            }
+          },
+          "thresholds": {
+            "K0": 0.0,
+            "K3": 0.0,
+            "K4": 0.9779944602324038,
+            "K6": 0.825895365403623
+          },
+          "validation": {
+            "accuracy": 0.7051727748691099,
+            "expected_cost": 9.129258443418566,
+            "feasible": true,
+            "macro_accuracy": 0.7043817379628152,
+            "worst_class_accuracy": 0.660257482026417
+          }
+        }
+      },
+      "detector_mode": "trained",
+      "layout": {
+        "detector": "detector",
+        "expected_cost_dp": 0.0,
+        "initial": [
+          "K0",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "measured_detector_cost_ms": 28.28079699887894,
+      "note": "No synthetic Kdet grid in trained mode \u2014 budget sweep only.",
+      "protect_cell": "measured_kdet_28.2808__budget_0pp",
+      "scene": "h08",
+      "seed": 2,
+      "split": {
+        "holdout_fraction": 0.2,
+        "holdout_samples": 5968,
+        "per_run": {
+          "run0": {
+            "holdout": 1123,
+            "validation": 4493
+          },
+          "run1": {
+            "holdout": 426,
+            "validation": 1704
+          },
+          "run2": {
+            "holdout": 1115,
+            "validation": 4459
+          },
+          "run3": {
+            "holdout": 380,
+            "validation": 1522
+          },
+          "run4": {
+            "holdout": 1102,
+            "validation": 4406
+          },
+          "run5": {
+            "holdout": 372,
+            "validation": 1487
+          },
+          "run6": {
+            "holdout": 1088,
+            "validation": 4354
+          },
+          "run7": {
+            "holdout": 362,
+            "validation": 1450
+          }
+        },
+        "random_seed": 2,
+        "strategy": "random_per_run",
+        "validation_samples": 23875
+      }
+    }
+  ],
+  "scene": "h08",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "split_strategy_primary": "random_per_run",
+  "status": "ok"
+}
