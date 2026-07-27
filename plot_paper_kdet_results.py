@@ -78,7 +78,25 @@ def _figure_metrics(scene: str, report: Mapping[str, object], output_path: Path)
         accuracy = [100.0 * float(values[label][partition]["accuracy"]) for partition in PARTITIONS]
         axes[0].bar(positions + offset, accuracy, width, label=label, color=COLORS[label])
         cost = [float(values[label][partition]["expected_cost"]) for partition in PARTITIONS]
-        axes[1].bar(positions + offset, cost, width, label=label, color=COLORS[label])
+        cost_bars = axes[1].bar(positions + offset, cost, width, label=label, color=COLORS[label])
+        if label == "Annealed":
+            baseline_cost = [
+                float(values["Baseline"][partition]["expected_cost"])
+                for partition in PARTITIONS
+            ]
+            for bar, reference_cost, annealed_cost in zip(
+                cost_bars, baseline_cost, cost, strict=True
+            ):
+                speedup = reference_cost / annealed_cost
+                axes[1].annotate(
+                    f"{speedup:.2f}x",
+                    (bar.get_x() + bar.get_width() / 2, bar.get_height()),
+                    xytext=(0, 4),
+                    textcoords="offset points",
+                    ha="center",
+                    va="bottom",
+                    fontsize=9,
+                )
 
     axes[0].set_title("End-to-end accuracy")
     axes[0].set_ylabel("Accuracy (%)")
@@ -180,6 +198,12 @@ def _collect_scene_data(scene: str, report: Mapping[str, object]) -> dict:
                 "thresholds": metrics["thresholds"],
             }
         collected["policies"][label.lower()] = policy_data  # type: ignore[index]
+    baseline = collected["policies"]["baseline"]  # type: ignore[index]
+    annealed = collected["policies"]["annealed"]  # type: ignore[index]
+    for partition in PARTITIONS:
+        baseline_cost = float(baseline[partition]["expected_cost"])
+        annealed_cost = float(annealed[partition]["expected_cost"])
+        annealed[partition]["speedup_vs_baseline"] = baseline_cost / annealed_cost
     return collected
 
 
@@ -188,7 +212,9 @@ def plot_reports(
     figures_dir: Path = DEFAULT_FIGURES_DIR,
 ) -> dict:
     report_paths = sorted(
-        path for path in reports_dir.glob("*.json") if path.name != "summary.json"
+        path
+        for path in reports_dir.glob("*.json")
+        if path.name not in {"summary.json", "plot_data.json"}
     )
     if not report_paths:
         raise FileNotFoundError(f"No scene reports found in {reports_dir}.")
