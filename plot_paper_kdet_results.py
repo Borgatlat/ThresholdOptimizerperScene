@@ -110,20 +110,29 @@ def _figure_policy(scene: str, report: Mapping[str, object], output_path: Path) 
     annealed_thresholds = annealed_holdout.get("thresholds", {})
     if not isinstance(baseline_thresholds, Mapping) or not isinstance(annealed_thresholds, Mapping):
         raise ValueError("thresholds must be objects.")
-    model_ids = sorted(set(baseline_thresholds) | set(annealed_thresholds))
+    threshold_ids = sorted(set(baseline_thresholds) | set(annealed_thresholds))
     positions_routes = np.arange(len(route_ids))
-    positions_models = np.arange(len(model_ids))
+    positions_thresholds = np.arange(len(threshold_ids))
     width = 0.36
 
-    figure, axes = plt.subplots(2, 1, figsize=(10.5, 7.2), constrained_layout=True)
-    axes[0].bar(
+    figure_height = max(7.2, 4.2 + 0.38 * len(threshold_ids))
+    figure, axes = plt.subplots(
+        2,
+        1,
+        figsize=(12.5, figure_height),
+        gridspec_kw={
+            "height_ratios": [1.0, max(1.4, 0.12 * len(threshold_ids))]
+        },
+        constrained_layout=True,
+    )
+    baseline_route_bars = axes[0].bar(
         positions_routes - width / 2,
         [baseline_routes.get(route_id, 0.0) for route_id in route_ids],
         width,
         label="Baseline",
         color=COLORS["Baseline"],
     )
-    axes[0].bar(
+    annealed_route_bars = axes[0].bar(
         positions_routes + width / 2,
         [annealed_routes.get(route_id, 0.0) for route_id in route_ids],
         width,
@@ -135,27 +144,42 @@ def _figure_policy(scene: str, report: Mapping[str, object], output_path: Path) 
     axes[0].set_xticks(positions_routes, route_ids)
     axes[0].grid(axis="y", alpha=0.25)
     axes[0].legend()
+    axes[0].bar_label(baseline_route_bars, fmt="%.1f", padding=2, fontsize=8)
+    axes[0].bar_label(annealed_route_bars, fmt="%.1f", padding=2, fontsize=8)
 
-    axes[1].bar(
-        positions_models - width / 2,
-        [float(baseline_thresholds.get(model_id, np.nan)) for model_id in model_ids],
+    baseline_threshold_bars = axes[1].barh(
+        positions_thresholds - width / 2,
+        [
+            float(baseline_thresholds.get(threshold_id, np.nan))
+            for threshold_id in threshold_ids
+        ],
         width,
         label="Baseline",
         color=COLORS["Baseline"],
     )
-    axes[1].bar(
-        positions_models + width / 2,
-        [float(annealed_thresholds.get(model_id, np.nan)) for model_id in model_ids],
+    annealed_threshold_bars = axes[1].barh(
+        positions_thresholds + width / 2,
+        [
+            float(annealed_thresholds.get(threshold_id, np.nan))
+            for threshold_id in threshold_ids
+        ],
         width,
         label="Annealed",
         color=COLORS["Annealed"],
     )
-    axes[1].set_title("Selected confidence thresholds")
-    axes[1].set_ylabel("Threshold")
-    axes[1].set_ylim(0.0, 1.02)
-    axes[1].set_xticks(positions_models, model_ids)
-    axes[1].grid(axis="y", alpha=0.25)
+    axes[1].set_title("Selected confidence thresholds by cascade position")
+    axes[1].set_xlabel("Threshold")
+    axes[1].set_xlim(0.0, 1.08)
+    axes[1].set_yticks(positions_thresholds, threshold_ids, fontsize=8)
+    axes[1].invert_yaxis()
+    axes[1].grid(axis="x", alpha=0.25)
     axes[1].legend()
+    axes[1].bar_label(
+        baseline_threshold_bars, fmt="%.2f", padding=2, fontsize=7
+    )
+    axes[1].bar_label(
+        annealed_threshold_bars, fmt="%.2f", padding=2, fontsize=7
+    )
 
     figure.suptitle(f"{scene}: paper-Kdet routing and thresholds")
     figure.savefig(output_path, dpi=180, bbox_inches="tight")
@@ -188,7 +212,9 @@ def plot_reports(
     figures_dir: Path = DEFAULT_FIGURES_DIR,
 ) -> dict:
     report_paths = sorted(
-        path for path in reports_dir.glob("*.json") if path.name != "summary.json"
+        path
+        for path in reports_dir.glob("*.json")
+        if path.name not in {"summary.json", "plot_data.json"}
     )
     if not report_paths:
         raise FileNotFoundError(f"No scene reports found in {reports_dir}.")
