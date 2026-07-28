@@ -64,17 +64,24 @@ def _default_threshold_bank() -> dict[str, float]:
 
 
 def _complete_threshold_vector(optimized: dict[str, float]) -> dict[str, float]:
-    """Ensure the bank always has K0..K6, even if a cascade never used K5.
+    """Ensure the bank has K0..K6 plus any location-specific overrides.
 
     Why: a scene detector later may switch banks mid-stream; missing keys
     would crash. Filling unused Kis with their original calibration threshold
     is a safe no-op default (that classifier simply keeps old behavior if
-    somehow invoked).
+    somehow invoked). Qualified keys such as ``K3@initial[1]`` are retained
+    so repeated occurrences do not lose their independently tuned values.
     """
     bank = _default_threshold_bank()
-    for ki, value in optimized.items():
-        bank[ki] = float(value)
-    return {ki: bank[ki] for ki in ALL_KI}
+    for threshold_id, value in optimized.items():
+        bank[threshold_id] = float(value)
+    ordered = {ki: bank[ki] for ki in ALL_KI}
+    ordered.update(
+        (threshold_id, value)
+        for threshold_id, value in bank.items()
+        if threshold_id not in ordered
+    )
+    return ordered
 
 
 def _cascade_from_split(split: dict) -> Cascade:
@@ -280,6 +287,7 @@ def run_mode(
         "notes": (
             "i22 omitted from optimization (no usable single-label outcomes). "
             "Unused Ki slots filled with registry default thresholds. "
+            "Repeated Ki occurrences retain location-qualified threshold overrides. "
             "Keys are scene_id, not sensor_id."
         ),
         "mode": mode,
@@ -342,7 +350,7 @@ def write_comparison_table(output_dir: Path, summaries: dict[str, dict]) -> Path
         "|---|---|---:|---:|---:|---|---|",
     ]
     for row in rows:
-        layout = "→".join(row["layout"] or [])
+        layout = " → ".join(row["layout"] or [])
         md.append(
             "| {exp} | {scene} | {acc} | {cost} | {spd} | {feas} | `{layout}` |".format(
                 exp=row["experiment"],
@@ -355,7 +363,7 @@ def write_comparison_table(output_dir: Path, summaries: dict[str, dict]) -> Path
             )
         )
     md_path = output_dir / "COMPARISON.md"
-    md_path.write_text("\n".join(md) + "\n")
+    md_path.write_text("\n".join(md) + "\n", encoding="utf-8")
     print(f"Wrote {path}")
     print(f"Wrote {md_path}")
     return path

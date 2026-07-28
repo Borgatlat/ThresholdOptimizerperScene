@@ -2,9 +2,11 @@
 
 The hierarchy DP chooses a *topology* from the acceptance decisions recorded
 at the registry thresholds.  This module keeps that topology fixed and
-chooses the confidence threshold for every non-deterministic Ki that occurs
-in it.  It never re-runs a neural network: each candidate policy is replayed
-against the shared ``empirical_outcomes.pkl`` confidence/prediction table.
+chooses the confidence threshold for every non-deterministic Ki *occurrence*
+in it. The same Ki can therefore use different thresholds at different
+locations. It never re-runs a neural network: each candidate policy is
+replayed against the shared ``empirical_outcomes.pkl`` confidence/prediction
+table.
 
 Two optimizers are provided:
 
@@ -25,6 +27,8 @@ from __future__ import annotations
 import argparse
 import json
 import math
+from collections import Counter
+from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
 from time import perf_counter
@@ -50,6 +54,92 @@ DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS = 500_000
 DEFAULT_DETECTOR_MODE = "trained"
 
 
+@dataclass(frozen=True)
+class ThresholdSlot:
+    """One independently tunable classifier occurrence in a cascade layout."""
+
+    key: str
+    candidate_id: str
+    location: str
+
+
+def enumerate_threshold_slots(
+    initial: Sequence[str],
+    specialized: Mapping[tuple[str, str], Sequence[str]],
+    detector_id: str = "detector",
+) -> tuple[ThresholdSlot, ...]:
+    """Return stable policy keys for every non-detector layout occurrence.
+
+    A model that occurs once keeps its historical key (for example ``K3``).
+    Repeated models are qualified by their location (for example
+    ``K3@initial[1]`` and ``K3@specialized[K0:suv][0]``), allowing each
+    occurrence to carry an independent confidence threshold.
+    """
+
+    occurrences: list[tuple[str, str]] = []
+    for index, candidate_id in enumerate(initial):
+        if candidate_id != detector_id:
+            occurrences.append((candidate_id, f"initial[{index}]"))
+    for (router_id, group), chain in specialized.items():
+        for index, candidate_id in enumerate(chain):
+            if candidate_id != detector_id:
+                location = f"specialized[{router_id}:{group}][{index}]"
+                occurrences.append((candidate_id, location))
+
+    counts = Counter(candidate_id for candidate_id, _ in occurrences)
+    return tuple(
+        ThresholdSlot(
+            key=(
+                candidate_id
+                if counts[candidate_id] == 1
+                else f"{candidate_id}@{location}"
+            ),
+            candidate_id=candidate_id,
+            location=location,
+        )
+        for candidate_id, location in occurrences
+    )
+
+
+def normalise_threshold_slots(
+    slots: Sequence[ThresholdSlot],
+    thresholds: Mapping[str, float],
+) -> dict[str, float]:
+    """Resolve a threshold mapping to one value per occurrence.
+
+    Location-qualified keys take precedence. A bare model id remains a
+    supported fallback and is expanded to every occurrence of that model,
+    which keeps policies written by older versions replayable.
+    """
+
+    slot_keys = {slot.key for slot in slots}
+    model_ids = {slot.candidate_id for slot in slots}
+    extra = set(thresholds) - slot_keys - model_ids
+    if extra:
+        raise ValueError(f"Thresholds contain unknown keys: {sorted(extra)}")
+
+    result: dict[str, float] = {}
+    missing: list[str] = []
+    for slot in slots:
+        if slot.key in thresholds:
+            value = thresholds[slot.key]
+        elif slot.candidate_id in thresholds:
+            value = thresholds[slot.candidate_id]
+        else:
+            missing.append(slot.key)
+            continue
+        result[slot.key] = float(value)
+
+    if missing:
+        raise ValueError(
+            "Thresholds must cover every fixed-layout occurrence; "
+            f"missing={sorted(missing)}"
+        )
+    if not np.isfinite(list(result.values())).all():
+        raise ValueError("Thresholds must be finite numbers.")
+    return result
+
+
 class FixedLayoutThresholdEvaluator:
     """Vectorized replay of one fixed cascade layout.
 
@@ -67,28 +157,50 @@ class FixedLayoutThresholdEvaluator:
         self.sample_ids, self.true_global = self._load_true_labels()
         self.sample_count = len(self.sample_ids)
 
-        self.tunable_ids = self._collect_tunable_ids()
-        required_outcomes = set(self.tunable_ids)
+        self.threshold_slots = self._collect_threshold_slots()
+        # ``tunable_ids`` remains the optimizer's ordered coordinate list.
+        # It now contains policy-slot ids rather than deduplicated model ids.
+        self.tunable_ids = tuple(slot.key for slot in self.threshold_slots)
+        self.threshold_candidates = {
+            slot.key: slot.candidate_id for slot in self.threshold_slots
+        }
+        self.threshold_locations = {
+            slot.key: slot.location for slot in self.threshold_slots
+        }
+        self.tunable_model_ids = tuple(
+            dict.fromkeys(slot.candidate_id for slot in self.threshold_slots)
+        )
+        self._slot_by_location = {
+            slot.location: slot.key for slot in self.threshold_slots
+        }
+        required_outcomes = set(self.tunable_model_ids)
         if optimizer.detector_mode == "trained":
             required_outcomes.add(optimizer.detector_outcome_id)
 
         self.prediction: dict[str, np.ndarray] = {}
-        self.confidence: dict[str, np.ndarray] = {}
+        candidate_confidence: dict[str, np.ndarray] = {}
         for candidate_id in required_outcomes:
             prediction, confidence = self._load_candidate_arrays(candidate_id)
             self.prediction[candidate_id] = prediction
-            self.confidence[candidate_id] = confidence
+            candidate_confidence[candidate_id] = confidence
+
+        # Confidence arrays are shared by occurrences of the same model, but
+        # their acceptance masks are computed independently from slot values.
+        self.confidence = {
+            slot.key: candidate_confidence[slot.candidate_id]
+            for slot in self.threshold_slots
+        }
 
         self.default_thresholds = {
-            candidate_id: self._default_threshold(candidate_id)
-            for candidate_id in self.tunable_ids
+            slot.key: self._default_threshold(slot.candidate_id)
+            for slot in self.threshold_slots
         }
         self._intermediate_idx_to_group = dict(optimizer._intermediate_idx_to_group)
         self._specialized_groups = set(optimizer.groups)
         self._global_name_to_idx = {
             name: idx for idx, name in enumerate(GLOBAL_CLASS_NAMES)
         }
-        ending_ids = [*self.tunable_ids, self.detector_id]
+        ending_ids = [*self.tunable_model_ids, self.detector_id]
         if optimizer.detector_mode == "trained":
             ending_ids[-1] = optimizer.detector_outcome_id
         self._ending_ids = tuple(dict.fromkeys(ending_ids))
@@ -113,24 +225,25 @@ class FixedLayoutThresholdEvaluator:
             raise ValueError(f"Unknown global label(s) in empirical outcomes: {unknown}")
         return sample_ids, true_global.to_numpy(dtype=int)
 
-    def _collect_tunable_ids(self) -> tuple[str, ...]:
-        ordered: list[str] = []
-        seen: set[str] = set()
-
-        for chain in [self.cascade.initial, *self.cascade.specialized.values()]:
-            for candidate_id in chain:
-                if candidate_id == self.detector_id or candidate_id in seen:
-                    continue
+    def _collect_threshold_slots(self) -> tuple[ThresholdSlot, ...]:
+        slots = enumerate_threshold_slots(
+            self.cascade.initial,
+            self.cascade.specialized,
+            self.detector_id,
+        )
+        for slot in slots:
+            candidate_id = slot.candidate_id
+            if candidate_id != self.detector_id:
                 if candidate_id not in self.candidates.index:
                     raise ValueError(f"Cascade refers to unknown candidate {candidate_id!r}")
                 if self.candidates.loc[candidate_id, "kind"] == "detector":
-                    continue
-                seen.add(candidate_id)
-                ordered.append(candidate_id)
+                    raise ValueError(
+                        f"Cascade uses detector candidate {candidate_id!r} as a tunable slot."
+                    )
 
-        if not ordered:
+        if not slots:
             raise ValueError("The fixed cascade contains no tunable classifier.")
-        return tuple(ordered)
+        return slots
 
     def _load_candidate_arrays(self, candidate_id: str) -> tuple[np.ndarray, np.ndarray]:
         rows = self.optimizer.outcomes[
@@ -162,17 +275,7 @@ class FixedLayoutThresholdEvaluator:
 
     def _normalise_thresholds(self, thresholds: Mapping[str, float] | None) -> dict[str, float]:
         supplied = self.default_thresholds if thresholds is None else thresholds
-        missing = set(self.tunable_ids) - set(supplied)
-        extra = set(supplied) - set(self.tunable_ids)
-        if missing or extra:
-            raise ValueError(
-                "Thresholds must match the fixed-layout models exactly; "
-                f"missing={sorted(missing)}, extra={sorted(extra)}"
-            )
-        result = {candidate_id: float(supplied[candidate_id]) for candidate_id in self.tunable_ids}
-        if not np.isfinite(list(result.values())).all():
-            raise ValueError("Thresholds must be finite numbers.")
-        return result
+        return normalise_threshold_slots(self.threshold_slots, supplied)
 
     def evaluate(
         self,
@@ -189,15 +292,15 @@ class FixedLayoutThresholdEvaluator:
         """
         threshold_map = self._normalise_thresholds(thresholds)
         accepts = {
-            candidate_id: self.confidence[candidate_id] >= threshold
-            for candidate_id, threshold in threshold_map.items()
+            slot_id: self.confidence[slot_id] >= threshold
+            for slot_id, threshold in threshold_map.items()
         }
         final_prediction = np.full(self.sample_count, -1, dtype=int)
         final_cost = np.zeros(self.sample_count, dtype=float)
         ending = np.full(self.sample_count, -1, dtype=np.int8)
 
         pending = np.ones(self.sample_count, dtype=bool)
-        for candidate_id in self.cascade.initial:
+        for index, candidate_id in enumerate(self.cascade.initial):
             if not pending.any():
                 break
             if candidate_id == self.detector_id:
@@ -206,7 +309,8 @@ class FixedLayoutThresholdEvaluator:
                 break
 
             final_cost[pending] += self._cost(candidate_id)
-            accepted = pending & accepts[candidate_id]
+            slot_id = self._slot_by_location[f"initial[{index}]"]
+            accepted = pending & accepts[slot_id]
             if self._is_identifier(candidate_id):
                 self._route_identifier(
                     candidate_id,
@@ -299,6 +403,8 @@ class FixedLayoutThresholdEvaluator:
                 chain = self.cascade.specialized.get((router_id, group), [self.detector_id])
                 self._run_specialized_chain(
                     chain,
+                    router_id,
+                    group,
                     branch_mask,
                     accepts,
                     final_prediction,
@@ -318,6 +424,8 @@ class FixedLayoutThresholdEvaluator:
     def _run_specialized_chain(
         self,
         chain: Sequence[str],
+        router_id: str,
+        group: str,
         initial_mask: np.ndarray,
         accepts: Mapping[str, np.ndarray],
         final_prediction: np.ndarray,
@@ -325,7 +433,7 @@ class FixedLayoutThresholdEvaluator:
         ending: np.ndarray,
     ) -> None:
         pending = initial_mask.copy()
-        for candidate_id in chain:
+        for index, candidate_id in enumerate(chain):
             if not pending.any():
                 return
             if candidate_id == self.detector_id:
@@ -333,7 +441,9 @@ class FixedLayoutThresholdEvaluator:
                 return
 
             final_cost[pending] += self._cost(candidate_id)
-            accepted = pending & accepts[candidate_id]
+            location = f"specialized[{router_id}:{group}][{index}]"
+            slot_id = self._slot_by_location[location]
+            accepted = pending & accepts[slot_id]
             self._finish_candidate(accepted, candidate_id, final_prediction, ending)
             pending &= ~accepted
 
@@ -375,7 +485,10 @@ class FixedLayoutThresholdEvaluator:
     @property
     def maximum_path_cost(self) -> float:
         """A conservative cost scale for the annealing accuracy penalty."""
-        candidate_cost = sum(self._cost(candidate_id) for candidate_id in self.tunable_ids)
+        candidate_cost = sum(
+            self._cost(self.threshold_candidates[slot_id])
+            for slot_id in self.tunable_ids
+        )
         return candidate_cost + self.optimizer.detector_cost
 
 
@@ -674,7 +787,7 @@ def build_threshold_grids(
     evaluator: FixedLayoutThresholdEvaluator,
     quantile_points: int | None = DEFAULT_QUANTILE_POINTS,
 ) -> dict[str, np.ndarray]:
-    """Return one empirically meaningful threshold grid per active Ki.
+    """Return one empirically meaningful threshold grid per active occurrence.
 
     An empirical policy changes only when a threshold crosses an observed
     confidence.  ``quantile_points=None`` exposes all such breakpoints.  A
@@ -685,8 +798,8 @@ def build_threshold_grids(
         raise ValueError("quantile_points must be at least 2, or None for exact breakpoints.")
 
     grids: dict[str, np.ndarray] = {}
-    for candidate_id in evaluator.tunable_ids:
-        confidence = evaluator.confidence[candidate_id]
+    for slot_id in evaluator.tunable_ids:
+        confidence = evaluator.confidence[slot_id]
         if quantile_points is None:
             values = np.unique(confidence)
         else:
@@ -695,12 +808,12 @@ def build_threshold_grids(
 
         values = np.concatenate(
             (
-                np.array([0.0, evaluator.default_thresholds[candidate_id]]),
+                np.array([0.0, evaluator.default_thresholds[slot_id]]),
                 np.asarray(values, dtype=float),
                 np.array([np.nextafter(float(np.max(confidence)), np.inf)]),
             )
         )
-        grids[candidate_id] = np.unique(values)
+        grids[slot_id] = np.unique(values)
     return grids
 
 
@@ -709,19 +822,36 @@ def _validate_grids(
     grids: Mapping[str, Sequence[float]] | None,
     quantile_points: int | None,
 ) -> dict[str, np.ndarray]:
-    resolved = build_threshold_grids(evaluator, quantile_points) if grids is None else grids
-    if set(resolved) != set(evaluator.tunable_ids):
-        raise ValueError(
-            "Threshold grids must contain exactly the fixed-layout classifier ids; "
-            f"expected={list(evaluator.tunable_ids)}, got={sorted(resolved)}"
+    if grids is None:
+        resolved: Mapping[str, Sequence[float]] = build_threshold_grids(
+            evaluator, quantile_points
         )
+    else:
+        resolved = grids
+
+    slot_keys = set(evaluator.tunable_ids)
+    model_ids = set(evaluator.tunable_model_ids)
+    extra = set(resolved) - slot_keys - model_ids
+    if extra:
+        raise ValueError(f"Threshold grids contain unknown keys: {sorted(extra)}")
 
     validated: dict[str, np.ndarray] = {}
-    for candidate_id in evaluator.tunable_ids:
-        values = np.unique(np.asarray(resolved[candidate_id], dtype=float))
+    missing: list[str] = []
+    for slot_id in evaluator.tunable_ids:
+        candidate_id = evaluator.threshold_candidates[slot_id]
+        source_id = slot_id if slot_id in resolved else candidate_id
+        if source_id not in resolved:
+            missing.append(slot_id)
+            continue
+        values = np.unique(np.asarray(resolved[source_id], dtype=float))
         if len(values) == 0 or not np.isfinite(values).all():
-            raise ValueError(f"Threshold grid for {candidate_id} must contain finite values.")
-        validated[candidate_id] = values
+            raise ValueError(f"Threshold grid for {slot_id} must contain finite values.")
+        validated[slot_id] = values
+    if missing:
+        raise ValueError(
+            "Threshold grids must cover every fixed-layout occurrence; "
+            f"missing={sorted(missing)}"
+        )
     return validated
 
 
@@ -762,11 +892,11 @@ def optimize_fixed_layout_thresholds_exhaustive(
     quantile_points: int | None = DEFAULT_QUANTILE_POINTS,
     max_combinations: int = DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS,
 ) -> dict:
-    """Find the exact best policy in a discrete Cartesian threshold grid."""
+    """Find the exact best per-occurrence policy in a Cartesian grid."""
     if not 0.0 <= target_accuracy <= 1.0:
         raise ValueError("target_accuracy must be between 0 and 1.")
     threshold_grids = _validate_grids(evaluator, grids, quantile_points)
-    grid_sizes = {candidate_id: len(values) for candidate_id, values in threshold_grids.items()}
+    grid_sizes = {slot_id: len(values) for slot_id, values in threshold_grids.items()}
     combinations = math.prod(grid_sizes.values())
     if combinations > max_combinations:
         raise ValueError(
@@ -776,12 +906,12 @@ def optimize_fixed_layout_thresholds_exhaustive(
             "or use simulated annealing."
         )
 
-    candidate_ids = evaluator.tunable_ids
+    slot_ids = evaluator.tunable_ids
     best_metrics: dict | None = None
     evaluations = 0
     started = perf_counter()
-    for values in product(*(threshold_grids[candidate_id] for candidate_id in candidate_ids)):
-        policy = dict(zip(candidate_ids, values, strict=True))
+    for values in product(*(threshold_grids[slot_id] for slot_id in slot_ids)):
+        policy = dict(zip(slot_ids, values, strict=True))
         metrics = evaluator.evaluate(policy, include_route_counts=False)
         evaluations += 1
         if best_metrics is None or _policy_key(metrics, target_accuracy) < _policy_key(best_metrics, target_accuracy):
@@ -821,12 +951,12 @@ def coordinate_descent_thresholds(
     current = evaluator._normalise_thresholds(initial_thresholds)
     # Snap a caller-provided continuous initial policy to the discrete grid.
     current = {
-        candidate_id: float(
-            threshold_grids[candidate_id][
-                np.argmin(np.abs(threshold_grids[candidate_id] - value))
+        slot_id: float(
+            threshold_grids[slot_id][
+                np.argmin(np.abs(threshold_grids[slot_id] - value))
             ]
         )
-        for candidate_id, value in current.items()
+        for slot_id, value in current.items()
     }
     started = perf_counter()
     current_metrics = evaluator.evaluate(current, include_route_counts=False)
@@ -836,21 +966,21 @@ def coordinate_descent_thresholds(
     for _ in range(max_passes):
         passes += 1
         changed = False
-        for candidate_id in evaluator.tunable_ids:
+        for slot_id in evaluator.tunable_ids:
             coordinate_best = current_metrics
-            coordinate_value = current[candidate_id]
-            for value in threshold_grids[candidate_id]:
-                if value == current[candidate_id]:
+            coordinate_value = current[slot_id]
+            for value in threshold_grids[slot_id]:
+                if value == current[slot_id]:
                     continue
                 proposal = dict(current)
-                proposal[candidate_id] = float(value)
+                proposal[slot_id] = float(value)
                 metrics = evaluator.evaluate(proposal, include_route_counts=False)
                 evaluations += 1
                 if _policy_key(metrics, target_accuracy) < _policy_key(coordinate_best, target_accuracy):
                     coordinate_best = metrics
                     coordinate_value = float(value)
-            if coordinate_value != current[candidate_id]:
-                current[candidate_id] = coordinate_value
+            if coordinate_value != current[slot_id]:
+                current[slot_id] = coordinate_value
                 current_metrics = coordinate_best
                 changed = True
         if not changed:
@@ -878,7 +1008,7 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     coordinate_descent_passes: int = 25,
     accuracy_penalty: float | None = None,
 ) -> dict:
-    """Anneal on a discrete threshold grid, then polish with coordinate descent.
+    """Anneal per occurrence, then polish with coordinate descent.
 
     The energy is a Lagrangian-style runtime plus an accuracy-shortfall
     penalty.  The returned winner is still selected by the hard constraint:
@@ -889,17 +1019,17 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     if n_iterations < 1:
         raise ValueError("n_iterations must be at least 1.")
     threshold_grids = _validate_grids(evaluator, grids, quantile_points)
-    candidate_ids = evaluator.tunable_ids
+    slot_ids = evaluator.tunable_ids
     grid_indices = {
-        candidate_id: int(
+        slot_id: int(
             np.argmin(
                 np.abs(
-                    threshold_grids[candidate_id]
-                    - evaluator.default_thresholds[candidate_id]
+                    threshold_grids[slot_id]
+                    - evaluator.default_thresholds[slot_id]
                 )
             )
         )
-        for candidate_id in candidate_ids
+        for slot_id in slot_ids
     }
     rng = np.random.default_rng(random_seed)
     if accuracy_penalty is None:
@@ -908,8 +1038,8 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
 
     def policy_from_indices(indices: Mapping[str, int]) -> dict[str, float]:
         return {
-            candidate_id: float(threshold_grids[candidate_id][indices[candidate_id]])
-            for candidate_id in candidate_ids
+            slot_id: float(threshold_grids[slot_id][indices[slot_id]])
+            for slot_id in slot_ids
         }
 
     def energy(metrics: Mapping[str, float]) -> float:
@@ -935,9 +1065,9 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
         for iteration in t_iter:
             progress = iteration / max(n_iterations - 1, 1)
             temperature = initial_temperature * (final_temperature / initial_temperature) ** progress
-            candidate_id = str(rng.choice(candidate_ids))
-            grid = threshold_grids[candidate_id]
-            current_index = current_indices[candidate_id]
+            slot_id = str(rng.choice(slot_ids))
+            grid = threshold_grids[slot_id]
+            current_index = current_indices[slot_id]
             proposal_indices = dict(current_indices)
 
             if len(grid) > 1 and rng.random() < 0.8:
@@ -945,11 +1075,13 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
                 step = int(rng.integers(-max_step, max_step + 1))
                 if step == 0:
                     step = 1 if current_index < len(grid) - 1 else -1
-                proposal_indices[candidate_id] = int(np.clip(current_index + step, 0, len(grid) - 1))
+                proposal_indices[slot_id] = int(
+                    np.clip(current_index + step, 0, len(grid) - 1)
+                )
             else:
-                proposal_indices[candidate_id] = int(rng.integers(0, len(grid)))
+                proposal_indices[slot_id] = int(rng.integers(0, len(grid)))
 
-            if proposal_indices[candidate_id] == current_index:
+            if proposal_indices[slot_id] == current_index:
                 continue
 
             proposal_metrics = evaluator.evaluate(
@@ -1172,7 +1304,7 @@ def main() -> None:
     )
     print(f"fixed initial layout: {evaluator.cascade.initial}")
     print(f"fixed specialized layout: {evaluator.cascade.specialized}")
-    print(f"tunable models: {list(evaluator.tunable_ids)}")
+    print(f"tunable threshold slots: {list(evaluator.tunable_ids)}")
 
     if target_accuracy is None:
         target_accuracy = float(evaluator.evaluate(include_route_counts=False)["accuracy"])

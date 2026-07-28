@@ -197,16 +197,24 @@ The threshold optimizer can use either:
   to one. A quantile is not an accuracy or recall value; it is a way of
   choosing thresholds where confidence values actually occur.
 
-- **Threshold grid**: the allowed confidence thresholds for one model. It
-  contains the selected confidence quantiles, the model's current threshold,
+- **Threshold slot**: one occurrence of a model in the fixed cascade. A model
+  used once keeps its normal id (`K3`). If it appears more than once, each
+  occurrence gets a location-qualified id such as `K3@initial[1]` or
+  `K3@specialized[K0:suv][0]`. Those slots are optimized independently.
+
+- **Threshold grid**: the allowed confidence thresholds for one threshold
+  slot. It contains the selected confidence quantiles, the model's current
+  threshold,
   `0.0` (accept every cached sample), and a value just above the maximum
   confidence (reject every cached sample). Between two adjacent cached
   confidence values, changing the threshold cannot change any cached route,
   so a continuous search would mostly repeat equivalent policies.
 
-- **Policy**: one chosen threshold from every active model's grid. Replaying
-  a policy gives end-to-end accuracy, expected runtime, routes, and per-class
-  metrics.
+- **Policy**: one chosen threshold from every active occurrence's grid.
+  Replaying a policy gives end-to-end accuracy, expected runtime, routes, and
+  per-class metrics. For backward compatibility, a bare model key in an input
+  policy or custom grid is used as the fallback for all occurrences of that
+  model; optimized output always writes distinct location keys when needed.
 
 - **Policy key**: the hard final ranking rule used by both optimizers. A
   policy that meets the target accuracy always beats one that misses it. Among
@@ -218,7 +226,7 @@ The threshold optimizer can use either:
 
 This is the brute-force baseline. It evaluates every Cartesian product of the
 threshold grids, then selects the policy with the best policy key. It is exact
-for that discrete grid, but becomes impractical once many models or many
+for that discrete grid, but becomes impractical once many occurrences or many
 thresholds are used.
 
 ```text
@@ -251,14 +259,14 @@ gives the annealer a stronger signal that 94.9% is preferable to 70.0% when
 both policies miss a 95% target. This energy guides exploration; the policy
 key above still decides the final winner.
 
-At each iteration, the annealer chooses one model:
+At each iteration, the annealer chooses one threshold slot:
 
-- **80% chance**: move that model's threshold index by a random local step.
+- **80% chance**: move that occurrence's threshold index by a random local step.
   The maximum step decreases as the search progresses.
-- **20% chance**: jump to a random threshold index in that model's grid.
+- **20% chance**: jump to a random threshold index in that occurrence's grid.
 
 ```text
-current = grid value nearest to each model's current threshold
+current = grid value nearest to each occurrence's current threshold
 current_metrics = replay_cached_outcomes(current)
 best = current
 best_metrics = current_metrics
@@ -267,13 +275,13 @@ for iteration in range(n_iterations):
     progress = iteration / (n_iterations - 1)
     temperature = exponential_decay(start_temperature, end_temperature, progress)
 
-    model = random active model
+    slot = random active occurrence
     proposal = copy(current)
 
     if random() < 0.8:
-        proposal[model] = clamp(current[model] + random_local_step(progress))
+        proposal[slot] = clamp(current[slot] + random_local_step(progress))
     else:
-        proposal[model] = random index from that model's grid
+        proposal[slot] = random index from that occurrence's grid
 
     proposal_metrics = replay_cached_outcomes(proposal)
     delta = energy(proposal_metrics) - energy(current_metrics)
@@ -292,16 +300,16 @@ return coordinate_descent(best)
 ### Coordinate Descent Polish
 
 Coordinate descent is the greedy finishing step. It holds every threshold
-fixed except one, tries every value in that model's grid, and keeps an
-improvement according to the policy key. It repeats full passes until no model
-improves or the maximum number of passes is reached.
+fixed except one, tries every value in that occurrence's grid, and keeps an
+improvement according to the policy key. It repeats full passes until no
+occurrence improves or the maximum number of passes is reached.
 
 ```text
 for pass in range(max_passes):
     changed = false
 
-    for model in active models:
-        try every threshold for model while holding all other thresholds fixed
+    for slot in active occurrences:
+        try every threshold for slot while holding all other thresholds fixed
         keep the best value if it improves the policy key
         changed = changed or an improvement was kept
 

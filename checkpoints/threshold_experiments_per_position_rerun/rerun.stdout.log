@@ -1,0 +1,168 @@
+
+[layouts] dp_optimal
+  holdout acc=0.9716  cost=832.66ms  speedup=1.52x
+
+[layouts] global_only
+  holdout acc=0.9755  cost=969.38ms  speedup=1.40x
+
+[layouts] single_global
+  holdout acc=0.9852  cost=1561.06ms  speedup=1.00x
+
+[layouts] hierarchy_classic
+  holdout acc=0.9871  cost=4267.95ms  speedup=1.03x
+
+[layouts] three_linear
+  holdout acc=0.9890  cost=1917.87ms  speedup=4.10x
+
+[layouts] three_global
+  holdout acc=0.9755  cost=969.38ms  speedup=1.40x
+
+[layouts] k0_k2_k3_hierarchy
+  holdout acc=0.9729  cost=892.92ms  speedup=1.49x
+
+[layouts] both_identifiers
+  holdout acc=0.9748  cost=980.00ms  speedup=2.26x
+Wrote checkpoints\threshold_experiments_per_position_rerun\layouts_h24_paper\summary.json
+
+[targets] paper_baseline
+  target=0.9655  holdout acc=0.9716  cost=832.66ms
+
+[targets] paper_acc_0.90
+  target=0.9000  holdout acc=0.9077  cost=6.61ms
+
+[targets] paper_acc_0.95
+  target=0.9500  holdout acc=0.9516  cost=389.10ms
+
+[targets] paper_acc_0.98
+  target=0.9800  holdout acc=0.9845  cost=1426.62ms
+
+[targets] trained_baseline
+  target=0.9266  holdout acc=0.9323  cost=8.82ms
+
+[targets] trained_acc_0.90
+  target=0.9000  holdout acc=0.9110  cost=6.24ms
+
+[targets] trained_acc_0.95
+  target=0.9500  holdout acc=0.9400  cost=13.56ms
+
+[targets] trained_acc_0.98
+  target=0.9800  holdout acc=0.9400  cost=13.56ms
+Wrote checkpoints\threshold_experiments_per_position_rerun\targets_h24\summary.json
+
+[scenes_trained] h24
+  holdout acc=0.9323  cost=8.82ms  speedup=1.47x
+
+[scenes_trained] h08
+  holdout acc=0.7619  cost=15.84ms  speedup=1.30x
+
+[scenes_trained] s31
+  holdout acc=0.4929  cost=23.19ms  speedup=1.05x
+
+[scenes_trained] a06
+  holdout acc=0.3425  cost=9.46ms  speedup=2.89x
+
+[scenes_trained] i29
+  holdout acc=0.2532  cost=15.47ms  speedup=1.63x
+Wrote checkpoints\threshold_experiments_per_position_rerun\scenes_trained_baseline_target\summary.json
+
+[transfer] optimizing source policy on h24 (paper, baseline target)
+
+[transfer] h24
+  zero-shot acc=0.9667  cost=858.94ms
+  retuned holdout acc=0.9716  cost=832.66ms  speedup=1.52x
+
+[transfer] h08
+  zero-shot acc=0.9048  cost=2731.03ms
+  retuned holdout acc=0.9159  cost=2370.91ms  speedup=1.24x
+
+[transfer] s31
+  zero-shot acc=0.7772  cost=3880.31ms
+  retuned holdout acc=0.7851  cost=4116.51ms  speedup=1.10x
+
+[transfer] a06
+  zero-shot acc=0.6904  cost=3823.39ms
+  retuned holdout acc=0.7138  cost=4456.43ms  speedup=0.85x
+
+[transfer] i29
+  zero-shot acc=0.7118  cost=4940.33ms
+  retuned holdout acc=0.7378  cost=5732.14ms  speedup=1.04x
+Wrote checkpoints\threshold_experiments_per_position_rerun\transfer_h24_layout\summary.json
+
+[search_settings] q10_blocked
+  holdout acc=0.9658  cost=846.84ms
+
+[search_settings] q25_blocked
+  holdout acc=0.9748  cost=992.94ms
+
+[search_settings] q50_blocked
+  holdout acc=0.9716  cost=832.66ms
+
+[search_settings] q100_blocked
+  holdout acc=0.9677  cost=711.29ms
+
+[search_settings] q50_random
+  holdout acc=0.9555  cost=870.72ms
+Wrote checkpoints\threshold_experiments_per_position_rerun\search_settings_h24\summary.json
+
+[layouts_by_scene] h24__dp_optimal
+  holdout acc=0.9716  cost=832.66ms  speedup=1.52x
+
+[layouts_by_scene] h24__global_only
+  holdout acc=0.9755  cost=969.38ms  speedup=1.40x
+
+[layouts_by_scene] h24__hierarchy_classic
+  holdout acc=0.9871  cost=4267.95ms  speedup=1.03x
+
+[layouts_by_scene] h24__three_linear
+  holdout acc=0.9890  cost=1917.87ms  speedup=4.10x
+
+[layouts_by_scene] h08__dp_optimal
+  holdout acc=0.9142  cost=2438.22ms  speedup=1.21x
+
+[layouts_by_scene] h08__global_only
+  holdout acc=0.9254  cost=2699.46ms  speedup=1.18x
+
+[layouts_by_scene] h08__hierarchy_classic
+  holdout acc=0.9657  cost=6542.74ms  speedup=0.99x
+
+[layouts_by_scene] h08__three_linear
+  holdout acc=0.9745  cost=4201.97ms  speedup=1.85x
+
+[layouts_by_scene] s31__dp_optimal
+  holdout acc=0.7881  cost=4316.63ms  speedup=1.04x
+
+[layouts_by_scene] s31__global_only
+  holdout acc=0.8163  cost=4609.82ms  speedup=1.09x
+
+[layouts_by_scene] s31__hierarchy_classic
+  holdout acc=0.8940  cost=7431.07ms  speedup=1.04x
+
+[layouts_by_scene] s31__three_linear
+  holdout acc=0.8883  cost=5893.61ms  speedup=1.30x
+
+[layouts_by_scene] a06__dp_optimal
+  holdout acc=0.7109  cost=4348.15ms  speedup=0.87x
+
+[layouts_by_scene] a06__global_only
+  holdout acc=0.6300  cost=3348.19ms  speedup=1.31x
+
+[layouts_by_scene] a06__hierarchy_classic
+  holdout acc=0.9297  cost=8796.30ms  speedup=0.96x
+
+[layouts_by_scene] a06__three_linear
+  holdout acc=0.8440  cost=6517.32ms  speedup=1.22x
+
+[layouts_by_scene] i29__dp_optimal
+  holdout acc=0.7392  cost=5682.93ms  speedup=1.05x
+
+[layouts_by_scene] i29__global_only
+  holdout acc=0.7673  cost=6077.93ms  speedup=1.06x
+
+[layouts_by_scene] i29__hierarchy_classic
+  holdout acc=0.8897  cost=8038.20ms  speedup=1.00x
+
+[layouts_by_scene] i29__three_linear
+  holdout acc=0.9154  cost=8035.42ms  speedup=1.02x
+Wrote checkpoints\threshold_experiments_per_position_rerun\layouts_by_scene_paper\summary.json
+Wrote checkpoints\threshold_experiments_per_position_rerun\MASTER_SUMMARY.json
+Wrote checkpoints\threshold_experiments_per_position_rerun\MASTER_SUMMARY.md

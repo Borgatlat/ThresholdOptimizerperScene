@@ -1,0 +1,77 @@
+{
+  "description": "Per-scene optimized IDK thresholds for M3N-VC. mode=per_scene_structure, detector_mode=trained, target=each scene's baseline validation accuracy.",
+  "detector_mode": "trained",
+  "mode": "per_scene_structure",
+  "notes": "i22 omitted from optimization (no usable single-label outcomes). Unused Ki slots filled with registry default thresholds. Repeated Ki occurrences retain location-qualified threshold overrides. Keys are scene_id, not sensor_id.",
+  "scene_ids": [
+    "h24",
+    "h08",
+    "s31",
+    "a06",
+    "i29",
+    "i22"
+  ],
+  "threshold_bank": {
+    "a06": {
+      "K0": 0.8588543461293591,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9214253656718195,
+      "K4": 0.0,
+      "K5": 0.95,
+      "K6": 0.0
+    },
+    "h08": {
+      "K0": 0.7419269449856816,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9,
+      "K3@specialized[K0:coupe][1]": 0.0,
+      "K3@specialized[K0:suv][1]": 0.0,
+      "K4": 0.9997279291250267,
+      "K5": 0.95,
+      "K6": 0.9769513363740882
+    },
+    "h24": {
+      "K0": 0.9454332164355687,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9,
+      "K3@initial[1]": 0.31238147616386414,
+      "K3@specialized[K0:coupe][1]": 0.6029707193374634,
+      "K3@specialized[K0:suv][1]": 0.5286086031368801,
+      "K4": 0.9045340418815613,
+      "K5": 0.95,
+      "K6": 0.9394601498331342
+    },
+    "i22": {
+      "K0": 0.0,
+      "K1": 0.0,
+      "K2": 0.0,
+      "K3": 0.0,
+      "K4": 0.0,
+      "K5": 0.0,
+      "K6": 0.0
+    },
+    "i29": {
+      "K0": 0.0,
+      "K1": 0.95,
+      "K2": 0.9999990463256837,
+      "K3": 0.9,
+      "K4": 0.9090003724000892,
+      "K5": 0.95,
+      "K6": 0.9999986886978149
+    },
+    "s31": {
+      "K0": 0.9382889051826633,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K2@specialized[K0:coupe][1]": 0.998507887733226,
+      "K2@specialized[K0:suv][1]": 0.8762508825379975,
+      "K3": 0.9,
+      "K4": 0.8955016209154713,
+      "K5": 0.95,
+      "K6": 0.9260283903199799
+    }
+  }
+}

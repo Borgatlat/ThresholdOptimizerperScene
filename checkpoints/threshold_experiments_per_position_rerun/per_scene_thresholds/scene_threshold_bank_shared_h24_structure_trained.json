@@ -1,0 +1,85 @@
+{
+  "description": "Per-scene optimized IDK thresholds for M3N-VC. mode=shared_h24_structure, detector_mode=trained, target=each scene's baseline validation accuracy.",
+  "detector_mode": "trained",
+  "mode": "shared_h24_structure",
+  "notes": "i22 omitted from optimization (no usable single-label outcomes). Unused Ki slots filled with registry default thresholds. Repeated Ki occurrences retain location-qualified threshold overrides. Keys are scene_id, not sensor_id.",
+  "scene_ids": [
+    "h24",
+    "h08",
+    "s31",
+    "a06",
+    "i29",
+    "i22"
+  ],
+  "threshold_bank": {
+    "a06": {
+      "K0": 0.9923835567065648,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9,
+      "K3@initial[1]": 0.42221796573424825,
+      "K3@specialized[K0:coupe][1]": 0.9318571151519308,
+      "K3@specialized[K0:suv][1]": 1.0000000000000002,
+      "K4": 0.0,
+      "K5": 0.95,
+      "K6": 0.5000036358833313
+    },
+    "h08": {
+      "K0": 0.9176953361958873,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9,
+      "K3@initial[1]": 0.0,
+      "K3@specialized[K0:coupe][1]": 0.0,
+      "K3@specialized[K0:suv][1]": 0.0,
+      "K4": 0.9406448882453295,
+      "K5": 0.95,
+      "K6": 0.9143028782338513
+    },
+    "h24": {
+      "K0": 0.9454332164355687,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9,
+      "K3@initial[1]": 0.31238147616386414,
+      "K3@specialized[K0:coupe][1]": 0.6029707193374634,
+      "K3@specialized[K0:suv][1]": 0.5286086031368801,
+      "K4": 0.9045340418815613,
+      "K5": 0.95,
+      "K6": 0.9394601498331342
+    },
+    "i22": {
+      "K0": 0.0,
+      "K1": 0.0,
+      "K2": 0.0,
+      "K3": 0.0,
+      "K4": 0.0,
+      "K5": 0.0,
+      "K6": 0.0
+    },
+    "i29": {
+      "K0": 0.0,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9,
+      "K3@initial[1]": 1.0000000000000002,
+      "K3@specialized[K0:coupe][1]": 0.0,
+      "K3@specialized[K0:suv][1]": 0.23144657909870148,
+      "K4": 0.8981400728225708,
+      "K5": 0.95,
+      "K6": 0.0
+    },
+    "s31": {
+      "K0": 0.9520722262713374,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.9,
+      "K3@initial[1]": 0.0,
+      "K3@specialized[K0:coupe][1]": 0.0,
+      "K3@specialized[K0:suv][1]": 0.0,
+      "K4": 0.8799671530723572,
+      "K5": 0.95,
+      "K6": 0.8938704911543398
+    }
+  }
+}

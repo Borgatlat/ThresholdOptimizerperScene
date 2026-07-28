@@ -615,18 +615,39 @@ def fig_per_scene_threshold_heatmap(results_dir: Path, figures_dir: Path) -> Pat
     bank = _load(bank_path)["threshold_bank"]
     kis = ["K0", "K1", "K2", "K3", "K4", "K5", "K6"]
     scenes = [s for s in SCENE_ORDER if s in bank]
-    data = np.array([[float(bank[s][k]) for k in kis] for s in scenes])
+    location_keys = sorted(
+        {
+            threshold_id
+            for scene in scenes
+            for threshold_id in bank[scene]
+            if "@" in threshold_id
+        }
+    )
+    threshold_ids = [*kis, *location_keys]
+    data = np.array(
+        [
+            [float(bank[scene].get(threshold_id, np.nan)) for threshold_id in threshold_ids]
+            for scene in scenes
+        ]
+    )
 
-    fig, ax = plt.subplots(figsize=(7.2, 3.8), constrained_layout=True)
+    fig_width = max(7.2, 0.65 * len(threshold_ids))
+    fig, ax = plt.subplots(figsize=(fig_width, 3.8), constrained_layout=True)
     im = ax.imshow(data, cmap="YlOrBr", aspect="auto", vmin=0.0, vmax=1.0)
-    ax.set_xticks(np.arange(len(kis)), kis)
+    ax.set_xticks(np.arange(len(threshold_ids)), threshold_ids)
+    if location_keys:
+        ax.tick_params(axis="x", labelrotation=45)
+        for label in ax.get_xticklabels():
+            label.set_horizontalalignment("right")
     ax.set_yticks(np.arange(len(scenes)), scenes)
-    ax.set_xlabel("Classifier")
+    ax.set_xlabel("Classifier / threshold slot")
     ax.set_ylabel("Scene")
     ax.set_title("Optimized per-scene confidence thresholds (paper Kdet)")
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
             val = data[i, j]
+            if not np.isfinite(val):
+                continue
             text_color = "white" if val > 0.62 else C_TEXT
             ax.text(j, i, f"{val:.2f}", ha="center", va="center", color=text_color, fontsize=8)
     cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)

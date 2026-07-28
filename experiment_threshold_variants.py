@@ -427,11 +427,16 @@ def suite_transfer(
             ),
             frozen_cascade,
         )
-        # Only keep thresholds for models that exist in this layout.
+        # Only keep thresholds for slots/models that exist in this layout.
+        # Bare model ids support replaying reports written before thresholds
+        # were keyed by repeated cascade occurrence.
+        active_threshold_keys = set(evaluator.tunable_ids) | set(
+            evaluator.tunable_model_ids
+        )
         usable = {
-            cid: float(frozen_thresholds[cid])
-            for cid in evaluator.tunable_ids
-            if cid in frozen_thresholds
+            threshold_id: float(value)
+            for threshold_id, value in frozen_thresholds.items()
+            if threshold_id in active_threshold_keys
         }
         zero_shot = evaluator.evaluate(usable)
         summary["zero_shot"][scene] = {  # type: ignore[index]

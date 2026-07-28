@@ -26,6 +26,7 @@ import torch
 
 from checkpoint_paths import resolve_registry_checkpoint
 from models.dual_modal_cnn import build_ki_model
+from threshold_optimizer import enumerate_threshold_slots, normalise_threshold_slots
 from utils.classifier_registry import ClassifierRegistry
 from utils.labels import GLOBAL_CLASS_NAMES, KI_REGISTRY
 
@@ -244,28 +245,34 @@ class LiveCascade:
         registry: ClassifierRegistry,
     ) -> None:
         self.layout = layout
-        self.thresholds = {candidate_id: float(value) for candidate_id, value in thresholds.items()}
+        self.threshold_slots = enumerate_threshold_slots(
+            layout.initial,
+            layout.specialized,
+            DETECTOR_SENTINEL,
+        )
+        self.thresholds = normalise_threshold_slots(
+            self.threshold_slots,
+            thresholds,
+        )
+        self._slot_by_location = {
+            slot.location: slot.key for slot in self.threshold_slots
+        }
         self.models = models
         self.class_names = {
             model_id: tuple(registry.get(model_id).class_names)  # type: ignore[union-attr]
             for model_id in models
         }
-        active = set(active_model_ids(layout)) - {"Kdet"}
-        missing_thresholds = active - set(self.thresholds)
-        if missing_thresholds:
-            raise ValueError(
-                f"Saved policy is missing thresholds for {sorted(missing_thresholds)}"
-            )
 
     @torch.inference_mode()
     def run(self, mic: torch.Tensor, geo: torch.Tensor) -> str:
         """Run the live cascade and return its final global-label prediction."""
-        for candidate_id in self.layout.initial:
+        for index, candidate_id in enumerate(self.layout.initial):
             if candidate_id == DETECTOR_SENTINEL:
                 return self._infer("Kdet", mic, geo)[0]
 
             label, confidence = self._infer(candidate_id, mic, geo)
-            if confidence < self.thresholds[candidate_id]:
+            slot_id = self._slot_by_location[f"initial[{index}]"]
+            if confidence < self.thresholds[slot_id]:
                 continue
 
             if KI_REGISTRY[candidate_id].level == "intermediate":
@@ -273,7 +280,9 @@ class LiveCascade:
                     chain = self.layout.specialized.get(
                         (candidate_id, label), (DETECTOR_SENTINEL,)
                     )
-                    return self._run_specialized(chain, mic, geo)
+                    return self._run_specialized(
+                        chain, candidate_id, label, mic, geo
+                    )
                 # "background" is a valid global leaf from an identifier.
                 if label in GLOBAL_CLASS_NAMES:
                     return label
@@ -291,14 +300,18 @@ class LiveCascade:
     def _run_specialized(
         self,
         chain: Sequence[str],
+        router_id: str,
+        group: str,
         mic: torch.Tensor,
         geo: torch.Tensor,
     ) -> str:
-        for candidate_id in chain:
+        for index, candidate_id in enumerate(chain):
             if candidate_id == DETECTOR_SENTINEL:
                 return self._infer("Kdet", mic, geo)[0]
             label, confidence = self._infer(candidate_id, mic, geo)
-            if confidence >= self.thresholds[candidate_id]:
+            location = f"specialized[{router_id}:{group}][{index}]"
+            slot_id = self._slot_by_location[location]
+            if confidence >= self.thresholds[slot_id]:
                 return label
         return self._infer("Kdet", mic, geo)[0]
 

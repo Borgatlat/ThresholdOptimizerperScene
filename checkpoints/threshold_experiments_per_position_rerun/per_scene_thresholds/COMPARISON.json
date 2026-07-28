@@ -1,0 +1,627 @@
+{
+  "table": [
+    {
+      "baseline_holdout_acc": 0.6464395099540582,
+      "detector_mode": "paper",
+      "experiment": "per_scene_structure__paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 0.8678149837724717,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.7109494640122511,
+      "opt_holdout_cost_ms": 4348.151752600563,
+      "scene": "a06",
+      "thresholds": {
+        "K0": 0.9999986886978149,
+        "K1": 0.8837190708335565,
+        "K2": 0.9,
+        "K2@initial[2]": 0.8852992374069837,
+        "K2@specialized[K0:suv][1]": 0.0,
+        "K3": 0.9,
+        "K3@initial[1]": 0.9109736680984497,
+        "K3@specialized[K0:coupe][1]": 0.6137802686010089,
+        "K3@specialized[K0:suv][2]": 0.0,
+        "K4": 0.6158855374978514,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.0,
+        "K6@specialized[K1:coupe][0]": 0.0
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.9157171581769437,
+      "detector_mode": "paper",
+      "experiment": "per_scene_structure__paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.2055949172191665,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.9142091152815014,
+      "opt_holdout_cost_ms": 2438.218908750962,
+      "scene": "h08",
+      "thresholds": {
+        "K0": 0.9989043011957285,
+        "K1": 0.9697120359965733,
+        "K2": 0.9,
+        "K2@initial[2]": 0.9995218369425559,
+        "K2@specialized[K0:coupe][2]": 0.44466874733263134,
+        "K2@specialized[K0:suv][2]": 0.0,
+        "K3": 0.9,
+        "K3@initial[1]": 0.7705238899406122,
+        "K3@specialized[K0:coupe][1]": 0.5125768926678872,
+        "K3@specialized[K0:suv][1]": 0.0,
+        "K4": 0.95,
+        "K4@specialized[K0:suv][0]": 0.5812465451201614,
+        "K4@specialized[K1:suv][0]": 0.0,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.9986826363874941,
+        "K6@specialized[K1:coupe][0]": 0.9598111327813597
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "detector_mode": "paper",
+      "experiment": "per_scene_structure__paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.5237892987310493,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.9716129032258064,
+      "opt_holdout_cost_ms": 832.6563081340281,
+      "scene": "h24",
+      "thresholds": {
+        "K0": 0.9974343861852374,
+        "K1": 0.9795682004519871,
+        "K2": 0.9,
+        "K2@initial[2]": 0.9396532348224095,
+        "K2@specialized[K0:coupe][2]": 0.28718581795692444,
+        "K2@specialized[K0:suv][2]": 0.886871337890625,
+        "K3": 0.9,
+        "K3@initial[1]": 0.7913912534713745,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.5286086031368801,
+        "K4": 0.9588181291307721,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.9990090131759644,
+        "K6@specialized[K1:coupe][0]": 0.0
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.7398489140698773,
+      "detector_mode": "paper",
+      "experiment": "per_scene_structure__paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.050735967547418,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.7391879131255902,
+      "opt_holdout_cost_ms": 5682.934902354439,
+      "scene": "i29",
+      "thresholds": {
+        "K0": 0.9690416564746779,
+        "K1": 0.9420359171166711,
+        "K2": 0.9,
+        "K2@initial[1]": 0.9896456866848226,
+        "K2@specialized[K0:coupe][1]": 0.7145766980794012,
+        "K2@specialized[K0:suv][2]": 0.0,
+        "K3": 0.9,
+        "K3@initial[2]": 0.8458788407092191,
+        "K3@specialized[K0:coupe][2]": 0.4163566925087754,
+        "K3@specialized[K0:suv][1]": 0.6883450491087777,
+        "K4": 0.95,
+        "K4@specialized[K0:suv][0]": 0.9985799132561197,
+        "K4@specialized[K1:suv][0]": 0.0,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.7518284418145005,
+        "K6@specialized[K1:coupe][0]": 0.6445693093903211
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.7867063492063492,
+      "detector_mode": "paper",
+      "experiment": "per_scene_structure__paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.04371189421983,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.7880952380952381,
+      "opt_holdout_cost_ms": 4316.626970065538,
+      "scene": "s31",
+      "thresholds": {
+        "K0": 0.9916025752923926,
+        "K1": 0.8087455119405474,
+        "K2": 0.9,
+        "K2@initial[2]": 0.922258621575881,
+        "K2@specialized[K0:coupe][1]": 0.998507887733226,
+        "K2@specialized[K0:suv][1]": 0.6015920468739101,
+        "K3": 0.9,
+        "K3@initial[1]": 0.8811693957873753,
+        "K3@specialized[K0:coupe][2]": 0.468469712198997,
+        "K3@specialized[K0:suv][2]": 0.439492510289562,
+        "K4": 0.9549123219081334,
+        "K5": 0.95,
+        "K5@specialized[K0:coupe][3]": 0.509793550384288,
+        "K5@specialized[K1:coupe][1]": 0.0,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.9857902356556484,
+        "K6@specialized[K1:coupe][0]": 0.5903166277068002
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.6473966309341501,
+      "detector_mode": "paper",
+      "experiment": "shared_h24_structure__paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 0.8464321742118092,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.7138208269525268,
+      "opt_holdout_cost_ms": 4456.426504333585,
+      "scene": "a06",
+      "thresholds": {
+        "K0": 0.9974234444754464,
+        "K1": 0.998279094696045,
+        "K2": 0.9,
+        "K2@initial[2]": 0.8091712922466044,
+        "K2@specialized[K0:coupe][2]": 0.46829457064064184,
+        "K2@specialized[K0:suv][2]": 0.9093337436111606,
+        "K3": 0.9,
+        "K3@initial[1]": 0.9318571151519308,
+        "K3@specialized[K0:coupe][1]": 0.9,
+        "K3@specialized[K0:suv][1]": 0.9318571151519308,
+        "K4": 0.8640549438340324,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.7610644394037674,
+        "K6@specialized[K1:coupe][0]": 0.9773223971833988
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.9157171581769437,
+      "detector_mode": "paper",
+      "experiment": "shared_h24_structure__paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.2398203167739354,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.9158847184986595,
+      "opt_holdout_cost_ms": 2370.9109496829174,
+      "scene": "h08",
+      "thresholds": {
+        "K0": 0.9967094051594637,
+        "K1": 0.9788751042619044,
+        "K2": 0.9,
+        "K2@initial[2]": 0.9929998845470195,
+        "K2@specialized[K0:coupe][2]": 0.5932160396965183,
+        "K2@specialized[K0:suv][2]": 0.995337536140364,
+        "K3": 0.9,
+        "K3@initial[1]": 0.7705238899406122,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.2607153058052063,
+        "K4": 0.959712319228114,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.9660391576436101,
+        "K6@specialized[K1:coupe][0]": 0.0
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "detector_mode": "paper",
+      "experiment": "shared_h24_structure__paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.5237892987310493,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.9716129032258064,
+      "opt_holdout_cost_ms": 832.6563081340281,
+      "scene": "h24",
+      "thresholds": {
+        "K0": 0.9974343861852374,
+        "K1": 0.9795682004519871,
+        "K2": 0.9,
+        "K2@initial[2]": 0.9396532348224095,
+        "K2@specialized[K0:coupe][2]": 0.28718581795692444,
+        "K2@specialized[K0:suv][2]": 0.886871337890625,
+        "K3": 0.9,
+        "K3@initial[1]": 0.7913912534713745,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.5286086031368801,
+        "K4": 0.9588181291307721,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.9990090131759644,
+        "K6@specialized[K1:coupe][0]": 0.0
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.740604343720491,
+      "detector_mode": "paper",
+      "experiment": "shared_h24_structure__paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.0417792844524945,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.7377714825306894,
+      "opt_holdout_cost_ms": 5732.1404142706915,
+      "scene": "i29",
+      "thresholds": {
+        "K0": 0.95,
+        "K1": 0.9420359171166711,
+        "K2": 0.9,
+        "K2@initial[2]": 0.9950627295338378,
+        "K2@specialized[K0:coupe][2]": 0.9754578896931239,
+        "K2@specialized[K0:suv][2]": 0.3579635565378228,
+        "K3": 0.9,
+        "K3@initial[1]": 0.9,
+        "K3@specialized[K0:coupe][1]": 0.8741749366935418,
+        "K3@specialized[K0:suv][1]": 0.0,
+        "K4": 0.9967853171484811,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.0,
+        "K6@specialized[K1:coupe][0]": 1.0
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.7916666666666666,
+      "detector_mode": "paper",
+      "experiment": "shared_h24_structure__paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 1.0963782446911094,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.7851190476190476,
+      "opt_holdout_cost_ms": 4116.510854710199,
+      "scene": "s31",
+      "thresholds": {
+        "K0": 0.9999543744690564,
+        "K1": 0.8423958250454493,
+        "K2": 0.9,
+        "K2@initial[2]": 0.9741235509210703,
+        "K2@specialized[K0:coupe][2]": 0.8498345589151187,
+        "K2@specialized[K0:suv][2]": 0.6624158450535366,
+        "K3": 0.9,
+        "K3@initial[1]": 0.7956160562379018,
+        "K3@specialized[K0:coupe][1]": 0.4901389698592984,
+        "K3@specialized[K0:suv][1]": 1.0000000000000002,
+        "K4": 0.7815441099964843,
+        "K5": 0.95,
+        "K6": 0.95,
+        "K6@specialized[K0:coupe][0]": 0.8813555544736434,
+        "K6@specialized[K1:coupe][0]": 0.7735000544664811
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.32924961715160794,
+      "detector_mode": "trained",
+      "experiment": "per_scene_structure__trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 2.886649886922186,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.34245788667687593,
+      "opt_holdout_cost_ms": 9.457754673765697,
+      "scene": "a06",
+      "thresholds": {
+        "K0": 0.8588543461293591,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9214253656718195,
+        "K4": 0.0,
+        "K5": 0.95,
+        "K6": 0.0
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.7742962466487936,
+      "detector_mode": "trained",
+      "experiment": "per_scene_structure__trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.3012032550278694,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.761896782841823,
+      "opt_holdout_cost_ms": 15.83979500847386,
+      "scene": "h08",
+      "thresholds": {
+        "K0": 0.7419269449856816,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.0,
+        "K4": 0.9997279291250267,
+        "K5": 0.95,
+        "K6": 0.9769513363740882
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.944516129032258,
+      "detector_mode": "trained",
+      "experiment": "per_scene_structure__trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.4650723979032978,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.932258064516129,
+      "opt_holdout_cost_ms": 8.819969649023315,
+      "scene": "h24",
+      "thresholds": {
+        "K0": 0.9454332164355687,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@initial[1]": 0.31238147616386414,
+        "K3@specialized[K0:coupe][1]": 0.6029707193374634,
+        "K3@specialized[K0:suv][1]": 0.5286086031368801,
+        "K4": 0.9045340418815613,
+        "K5": 0.95,
+        "K6": 0.9394601498331342
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.2395656279508971,
+      "detector_mode": "trained",
+      "experiment": "per_scene_structure__trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 1.6263020392304774,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.25316336166194525,
+      "opt_holdout_cost_ms": 15.46742698790904,
+      "scene": "i29",
+      "thresholds": {
+        "K0": 0.0,
+        "K1": 0.95,
+        "K2": 0.9999990463256837,
+        "K3": 0.9,
+        "K4": 0.9090003724000892,
+        "K5": 0.95,
+        "K6": 0.9999986886978149
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.49484126984126986,
+      "detector_mode": "trained",
+      "experiment": "per_scene_structure__trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.053158601871509,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "mode": "per_scene_structure",
+      "opt_holdout_acc": 0.4928571428571429,
+      "opt_holdout_cost_ms": 23.190909652931232,
+      "scene": "s31",
+      "thresholds": {
+        "K0": 0.9382889051826633,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K2@specialized[K0:coupe][1]": 0.998507887733226,
+        "K2@specialized[K0:suv][1]": 0.8762508825379975,
+        "K3": 0.9,
+        "K4": 0.8955016209154713,
+        "K5": 0.95,
+        "K6": 0.9260283903199799
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.40524502297090353,
+      "detector_mode": "trained",
+      "experiment": "shared_h24_structure__trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 2.1214008079852946,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.41098774885145484,
+      "opt_holdout_cost_ms": 11.869772570731852,
+      "scene": "a06",
+      "thresholds": {
+        "K0": 0.9923835567065648,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@initial[1]": 0.42221796573424825,
+        "K3@specialized[K0:coupe][1]": 0.9318571151519308,
+        "K3@specialized[K0:suv][1]": 1.0000000000000002,
+        "K4": 0.0,
+        "K5": 0.95,
+        "K6": 0.5000036358833313
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.7761394101876675,
+      "detector_mode": "trained",
+      "experiment": "shared_h24_structure__trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.9508908758966246,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.7634048257372654,
+      "opt_holdout_cost_ms": 10.643723858061984,
+      "scene": "h08",
+      "thresholds": {
+        "K0": 0.9176953361958873,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@initial[1]": 0.0,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.0,
+        "K4": 0.9406448882453295,
+        "K5": 0.95,
+        "K6": 0.9143028782338513
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.944516129032258,
+      "detector_mode": "trained",
+      "experiment": "shared_h24_structure__trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.4650723979032978,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.932258064516129,
+      "opt_holdout_cost_ms": 8.819969649023315,
+      "scene": "h24",
+      "thresholds": {
+        "K0": 0.9454332164355687,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@initial[1]": 0.31238147616386414,
+        "K3@specialized[K0:coupe][1]": 0.6029707193374634,
+        "K3@specialized[K0:suv][1]": 0.5286086031368801,
+        "K4": 0.9045340418815613,
+        "K5": 0.95,
+        "K6": 0.9394601498331342
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.24154863078375827,
+      "detector_mode": "trained",
+      "experiment": "shared_h24_structure__trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 5.275555922775902,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.2612842304060434,
+      "opt_holdout_cost_ms": 5.961174688771544,
+      "scene": "i29",
+      "thresholds": {
+        "K0": 0.0,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@initial[1]": 1.0000000000000002,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.23144657909870148,
+        "K4": 0.8981400728225708,
+        "K5": 0.95,
+        "K6": 0.0
+      }
+    },
+    {
+      "baseline_holdout_acc": 0.5067460317460317,
+      "detector_mode": "trained",
+      "experiment": "shared_h24_structure__trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 2.2442536573511402,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "mode": "shared_h24_structure",
+      "opt_holdout_acc": 0.4936507936507937,
+      "opt_holdout_cost_ms": 11.90473115349365,
+      "scene": "s31",
+      "thresholds": {
+        "K0": 0.9520722262713374,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@initial[1]": 0.0,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.0,
+        "K4": 0.8799671530723572,
+        "K5": 0.95,
+        "K6": 0.8938704911543398
+      }
+    }
+  ]
+}
