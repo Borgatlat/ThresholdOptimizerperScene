@@ -1007,6 +1007,7 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     random_seed: int = 0,
     coordinate_descent_passes: int = 25,
     accuracy_penalty: float | None = None,
+    show_progress: bool = True,
 ) -> dict:
     """Anneal per occurrence, then polish with coordinate descent.
 
@@ -1060,7 +1061,11 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     final_temperature = max(1e-6, initial_temperature * 1e-3)
 
 
-    with trange(n_iterations, desc="Simulated annealing") as t_iter:
+    with trange(
+        n_iterations,
+        desc="Simulated annealing",
+        disable=not show_progress,
+    ) as t_iter:
 
         for iteration in t_iter:
             progress = iteration / max(n_iterations - 1, 1)
