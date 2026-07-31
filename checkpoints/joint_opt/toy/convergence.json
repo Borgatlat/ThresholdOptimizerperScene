@@ -1,0 +1,41 @@
+{
+  "a1": {
+    "converged": true,
+    "cost_gap": 0.0,
+    "exhaustive_accuracy": 0.7708333333333334,
+    "exhaustive_cost": 7.0,
+    "exhaustive_thresholds": {
+      "K0@initial": 0.0,
+      "K2@initial": 0.0,
+      "K2@suv": 0.0
+    },
+    "sa_accuracy": 0.7708333333333334,
+    "sa_cost": 7.0,
+    "sa_thresholds": {
+      "K0@initial": 0.95,
+      "K2@initial": 0.0,
+      "K2@suv": 0.9817258176291914
+    }
+  },
+  "a4": {
+    "converged": true,
+    "cost_gap": 0.0,
+    "exhaustive_best_layout": "layout_a",
+    "exhaustive_cost": 7.0,
+    "layouts_match": true,
+    "sa_best_layout": "layout_a",
+    "sa_cost": 7.0
+  },
+  "epsilon": 1e-06,
+  "k1_removed": true,
+  "passed": true,
+  "position_thresholds": true,
+  "quantile_points": 5,
+  "scene": "toy",
+  "slots_layout_a": [
+    "K2@initial",
+    "K0@initial",
+    "K2@suv"
+  ],
+  "toy_target_accuracy": 0.7
+}

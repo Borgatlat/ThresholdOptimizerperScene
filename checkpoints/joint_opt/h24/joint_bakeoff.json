@@ -1,0 +1,69 @@
+{
+  "scene": "h24",
+  "objective": "minimize validation expected_cost_ms s.t. validation accuracy >= 0.98337",
+  "note": "A1=thresholds-only; A3/A4=joint (layout can change); A2=layout-only",
+  "rows": [
+    {
+      "method": "a1",
+      "val_acc": 0.9833763718528082,
+      "val_cost_ms": 1655.5135166234913,
+      "holdout_acc": 0.9851612903225806,
+      "holdout_cost_ms": 1557.6168289414752,
+      "feasible": true,
+      "initial_layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "joint": false,
+      "note": "thresholds-only"
+    },
+    {
+      "method": "a2",
+      "val_acc": 0.9759522272433828,
+      "val_cost_ms": 4101.0526577059245,
+      "holdout_acc": 0.9780645161290322,
+      "holdout_cost_ms": 4116.161260550632,
+      "feasible": false,
+      "initial_layout": [
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "joint": false,
+      "note": "layout-only"
+    },
+    {
+      "method": "a3",
+      "val_acc": 0.9833763718528082,
+      "val_cost_ms": 1647.2738027822938,
+      "holdout_acc": 0.9851612903225806,
+      "holdout_cost_ms": 1557.4205699356567,
+      "feasible": true,
+      "initial_layout": [
+        "K0",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "joint": true,
+      "note": "joint"
+    },
+    {
+      "method": "a4",
+      "val_acc": 0.9833763718528082,
+      "val_cost_ms": 1627.2298352506248,
+      "holdout_acc": 0.984516129032258,
+      "holdout_cost_ms": 1530.9425544711232,
+      "feasible": true,
+      "initial_layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "joint": true,
+      "note": "joint"
+    }
+  ]
+}

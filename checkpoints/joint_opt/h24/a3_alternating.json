@@ -1,0 +1,119 @@
+{
+  "method": "a3",
+  "scene": "h24",
+  "target_accuracy": 0.98337,
+  "detector_mode": "paper",
+  "detector_cost_ms": 10000.0,
+  "quantile_points": 50,
+  "annealing_iterations": 8000,
+  "holdout_fraction": 0.2,
+  "k1_removed": true,
+  "position_thresholds": true,
+  "layout": {
+    "initial": [
+      "K0",
+      "K3",
+      "K2",
+      "detector"
+    ],
+    "specialized": {
+      "K0|coupe": [
+        "K6",
+        "K3",
+        "detector"
+      ],
+      "K0|suv": [
+        "K4",
+        "K3",
+        "detector"
+      ]
+    }
+  },
+  "thresholds": {
+    "K0@initial": 0.999996542930603,
+    "K3@initial": 0.9,
+    "K2@initial": 0.9937955141067505,
+    "K6@coupe": 0.995512068271637,
+    "K3@coupe": 0.7307737725121635,
+    "K4@suv": 0.0,
+    "K3@suv": 0.9370492611612592
+  },
+  "validation": {
+    "accuracy": 0.9833763718528082,
+    "expected_cost_ms": 1647.2738027822938,
+    "feasible": true
+  },
+  "holdout": {
+    "accuracy": 0.9851612903225806,
+    "expected_cost_ms": 1557.4205699356567,
+    "feasible": true
+  },
+  "metrics": {
+    "method": "a3",
+    "scene": "h24",
+    "target_accuracy": 0.98337,
+    "detector_mode": "paper",
+    "detector_cost_ms": 10000.0,
+    "quantile_points": 50,
+    "annealing_iterations": 8000,
+    "holdout_fraction": 0.2,
+    "k1_removed": true,
+    "position_thresholds": true,
+    "validation_accuracy": 0.9833763718528082,
+    "validation_expected_cost_ms": 1647.2738027822938,
+    "validation_feasible": true,
+    "holdout_accuracy": 0.9851612903225806,
+    "holdout_expected_cost_ms": 1557.4205699356567,
+    "holdout_feasible": true,
+    "round": 2,
+    "rounds": 3,
+    "history": [
+      {
+        "round": 0,
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "val_acc": 0.9833763718528082,
+        "val_cost": 1655.5135166234913,
+        "feasible": true
+      },
+      {
+        "round": 1,
+        "initial": [
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "val_acc": 0.9833763718528082,
+        "val_cost": 1653.546943626156,
+        "feasible": true
+      },
+      {
+        "round": 2,
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "val_acc": 0.9833763718528082,
+        "val_cost": 1647.2738027822938,
+        "feasible": true
+      },
+      {
+        "round": 3,
+        "initial": [
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "val_acc": 0.9833763718528082,
+        "val_cost": 1653.546943626156,
+        "feasible": true
+      }
+    ]
+  }
+}

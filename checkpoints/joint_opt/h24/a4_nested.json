@@ -1,0 +1,128 @@
+{
+  "method": "a4",
+  "scene": "h24",
+  "target_accuracy": 0.98337,
+  "detector_mode": "paper",
+  "detector_cost_ms": 10000.0,
+  "quantile_points": 50,
+  "annealing_iterations": 8000,
+  "holdout_fraction": 0.2,
+  "k1_removed": true,
+  "position_thresholds": true,
+  "layout": {
+    "initial": [
+      "K0",
+      "K3",
+      "detector"
+    ],
+    "specialized": {
+      "K0|coupe": [
+        "K3",
+        "K5",
+        "K6",
+        "K2",
+        "detector"
+      ],
+      "K0|suv": [
+        "K3",
+        "K2",
+        "K4",
+        "detector"
+      ]
+    }
+  },
+  "thresholds": {
+    "K0@initial": 0.9962268216269357,
+    "K3@initial": 0.8982217822756086,
+    "K3@coupe": 0.9184247851371764,
+    "K5@coupe": 0.8342599698475429,
+    "K6@coupe": 0.9978548543793815,
+    "K2@coupe": 0.9799265350614275,
+    "K3@suv": 0.6029707193374634,
+    "K2@suv": 0.625724332673209,
+    "K4@suv": 0.5415380852563041
+  },
+  "validation": {
+    "accuracy": 0.9833763718528082,
+    "expected_cost_ms": 1627.2298352506248,
+    "feasible": true
+  },
+  "holdout": {
+    "accuracy": 0.984516129032258,
+    "expected_cost_ms": 1530.9425544711232,
+    "feasible": true
+  },
+  "metrics": {
+    "method": "a4",
+    "scene": "h24",
+    "target_accuracy": 0.98337,
+    "detector_mode": "paper",
+    "detector_cost_ms": 10000.0,
+    "quantile_points": 50,
+    "annealing_iterations": 8000,
+    "holdout_fraction": 0.2,
+    "k1_removed": true,
+    "position_thresholds": true,
+    "validation_accuracy": 0.9833763718528082,
+    "validation_expected_cost_ms": 1627.2298352506248,
+    "validation_feasible": true,
+    "holdout_accuracy": 0.984516129032258,
+    "holdout_expected_cost_ms": 1530.9425544711232,
+    "holdout_feasible": true,
+    "layout_family": "teammate_short",
+    "family_results": [
+      {
+        "layout_family": "dp_expand",
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "val_acc": 0.9833763718528082,
+        "val_cost": 1655.5135166234913,
+        "holdout_acc": 0.9851612903225806,
+        "holdout_cost": 1557.6168289414752,
+        "feasible": true
+      },
+      {
+        "layout_family": "teammate_short",
+        "initial": [
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "val_acc": 0.9833763718528082,
+        "val_cost": 1627.2298352506248,
+        "holdout_acc": 0.984516129032258,
+        "holdout_cost": 1530.9425544711232,
+        "feasible": true
+      },
+      {
+        "layout_family": "short_global",
+        "initial": [
+          "K0",
+          "K2",
+          "detector"
+        ],
+        "val_acc": 0.9833763718528082,
+        "val_cost": 4192.994258445883,
+        "holdout_acc": 0.9838709677419355,
+        "holdout_cost": 4045.1241684286674,
+        "feasible": true
+      },
+      {
+        "layout_family": "k0_branchy",
+        "initial": [
+          "K0",
+          "detector"
+        ],
+        "val_acc": 0.9833763718528082,
+        "val_cost": 4464.619999850862,
+        "holdout_acc": 0.9851612903225806,
+        "holdout_cost": 4339.168274805124,
+        "feasible": true
+      }
+    ]
+  }
+}

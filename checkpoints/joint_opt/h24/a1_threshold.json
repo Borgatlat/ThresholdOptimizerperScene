@@ -1,0 +1,73 @@
+{
+  "method": "a1",
+  "scene": "h24",
+  "target_accuracy": 0.98337,
+  "detector_mode": "paper",
+  "detector_cost_ms": 10000.0,
+  "quantile_points": 50,
+  "annealing_iterations": 8000,
+  "holdout_fraction": 0.2,
+  "k1_removed": true,
+  "position_thresholds": true,
+  "layout": {
+    "initial": [
+      "K0",
+      "K3",
+      "K2",
+      "detector"
+    ],
+    "specialized": {
+      "K0|coupe": [
+        "K6",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "K0|suv": [
+        "K4",
+        "K3",
+        "K2",
+        "detector"
+      ]
+    }
+  },
+  "thresholds": {
+    "K0@initial": 1.0000000000000002,
+    "K3@initial": 0.9,
+    "K2@initial": 0.9937955141067505,
+    "K6@coupe": 0.9995720131056649,
+    "K3@coupe": 1.0000000000000002,
+    "K2@coupe": 0.9999998807907106,
+    "K4@suv": 1.0000000000000002,
+    "K3@suv": 1.0000000000000002,
+    "K2@suv": 0.8734378388949803
+  },
+  "validation": {
+    "accuracy": 0.9833763718528082,
+    "expected_cost_ms": 1655.5135166234913,
+    "feasible": true
+  },
+  "holdout": {
+    "accuracy": 0.9851612903225806,
+    "expected_cost_ms": 1557.6168289414752,
+    "feasible": true
+  },
+  "metrics": {
+    "method": "a1",
+    "scene": "h24",
+    "target_accuracy": 0.98337,
+    "detector_mode": "paper",
+    "detector_cost_ms": 10000.0,
+    "quantile_points": 50,
+    "annealing_iterations": 8000,
+    "holdout_fraction": 0.2,
+    "k1_removed": true,
+    "position_thresholds": true,
+    "validation_accuracy": 0.9833763718528082,
+    "validation_expected_cost_ms": 1655.5135166234913,
+    "validation_feasible": true,
+    "holdout_accuracy": 0.9851612903225806,
+    "holdout_expected_cost_ms": 1557.6168289414752,
+    "holdout_feasible": true
+  }
+}
