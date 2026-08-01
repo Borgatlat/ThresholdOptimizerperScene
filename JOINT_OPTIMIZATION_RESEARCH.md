@@ -73,6 +73,53 @@ random immigrants, and a restart after six stagnant generations. Only the
 pre-existing K3→Kdet reference is seeded; all other initial layouts are
 uniform samples. The primary stop is 512 unique layouts, not proposal count.
 
+An optional progress-annealed outer variant is enabled with
+`--annealed-outer-schedule`. After each evaluated generation it computes
+`p = unique_layouts_evaluated / evaluation_budget` and linearly interpolates
+the controls used to breed the next population:
+
+| Outer control | Start | End | Intent |
+|---|---:|---:|---|
+| Random immigrants | 0.40 | 0.05 | broad sampling, then inheritance |
+| Whole-component resampling within mutation | 0.60 | 0.10 | large, then local edits |
+| Mutation probability | 0.95 | 0.50 | high early diversity, then retention |
+| Crossover probability | 0.60 | 0.90 | more recombination late |
+| Tournament size | 2 | 4 | gradually stronger selection |
+| Elite count | 2 | 6 | gradually preserve more strong layouts |
+
+Integer controls use deterministic nearest-integer interpolation. Stagnation
+restarts are deliberately unchanged, so the schedule is the only experimental
+change. The inner 8k SA, coordinate polish, split, target, quantiles, seeds,
+hard constraint, and 512-layout budget are identical to the fixed GA.
+
+## Publication and patent context
+
+The IBM disclosure is prior work that should be cited, but it does not prevent
+publication of an academic paper. Its specification already discusses genetic
+search over cascade stages and thresholds, including iteration-dependent
+mutation behavior, so neither “GA for a cascade” nor progress-dependent
+mutation should be presented as the standalone novelty.
+
+The claims that actually issued in
+[US12,443,855B2](https://patents.google.com/patent/US12443855B2/en#claims)
+are materially narrower than the original application claims: each independent
+claim requires a specific linear-regression, CatBoost, and larger/deeper
+CatBoost three-stage combination. The official issuance is recorded in the
+[USPTO Patent Gazette](https://patentsgazette.uspto.gov/week41/OG/html/1539-2/US12443855-20251014.html).
+This K-router hierarchy does not apparently use that literal architecture, but
+only qualified counsel can give a freedom-to-operate opinion.
+
+The paper's defensible contribution should therefore be framed around the
+routed hierarchical grammar, per-occurrence thresholds, hard accuracy
+constraint, bilevel inner optimization, exhaustive ground-truth comparison,
+and empirical behavior of approximation algorithms. In the United States,
+[35 U.S.C. §271](https://www.law.cornell.edu/uscode/text/35/271)
+lists making and using a claimed invention among potentially infringing acts,
+and the common-law academic experimental-use defense is very narrow under
+[Madey v. Duke](https://law.justia.com/cases/federal/appellate-courts/F3/307/1351/521835/).
+This section is research context, not legal advice; seek institutional IP
+counsel before commercialization or if a formal claim analysis is needed.
+
 ## Budget and expected runtime
 
 The completed exhaustive run took 17,066.2 seconds for 5,545 layouts, or
@@ -118,12 +165,41 @@ rank 4. The real run still needs to be executed because this replay validates
 the topology search using already-computed fitness rather than producing a new
 GA checkpoint.
 
+### Fixed versus progress-annealed outer GA
+
+Because the inner seed is fixed and the exhaustive run already contains the
+8k-SA validation fitness for every legal layout, the outer policy can be
+compared cheaply without rerunning threshold optimization. Over 1,000 paired
+outer seeds at the same 512-layout budget:
+
+| Outer schedule | Mean rank | Median rank | Mean regret | Top-10 | Exact optimum |
+|---|---:|---:|---:|---:|---:|
+| Fixed | 10.485 | 7 | 2.3337 ms | 63.5% | 5.8% |
+| Progress annealed | 9.272 | 5 | 2.1365 ms | 69.2% | 6.0% |
+
+The annealed schedule won 480 paired seeds, tied 108, and lost 412. An exact
+two-sided sign test excluding ties gives `p = 0.02482`. This is a small positive
+outer-search effect, not a guarantee for an individual run: at the default
+outer seed 0, fixed reached rank 2 while annealed reached rank 7. The replay
+uses exhaustive validation fitness and never holdout, so it is a diagnostic of
+the search policy rather than independent threshold/holdout evidence.
+
+Reproduce the paired diagnostic with:
+
+```bash
+python benchmark_ga_outer_schedules.py --runs 1000 --no-output
+```
+
 ## Running it
 
 ```bash
 python joint_optimize_hierarchy_ga.py --dry-run
 python joint_optimize_hierarchy_ga.py
+python joint_optimize_hierarchy_ga.py --annealed-outer-schedule
 ```
+
+The fixed and annealed defaults write to separate checkpoint directories, so
+the existing fixed run is preserved.
 
 Use a new output directory for independent outer seeds:
 

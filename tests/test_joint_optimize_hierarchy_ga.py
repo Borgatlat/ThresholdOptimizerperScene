@@ -19,8 +19,10 @@ from joint_optimize_hierarchy_ga import (
     initial_population,
     mutate_genome,
     next_population,
+    outer_ga_parameters,
     repair_genome,
     restart_population,
+    run_joint_search,
     topology_selection_key,
 )
 
@@ -150,6 +152,71 @@ class JointHierarchyGenomeTests(unittest.TestCase):
         )
         self.assertEqual(restarted[0], population[-1])
         self.assertTrue(set(restarted[1:]).isdisjoint(records))
+
+
+class OuterScheduleTests(unittest.TestCase):
+    def test_annealed_schedule_hits_endpoints_and_clamps_progress(self) -> None:
+        start = outer_ga_parameters(-1.0, annealed=True)
+        end = outer_ga_parameters(2.0, annealed=True)
+
+        self.assertEqual(start.elite_count, 2)
+        self.assertEqual(start.tournament_size, 2)
+        self.assertAlmostEqual(start.crossover_rate, 0.60)
+        self.assertAlmostEqual(start.mutation_rate, 0.95)
+        self.assertAlmostEqual(start.random_immigrant_rate, 0.40)
+        self.assertAlmostEqual(start.component_resample_rate, 0.60)
+
+        self.assertEqual(end.elite_count, 6)
+        self.assertEqual(end.tournament_size, 4)
+        self.assertAlmostEqual(end.crossover_rate, 0.90)
+        self.assertAlmostEqual(end.mutation_rate, 0.50)
+        self.assertAlmostEqual(end.random_immigrant_rate, 0.05)
+        self.assertAlmostEqual(end.component_resample_rate, 0.10)
+
+    def test_annealed_schedule_linearly_interpolates_midpoint(self) -> None:
+        middle = outer_ga_parameters(0.5, annealed=True)
+
+        self.assertEqual(middle.elite_count, 4)
+        self.assertEqual(middle.tournament_size, 3)
+        self.assertAlmostEqual(middle.crossover_rate, 0.75)
+        self.assertAlmostEqual(middle.mutation_rate, 0.725)
+        self.assertAlmostEqual(middle.random_immigrant_rate, 0.225)
+        self.assertAlmostEqual(middle.component_resample_rate, 0.35)
+
+    def test_fixed_schedule_passes_custom_parameters_through(self) -> None:
+        fixed = outer_ga_parameters(
+            0.73,
+            annealed=False,
+            elite_count=3,
+            tournament_size=5,
+            crossover_rate=0.12,
+            mutation_rate=0.34,
+            random_immigrant_rate=0.56,
+            component_resample_rate=0.78,
+        )
+
+        self.assertEqual(
+            fixed.as_dict(),
+            {
+                "elite_count": 3,
+                "tournament_size": 5,
+                "crossover_rate": 0.12,
+                "mutation_rate": 0.34,
+                "random_immigrant_rate": 0.56,
+                "component_resample_rate": 0.78,
+            },
+        )
+
+    def test_annealed_schedule_rejects_population_smaller_than_max_elites(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(ValueError, "maximum elite count"):
+            run_joint_search(
+                outcomes=Path("not-loaded.pkl"),
+                population_size=6,
+                evaluation_budget=6,
+                annealed_outer_schedule=True,
+            )
 
 
 class JointHierarchyFitnessTests(unittest.TestCase):

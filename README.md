@@ -124,6 +124,11 @@ python joint_optimize_hierarchy_ga.py --dry-run
 # sequential at the measured exhaustive-run rate.
 python joint_optimize_hierarchy_ga.py
 
+# Optional outer annealing: linearly move from diverse exploration toward
+# stronger selection/refinement as unique_evaluations / 512 increases.
+# This writes to checkpoints/joint_ga_annealed_k1_free_h24 by default.
+python joint_optimize_hierarchy_ga.py --annealed-outer-schedule
+
 # Parallelize the independent inner optimizations within each generation.
 python joint_optimize_hierarchy_ga.py --workers 8
 
@@ -140,6 +145,22 @@ an equal-budget uniform-random control. Exhaustive results are never read by
 the search itself. See [JOINT_OPTIMIZATION_RESEARCH.md](JOINT_OPTIMIZATION_RESEARCH.md)
 for the method comparison, prior work, budget rationale, and oracle-replay
 results.
+
+Outer annealing does not change a candidate's fitness calculation: the inner
+8,000-step threshold anneal, 50 quantiles, seed, split, target, hard accuracy
+constraint, coordinate polish, evaluation budget, and restart rule remain the
+same. Only GA population controls are interpolated, and each applied value is
+stored in the generation history.
+
+The completed exhaustive validation table can replay both outer schedules
+over many paired seeds without repeating the expensive inner anneals:
+
+```bash
+python benchmark_ga_outer_schedules.py --runs 1000 --no-output
+```
+
+This is an outer-search diagnostic only; it deliberately excludes holdout and
+does not replace a final independent checkpoint run.
 
 Every final baseline, optimized, and holdout report includes
 `per_class_accuracy`, `macro_accuracy`, and `worst_class_accuracy`. A class

@@ -34,6 +34,10 @@ Run the default 512-layout search::
 
     python joint_optimize_hierarchy_ga.py
 
+Run the progress-annealed outer GA in its own checkpoint directory::
+
+    python joint_optimize_hierarchy_ga.py --annealed-outer-schedule
+
 Evaluate one generation concurrently on a multi-core node::
 
     python joint_optimize_hierarchy_ga.py --workers 8
@@ -105,6 +109,19 @@ DEFAULT_RANDOM_IMMIGRANT_RATE = 0.20
 DEFAULT_COMPONENT_RESAMPLE_RATE = 0.30
 DEFAULT_STAGNATION_GENERATIONS = 6
 DEFAULT_MAX_RESTARTS = 3
+DEFAULT_ANNEALED_OUTPUT_DIR = Path("checkpoints/joint_ga_annealed_k1_free_h24")
+
+# Optional progress-based outer-GA schedule. This anneals only topology-search
+# behavior; every visited layout still receives the same independent 8k inner
+# threshold anneal. Values are intentionally kept explicit in checkpoints.
+ANNEALED_OUTER_SCHEDULE = {
+    "random_immigrant_rate": {"start": 0.40, "end": 0.05},
+    "component_resample_rate": {"start": 0.60, "end": 0.10},
+    "mutation_rate": {"start": 0.95, "end": 0.50},
+    "crossover_rate": {"start": 0.60, "end": 0.90},
+    "tournament_size": {"start": 2, "end": 4},
+    "elite_count": {"start": 2, "end": 6},
+}
 
 # The completed exhaustive run is a better estimate than the older, single-
 # layout microbenchmark retained in brute_force_k1_free_layouts.py.
@@ -128,6 +145,76 @@ class TopologyGenome:
     initial: tuple[str, ...]
     coupe: tuple[str, ...] = ()
     suv: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class OuterGAParameters:
+    """Resolved topology-search controls for one generation."""
+
+    elite_count: int
+    tournament_size: int
+    crossover_rate: float
+    mutation_rate: float
+    random_immigrant_rate: float
+    component_resample_rate: float
+
+    def as_dict(self) -> dict[str, int | float]:
+        return {
+            "elite_count": int(self.elite_count),
+            "tournament_size": int(self.tournament_size),
+            "crossover_rate": float(self.crossover_rate),
+            "mutation_rate": float(self.mutation_rate),
+            "random_immigrant_rate": float(self.random_immigrant_rate),
+            "component_resample_rate": float(self.component_resample_rate),
+        }
+
+
+def _lerp(start: float, end: float, progress: float) -> float:
+    progress = float(np.clip(progress, 0.0, 1.0))
+    if progress == 0.0:
+        return float(start)
+    if progress == 1.0:
+        return float(end)
+    return float(start + (end - start) * progress)
+
+
+def outer_ga_parameters(
+    progress: float,
+    *,
+    annealed: bool,
+    elite_count: int = DEFAULT_ELITE_COUNT,
+    tournament_size: int = DEFAULT_TOURNAMENT_SIZE,
+    crossover_rate: float = DEFAULT_CROSSOVER_RATE,
+    mutation_rate: float = DEFAULT_MUTATION_RATE,
+    random_immigrant_rate: float = DEFAULT_RANDOM_IMMIGRANT_RATE,
+    component_resample_rate: float = DEFAULT_COMPONENT_RESAMPLE_RATE,
+) -> OuterGAParameters:
+    """Resolve fixed or linearly annealed controls at search progress [0, 1]."""
+
+    if not annealed:
+        return OuterGAParameters(
+            elite_count=elite_count,
+            tournament_size=tournament_size,
+            crossover_rate=crossover_rate,
+            mutation_rate=mutation_rate,
+            random_immigrant_rate=random_immigrant_rate,
+            component_resample_rate=component_resample_rate,
+        )
+
+    def scheduled(name: str) -> float:
+        endpoints = ANNEALED_OUTER_SCHEDULE[name]
+        return _lerp(endpoints["start"], endpoints["end"], progress)
+
+    # Adding 0.5 implements intuitive nearest-integer interpolation rather
+    # than Python's banker rounding at exact half steps.
+    return OuterGAParameters(
+        elite_count=int(scheduled("elite_count") + 0.5),
+        tournament_size=int(scheduled("tournament_size") + 0.5),
+        crossover_rate=scheduled("crossover_rate"),
+        mutation_rate=scheduled("mutation_rate"),
+        random_immigrant_rate=scheduled("random_immigrant_rate"),
+        component_resample_rate=scheduled("component_resample_rate"),
+    )
 
 
 @dataclass(frozen=True)
@@ -1085,9 +1172,14 @@ def _search_settings(
     stagnation_generations: int,
     max_restarts: int,
     catalogue_sha256: str,
+    annealed_outer_schedule: bool,
 ) -> dict[str, object]:
     return {
-        "algorithm": "constrained_memetic_genetic_algorithm",
+        "algorithm": (
+            "annealed_constrained_memetic_genetic_algorithm"
+            if annealed_outer_schedule
+            else "constrained_memetic_genetic_algorithm"
+        ),
         "fitness_cache_schema": 1,
         "fitness_implementation_sha256": _fitness_implementation_sha256(),
         "layout_catalogue_sha256": catalogue_sha256,
@@ -1120,13 +1212,19 @@ def _search_settings(
         "component_resample_rate": float(component_resample_rate),
         "stagnation_generations": int(stagnation_generations),
         "max_restarts": int(max_restarts),
+        "outer_parameter_schedule": (
+            "linear_annealed" if annealed_outer_schedule else "fixed"
+        ),
+        "annealed_outer_schedule": (
+            ANNEALED_OUTER_SCHEDULE if annealed_outer_schedule else None
+        ),
     }
 
 
 def run_joint_search(
     *,
     outcomes: Path = DEFAULT_OUTCOMES,
-    output_dir: Path = DEFAULT_OUTPUT_DIR,
+    output_dir: Path | None = None,
     target_accuracy: float = FIG1_K3_TARGET_ACCURACY,
     iterations: int = DEFAULT_ITERATIONS,
     quantile_points: int = DEFAULT_QUANTILE_POINTS,
@@ -1146,12 +1244,20 @@ def run_joint_search(
     component_resample_rate: float = DEFAULT_COMPONENT_RESAMPLE_RATE,
     stagnation_generations: int = DEFAULT_STAGNATION_GENERATIONS,
     max_restarts: int = DEFAULT_MAX_RESTARTS,
+    annealed_outer_schedule: bool = False,
     workers: int = 1,
     overwrite: bool = False,
     brute_force_summary: Path | None = DEFAULT_BRUTE_FORCE_SUMMARY,
     brute_force_results: Path | None = DEFAULT_BRUTE_FORCE_RESULTS,
 ) -> dict[str, object]:
     """Run or resume the memetic GA and evaluate its winner on holdout."""
+
+    if output_dir is None:
+        output_dir = (
+            DEFAULT_ANNEALED_OUTPUT_DIR
+            if annealed_outer_schedule
+            else DEFAULT_OUTPUT_DIR
+        )
 
     _validate_arguments(
         target_accuracy=target_accuracy,
@@ -1174,6 +1280,15 @@ def run_joint_search(
         raise ValueError("stagnation_generations must be at least 1.")
     if max_restarts < 0:
         raise ValueError("max_restarts cannot be negative.")
+    if annealed_outer_schedule:
+        maximum_elites = int(
+            max(ANNEALED_OUTER_SCHEDULE["elite_count"].values())
+        )
+        if population_size <= maximum_elites:
+            raise ValueError(
+                "population_size must exceed the annealed schedule's maximum "
+                f"elite count ({maximum_elites})."
+            )
     catalogue = build_layout_catalogue()
     settings = _search_settings(
         outcomes=outcomes,
@@ -1197,6 +1312,7 @@ def run_joint_search(
         stagnation_generations=stagnation_generations,
         max_restarts=max_restarts,
         catalogue_sha256=_catalogue_sha256(catalogue),
+        annealed_outer_schedule=annealed_outer_schedule,
     )
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -1308,6 +1424,10 @@ def run_joint_search(
         "Inner fitness: K1-free, paper Kdet=10000 ms, "
         f"{iterations:,}-step SA, {quantile_points} quantiles, inner seed={inner_seed}"
     )
+    print(
+        "Outer parameter schedule: "
+        f"{'linear annealed' if annealed_outer_schedule else 'fixed'}"
+    )
     started = perf_counter()
     stop_reason = "generation_limit"
 
@@ -1343,6 +1463,11 @@ def run_joint_search(
             stagnant_generations += 1
         item["stagnant_generations"] = stagnant_generations
         item["restart_after_generation"] = False
+        # These fields describe breeding for the *next* generation. They stay
+        # null on the terminal history item, where no parameters are applied.
+        item["next_population_schedule_progress"] = None
+        item["next_population_parameters"] = None
+        item["next_population_strategy"] = None
         history.append(item)
         print(
             f"Generation {generation:02d}: unique={len(records):,}, "
@@ -1357,14 +1482,26 @@ def run_joint_search(
             stop_reason = "generation_limit"
             break
 
-        desired_size = min(
-            population_size,
-            elite_count + evaluation_budget - len(records),
+        schedule_progress = min(1.0, len(records) / evaluation_budget)
+        generation_parameters = outer_ga_parameters(
+            schedule_progress,
+            annealed=annealed_outer_schedule,
+            elite_count=elite_count,
+            tournament_size=tournament_size,
+            crossover_rate=crossover_rate,
+            mutation_rate=mutation_rate,
+            random_immigrant_rate=random_immigrant_rate,
+            component_resample_rate=component_resample_rate,
         )
+        item["next_population_schedule_progress"] = schedule_progress
+        remaining_unique = evaluation_budget - len(records)
         if (
             stagnant_generations >= stagnation_generations
             and restart_count < max_restarts
         ):
+            # A restart retains one cached global elite, whereas ordinary
+            # breeding retains the scheduled number of cached elites.
+            desired_size = min(population_size, 1 + remaining_unique)
             population = restart_population(
                 records,
                 catalogue,
@@ -1375,7 +1512,12 @@ def run_joint_search(
             restart_count += 1
             stagnant_generations = 0
             item["restart_after_generation"] = True
+            item["next_population_strategy"] = "restart"
         else:
+            desired_size = min(
+                population_size,
+                generation_parameters.elite_count + remaining_unique,
+            )
             population = next_population(
                 population,
                 records,
@@ -1383,13 +1525,24 @@ def run_joint_search(
                 rng,
                 target_accuracy=target_accuracy,
                 population_size=desired_size,
-                elite_count=min(elite_count, desired_size - 1),
-                tournament_size=tournament_size,
-                crossover_rate=crossover_rate,
-                mutation_rate=mutation_rate,
-                random_immigrant_rate=random_immigrant_rate,
-                component_resample_rate=component_resample_rate,
+                elite_count=min(
+                    generation_parameters.elite_count,
+                    desired_size - 1,
+                ),
+                tournament_size=generation_parameters.tournament_size,
+                crossover_rate=generation_parameters.crossover_rate,
+                mutation_rate=generation_parameters.mutation_rate,
+                random_immigrant_rate=(
+                    generation_parameters.random_immigrant_rate
+                ),
+                component_resample_rate=(
+                    generation_parameters.component_resample_rate
+                ),
                 excluded_layout_ids=set(records),
+            )
+            item["next_population_strategy"] = "breed"
+            item["next_population_parameters"] = (
+                generation_parameters.as_dict()
             )
         generation += 1
         _write_json_atomic(
@@ -1474,7 +1627,15 @@ def _build_parser() -> argparse.ArgumentParser:
         )
     )
     parser.add_argument("--outcomes", type=Path, default=DEFAULT_OUTCOMES)
-    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Checkpoint directory. Defaults to separate fixed/annealed "
+            "directories based on --annealed-outer-schedule."
+        ),
+    )
     parser.add_argument(
         "--target-accuracy",
         type=float,
@@ -1529,6 +1690,14 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Restart after this many generations without a new global best.",
     )
     parser.add_argument("--max-restarts", type=int, default=DEFAULT_MAX_RESTARTS)
+    parser.add_argument(
+        "--annealed-outer-schedule",
+        action="store_true",
+        help=(
+            "Linearly shift the outer GA from broad exploration to stronger "
+            "selection/local refinement. The inner 8k threshold SA is unchanged."
+        ),
+    )
     parser.add_argument(
         "--workers",
         type=int,
@@ -1587,6 +1756,10 @@ def main() -> None:
             f"({expected_evaluations / EXPECTED_LAYOUT_COUNT:.2%} of the space)"
         )
         print(
+            "Outer parameter schedule: "
+            f"{'linear annealed' if args.annealed_outer_schedule else 'fixed'}"
+        )
+        print(
             f"Observed sequential estimate: {sequential_seconds / 60.0:.1f} min "
             f"({OBSERVED_SECONDS_PER_LAYOUT:.3f} s/layout at 8k SA, scaled "
             f"linearly to {args.iterations:,} iterations)"
@@ -1605,9 +1778,14 @@ def main() -> None:
     comparison_results = (
         None if args.no_brute_force_comparison else args.brute_force_results
     )
+    output_dir = args.output_dir or (
+        DEFAULT_ANNEALED_OUTPUT_DIR
+        if args.annealed_outer_schedule
+        else DEFAULT_OUTPUT_DIR
+    )
     summary = run_joint_search(
         outcomes=args.outcomes,
-        output_dir=args.output_dir,
+        output_dir=output_dir,
         target_accuracy=args.target_accuracy,
         iterations=args.iterations,
         quantile_points=args.quantile_points,
@@ -1627,6 +1805,7 @@ def main() -> None:
         component_resample_rate=args.component_resample_rate,
         stagnation_generations=args.stagnation_generations,
         max_restarts=args.max_restarts,
+        annealed_outer_schedule=args.annealed_outer_schedule,
         workers=args.workers,
         overwrite=args.overwrite,
         brute_force_summary=comparison_summary,
