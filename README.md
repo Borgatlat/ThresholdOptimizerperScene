@@ -104,6 +104,43 @@ uses each run's final contiguous segment block for holdout rather than mixing
 nearby windows randomly. The current h24 table has one class per run, so this
 keeps all classes in both partitions; a whole-run holdout would not.
 
+## Joint hierarchy and threshold optimization
+
+`joint_optimize_hierarchy_ga.py` approximates the completed K1-free brute
+force with a constrained memetic genetic algorithm. The GA evolves a legal
+initial chain plus K0's coupe and SUV branches. Every new non-detector-only
+topology receives the same independent threshold optimization as the
+exhaustive experiment: 8,000 simulated-annealing steps, 50 confidence
+quantiles, inner seed 0, and the coordinate-descent polish. The detector-only
+topology is scored directly in both methods. Validation selects the winner;
+holdout is evaluated once only after the layout and thresholds have been
+frozen.
+
+```bash
+# Inspect the search budget and measured runtime estimate.
+python joint_optimize_hierarchy_ga.py --dry-run
+
+# Default: at most 512 unique layouts (9.23% of 5,545), about 26 minutes
+# sequential at the measured exhaustive-run rate.
+python joint_optimize_hierarchy_ga.py
+
+# Parallelize the independent inner optimizations within each generation.
+python joint_optimize_hierarchy_ga.py --workers 8
+
+# Repeat only the stochastic outer search; keep split and inner seeds fixed.
+python joint_optimize_hierarchy_ga.py --outer-seed 1 \
+  --output-dir checkpoints/joint_ga_k1_free_h24_seed1
+```
+
+The run automatically resumes from `checkpoint.json` and caches each layout
+in `evaluations.jsonl`. Its final `summary.json` includes best-so-far history,
+a validation cost/accuracy Pareto archive, winner-only holdout metrics, and—if
+the exhaustive files are present—a post-search optimality gap, exact rank, and
+an equal-budget uniform-random control. Exhaustive results are never read by
+the search itself. See [JOINT_OPTIMIZATION_RESEARCH.md](JOINT_OPTIMIZATION_RESEARCH.md)
+for the method comparison, prior work, budget rationale, and oracle-replay
+results.
+
 Every final baseline, optimized, and holdout report includes
 `per_class_accuracy`, `macro_accuracy`, and `worst_class_accuracy`. A class
 with no evaluated samples is reported with `accuracy: null` rather than being
