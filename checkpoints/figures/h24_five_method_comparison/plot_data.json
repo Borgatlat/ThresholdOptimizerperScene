@@ -1,0 +1,363 @@
+{
+  "dataset": "h24",
+  "detector_cost_ms": 10000.0,
+  "detector_mode": "paper",
+  "diagram_shading_semantics": "terminal cascade occurrence producing the final decision",
+  "methods": {
+    "approximate_joint": {
+      "holdout": {
+        "accuracy": 0.9670967741935483,
+        "expected_cost": 710.0749796755563,
+        "occurrence_route_counts": {
+          "K2": 4,
+          "K3": 1437,
+          "K6": 1,
+          "detector@initial[3]": 107,
+          "detector@specialized[K0:suv][0]": 1
+        },
+        "route_counts": {
+          "K2": 4,
+          "K3": 1437,
+          "K6": 1,
+          "detector": 108
+        },
+        "thresholds": {
+          "K0": 0.9999319314956665,
+          "K2": 0.9487942116601127,
+          "K3": 0.7307737725121635,
+          "K6": 0.9003422771181379
+        }
+      },
+      "label": "Approx. joint (0.9662)",
+      "layout": {
+        "initial": [
+          "K3",
+          "K0",
+          "K2",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "detector"
+          ]
+        }
+      },
+      "source": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\joint_ga_k1_free_h24_target_096\\summary.json",
+      "target_accuracy": 0.9662,
+      "validation": {
+        "accuracy": 0.9662685603615235,
+        "expected_cost": 786.4488681883986,
+        "route_counts": {
+          "K2": 17,
+          "K3": 5690,
+          "K6": 10,
+          "detector": 479
+        },
+        "thresholds": {
+          "K0": 0.9999319314956665,
+          "K2": 0.9487942116601127,
+          "K3": 0.7307737725121635,
+          "K6": 0.9003422771181379
+        }
+      }
+    },
+    "baseline": {
+      "holdout": {
+        "accuracy": 0.9690322580645161,
+        "expected_cost": 1268.7927718555352,
+        "occurrence_route_counts": {
+          "K0": 8,
+          "K2@initial[2]": 12,
+          "K2@specialized[K0:coupe][2]": 7,
+          "K2@specialized[K0:suv][2]": 1,
+          "K3@initial[1]": 324,
+          "K3@specialized[K0:coupe][1]": 56,
+          "K3@specialized[K0:suv][1]": 82,
+          "K4": 528,
+          "K6@specialized[K0:coupe][0]": 335,
+          "K6@specialized[K1:coupe][0]": 2,
+          "detector@initial[4]": 142,
+          "detector@specialized[K0:coupe][3]": 34,
+          "detector@specialized[K0:suv][3]": 18,
+          "detector@specialized[K1:coupe][1]": 1
+        },
+        "route_counts": {
+          "K0": 8,
+          "K2": 20,
+          "K3": 462,
+          "K4": 528,
+          "K6": 337,
+          "detector": 195
+        },
+        "thresholds": {
+          "K0": 0.95,
+          "K1": 0.95,
+          "K2@initial[2]": 0.9,
+          "K2@specialized[K0:coupe][2]": 0.9,
+          "K2@specialized[K0:suv][2]": 0.9,
+          "K3@initial[1]": 0.9,
+          "K3@specialized[K0:coupe][1]": 0.9,
+          "K3@specialized[K0:suv][1]": 0.9,
+          "K4": 0.95,
+          "K6@specialized[K0:coupe][0]": 0.95,
+          "K6@specialized[K1:coupe][0]": 0.95
+        }
+      },
+      "label": "Preset baseline",
+      "layout": {
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "source": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\paper_kdet_baseline_target\\h24.json",
+      "target_accuracy": 0.9654615881213686,
+      "validation": {
+        "accuracy": 0.9654615881213686,
+        "expected_cost": 1277.9577352016718,
+        "route_counts": {
+          "K0": 31,
+          "K2": 98,
+          "K3": 1958,
+          "K4": 2076,
+          "K6": 1248,
+          "detector": 785
+        },
+        "thresholds": {
+          "K0": 0.95,
+          "K1": 0.95,
+          "K2@initial[2]": 0.9,
+          "K2@specialized[K0:coupe][2]": 0.9,
+          "K2@specialized[K0:suv][2]": 0.9,
+          "K3@initial[1]": 0.9,
+          "K3@specialized[K0:coupe][1]": 0.9,
+          "K3@specialized[K0:suv][1]": 0.9,
+          "K4": 0.95,
+          "K6@specialized[K0:coupe][0]": 0.95,
+          "K6@specialized[K1:coupe][0]": 0.95
+        }
+      }
+    },
+    "baseline_annealed": {
+      "holdout": {
+        "accuracy": 0.9690322580645161,
+        "expected_cost": 840.2848760754816,
+        "occurrence_route_counts": {
+          "K2@initial[2]": 16,
+          "K3@initial[1]": 1082,
+          "K3@specialized[K0:coupe][1]": 74,
+          "K3@specialized[K0:suv][1]": 12,
+          "K4": 149,
+          "K6@specialized[K0:coupe][0]": 89,
+          "detector@initial[4]": 128
+        },
+        "route_counts": {
+          "K2": 16,
+          "K3": 1168,
+          "K4": 149,
+          "K6": 89,
+          "detector": 128
+        },
+        "thresholds": {
+          "K0": 0.9996232305254255,
+          "K1": 0.999854564666748,
+          "K2@initial[2]": 0.8976777281079973,
+          "K2@specialized[K0:coupe][2]": 0.9884414332253593,
+          "K2@specialized[K0:suv][2]": 0.9297523072787693,
+          "K3@initial[1]": 0.7913912534713745,
+          "K3@specialized[K0:coupe][1]": 0.5286086031368801,
+          "K3@specialized[K0:suv][1]": 0.5286086031368801,
+          "K4": 0.9588181291307721,
+          "K6@specialized[K0:coupe][0]": 0.9990090131759644,
+          "K6@specialized[K1:coupe][0]": 0.9999547004699707
+        }
+      },
+      "label": "Baseline annealed",
+      "layout": {
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "K1",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "source": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\paper_kdet_baseline_target\\h24.json",
+      "target_accuracy": 0.9654615881213686,
+      "validation": {
+        "accuracy": 0.9654615881213686,
+        "expected_cost": 874.760409180105,
+        "route_counts": {
+          "K2": 57,
+          "K3": 4661,
+          "K4": 605,
+          "K6": 340,
+          "detector": 533
+        },
+        "thresholds": {
+          "K0": 0.9996232305254255,
+          "K1": 0.999854564666748,
+          "K2@initial[2]": 0.8976777281079973,
+          "K2@specialized[K0:coupe][2]": 0.9884414332253593,
+          "K2@specialized[K0:suv][2]": 0.9297523072787693,
+          "K3@initial[1]": 0.7913912534713745,
+          "K3@specialized[K0:coupe][1]": 0.5286086031368801,
+          "K3@specialized[K0:suv][1]": 0.5286086031368801,
+          "K4": 0.9588181291307721,
+          "K6@specialized[K0:coupe][0]": 0.9990090131759644,
+          "K6@specialized[K1:coupe][0]": 0.9999547004699707
+        }
+      }
+    },
+    "brute_force": {
+      "holdout": {
+        "accuracy": 0.9606451612903226,
+        "expected_cost": 660.1498360124383,
+        "occurrence_route_counts": {
+          "K3@initial[1]": 930,
+          "K3@specialized[K0:coupe][0]": 212,
+          "K3@specialized[K0:suv][0]": 308,
+          "detector@initial[3]": 80,
+          "detector@specialized[K0:coupe][1]": 20
+        },
+        "route_counts": {
+          "K3": 1450,
+          "detector": 100
+        },
+        "thresholds": {
+          "K0": 0.9979241575513568,
+          "K2": 0.9905403086117336,
+          "K3@initial[1]": 0.667218702180045,
+          "K3@specialized[K0:coupe][0]": 0.9184247851371764,
+          "K3@specialized[K0:suv][0]": 0.6029707193374634
+        }
+      },
+      "label": "Brute force (0.9662)",
+      "layout": {
+        "initial": [
+          "K0",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "source": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\brute_force_k1_free_h24_target_096\\summary_shard_00000_of_00001.json",
+      "target_accuracy": 0.9662,
+      "validation": {
+        "accuracy": 0.9662685603615235,
+        "expected_cost": 780.0137383834923,
+        "route_counts": {
+          "K0": 1,
+          "K2": 1,
+          "K3": 5720,
+          "detector": 474
+        },
+        "thresholds": {
+          "K0": 0.9979241575513568,
+          "K2": 0.9905403086117336,
+          "K3@initial[1]": 0.667218702180045,
+          "K3@specialized[K0:coupe][0]": 0.9184247851371764,
+          "K3@specialized[K0:suv][0]": 0.6029707193374634
+        }
+      }
+    },
+    "linear_k3": {
+      "holdout": {
+        "accuracy": 0.967741935483871,
+        "expected_cost": 741.7078310667139,
+        "occurrence_route_counts": {
+          "K3": 1437,
+          "detector@initial[1]": 113
+        },
+        "route_counts": {
+          "K3": 1437,
+          "detector": 113
+        },
+        "thresholds": {
+          "K3": 0.7307737725121635
+        }
+      },
+      "label": "Annealed K3 -> Kdet (0.9662)",
+      "layout": {
+        "initial": [
+          "K3",
+          "detector"
+        ],
+        "specialized": {}
+      },
+      "source": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\brute_force_k1_free_h24_target_096\\results_shard_00000_of_00001.jsonl",
+      "target_accuracy": 0.9662,
+      "validation": {
+        "accuracy": 0.9677211103938025,
+        "expected_cost": 829.3314800389957,
+        "route_counts": {
+          "K3": 5690,
+          "detector": 506
+        },
+        "thresholds": {
+          "K3": 0.7307737725121635
+        }
+      }
+    }
+  },
+  "routing_bar_semantics": "terminal model producing the final decision"
+}
