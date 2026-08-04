@@ -1,0 +1,493 @@
+{
+  "elapsed_seconds_this_invocation": 1572.8400809000013,
+  "exhaustive_comparison": {
+    "comparison_available": false,
+    "reference_complete": true,
+    "reference_summary": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\brute_force_k1_free_h24\\summary_shard_00000_of_00001.json",
+    "settings_comparable": false,
+    "unavailable_reasons": [
+      "settings_mismatch"
+    ]
+  },
+  "fraction_of_layout_space": 0.09233543733092876,
+  "generations_completed": 19,
+  "history": [
+    {
+      "best_layout_id": "394d45403b090a19",
+      "best_layout_index": 3124,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 975.5420229562819,
+      "generation": 0,
+      "new_layouts_evaluated": 32,
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 32
+    },
+    {
+      "best_layout_id": "394d45403b090a19",
+      "best_layout_index": 3124,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 975.5420229562819,
+      "generation": 1,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 60
+    },
+    {
+      "best_layout_id": "95dfaa0c1aa39a2f",
+      "best_layout_index": 4932,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 967.3657390064128,
+      "generation": 2,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 88
+    },
+    {
+      "best_layout_id": "95dfaa0c1aa39a2f",
+      "best_layout_index": 4932,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 967.3657390064128,
+      "generation": 3,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 116
+    },
+    {
+      "best_layout_id": "799aa7b8effbd59a",
+      "best_layout_index": 3613,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 964.1094891736825,
+      "generation": 4,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 144
+    },
+    {
+      "best_layout_id": "799aa7b8effbd59a",
+      "best_layout_index": 3613,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 964.1094891736825,
+      "generation": 5,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 172
+    },
+    {
+      "best_layout_id": "799aa7b8effbd59a",
+      "best_layout_index": 3613,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 964.1094891736825,
+      "generation": 6,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 2,
+      "unique_layouts_evaluated": 200
+    },
+    {
+      "best_layout_id": "799aa7b8effbd59a",
+      "best_layout_index": 3613,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 964.1094891736825,
+      "generation": 7,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 3,
+      "unique_layouts_evaluated": 228
+    },
+    {
+      "best_layout_id": "799aa7b8effbd59a",
+      "best_layout_index": 3613,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 964.1094891736825,
+      "generation": 8,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 4,
+      "unique_layouts_evaluated": 256
+    },
+    {
+      "best_layout_id": "799aa7b8effbd59a",
+      "best_layout_index": 3613,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 964.1094891736825,
+      "generation": 9,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 5,
+      "unique_layouts_evaluated": 284
+    },
+    {
+      "best_layout_id": "799aa7b8effbd59a",
+      "best_layout_index": 3613,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 964.1094891736825,
+      "generation": 10,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": true,
+      "stagnant_generations": 6,
+      "unique_layouts_evaluated": 312
+    },
+    {
+      "best_layout_id": "799aa7b8effbd59a",
+      "best_layout_index": 3613,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 964.1094891736825,
+      "generation": 11,
+      "new_layouts_evaluated": 31,
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 343
+    },
+    {
+      "best_layout_id": "637e8fd9a03895e4",
+      "best_layout_index": 5472,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 963.7999344982034,
+      "generation": 12,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 371
+    },
+    {
+      "best_layout_id": "b549ac75a7b91901",
+      "best_layout_index": 2663,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 957.2123771936788,
+      "generation": 13,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 399
+    },
+    {
+      "best_layout_id": "b549ac75a7b91901",
+      "best_layout_index": 2663,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 957.2123771936788,
+      "generation": 14,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 427
+    },
+    {
+      "best_layout_id": "a20fd37c408c3ac7",
+      "best_layout_index": 2292,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 956.6260392954251,
+      "generation": 15,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 455
+    },
+    {
+      "best_layout_id": "a20fd37c408c3ac7",
+      "best_layout_index": 2292,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 956.6260392954251,
+      "generation": 16,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 483
+    },
+    {
+      "best_layout_id": "a20fd37c408c3ac7",
+      "best_layout_index": 2292,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 956.6260392954251,
+      "generation": 17,
+      "new_layouts_evaluated": 28,
+      "restart_after_generation": false,
+      "stagnant_generations": 2,
+      "unique_layouts_evaluated": 511
+    },
+    {
+      "best_layout_id": "a20fd37c408c3ac7",
+      "best_layout_index": 2292,
+      "best_validation_accuracy": 0.9701420271142672,
+      "best_validation_cost_ms": 956.6260392954251,
+      "generation": 18,
+      "new_layouts_evaluated": 1,
+      "restart_after_generation": false,
+      "stagnant_generations": 3,
+      "unique_layouts_evaluated": 512
+    }
+  ],
+  "holdout_usage": "winner_only_after_validation_search",
+  "layout_space_size": 5545,
+  "pareto_archive": [
+    {
+      "layout_id": "a20fd37c408c3ac7",
+      "layout_index": 2292,
+      "validation_accuracy": 0.9701420271142672,
+      "validation_cost_ms": 956.6260392954251
+    },
+    {
+      "layout_id": "f02e54c85c1d74f5",
+      "layout_index": 4551,
+      "validation_accuracy": 0.9703034215622982,
+      "validation_cost_ms": 975.4068874733524
+    },
+    {
+      "layout_id": "40a09889aad3ce49",
+      "layout_index": 2312,
+      "validation_accuracy": 0.9704648160103292,
+      "validation_cost_ms": 1011.4017741686023
+    },
+    {
+      "layout_id": "99763eb786c33bc7",
+      "layout_index": 2424,
+      "validation_accuracy": 0.9712717882504842,
+      "validation_cost_ms": 1024.547390965141
+    },
+    {
+      "layout_id": "59525b7d992bc2db",
+      "layout_index": 2,
+      "validation_accuracy": 0.9727243382827631,
+      "validation_cost_ms": 1034.3024290383503
+    },
+    {
+      "layout_id": "305ed70a0bd0e7dc",
+      "layout_index": 0,
+      "validation_accuracy": 1.0,
+      "validation_cost_ms": 10000.0
+    }
+  ],
+  "restart_count": 1,
+  "settings": {
+    "algorithm": "constrained_memetic_genetic_algorithm",
+    "component_resample_rate": 0.3,
+    "crossover_rate": 0.8,
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "elite_count": 4,
+    "evaluation_budget": 512,
+    "fitness_cache_schema": 1,
+    "fitness_implementation_sha256": "0759a3d389dbcad99dd17344c8bc6fc2049d7248ad715e4c059923be9e46d6bd",
+    "generations": 24,
+    "holdout_fraction": 0.2,
+    "inner_seed": 0,
+    "iterations": 8000,
+    "layout_catalogue_sha256": "9907857a0bd3d1f008e63dddd138744f2d6c2fa7d5392b9a79aae90632ff0140",
+    "max_restarts": 3,
+    "mutation_rate": 0.8,
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+    "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+    "outer_seed": 0,
+    "population_size": 32,
+    "quantile_points": 50,
+    "random_immigrant_rate": 0.2,
+    "removed_candidates": [
+      "K1"
+    ],
+    "split_seed": 0,
+    "split_strategy": "blocked_per_run",
+    "stagnation_generations": 6,
+    "target_accuracy": 0.97,
+    "target_accuracy_source": "explicit",
+    "tournament_size": 2
+  },
+  "split": {
+    "holdout_fraction": 0.2,
+    "holdout_samples": 1550,
+    "per_run": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "random_seed": 0,
+    "strategy": "blocked_per_run",
+    "validation_samples": 6196
+  },
+  "stop_reason": "evaluation_budget",
+  "unique_layouts_evaluated": 512,
+  "winner": {
+    "holdout": {
+      "accuracy": 0.9748387096774194,
+      "correct": 1511,
+      "expected_cost": 934.9804939249004,
+      "feasible": true,
+      "macro_accuracy": 0.9739954237588796,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9921465968586387,
+          "correct": 379,
+          "total": 382
+        },
+        "gle350": {
+          "accuracy": 0.9907192575406032,
+          "correct": 427,
+          "total": 431
+        },
+        "miata": {
+          "accuracy": 0.9621621621621622,
+          "correct": 356,
+          "total": 370
+        },
+        "mustang": {
+          "accuracy": 0.9509536784741145,
+          "correct": 349,
+          "total": 367
+        }
+      },
+      "route_counts": {
+        "K3": 1066,
+        "K4": 341,
+        "detector": 143
+      },
+      "thresholds": {
+        "K0": 0.9962268216269357,
+        "K2": 0.9961051940917969,
+        "K3@initial[1]": 0.7913912534713745,
+        "K3@specialized[K0:coupe][0]": 0.667218702180045,
+        "K3@specialized[K0:suv][1]": 0.5286086031368801,
+        "K4": 0.9588181291307721
+      },
+      "total": 1550,
+      "worst_class_accuracy": 0.9509536784741145
+    },
+    "holdout_feasible": true,
+    "layout": {
+      "initial": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "specialized": {
+        "K0:coupe": [
+          "K3",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K3",
+          "K2",
+          "detector"
+        ]
+      }
+    },
+    "layout_id": "a20fd37c408c3ac7",
+    "layout_index": 2292,
+    "settings": {
+      "algorithm": "constrained_memetic_genetic_algorithm",
+      "component_resample_rate": 0.3,
+      "crossover_rate": 0.8,
+      "detector_cost_ms": 10000.0,
+      "detector_mode": "paper",
+      "elite_count": 4,
+      "evaluation_budget": 512,
+      "fitness_cache_schema": 1,
+      "fitness_implementation_sha256": "0759a3d389dbcad99dd17344c8bc6fc2049d7248ad715e4c059923be9e46d6bd",
+      "generations": 24,
+      "holdout_fraction": 0.2,
+      "inner_seed": 0,
+      "iterations": 8000,
+      "layout_catalogue_sha256": "9907857a0bd3d1f008e63dddd138744f2d6c2fa7d5392b9a79aae90632ff0140",
+      "max_restarts": 3,
+      "mutation_rate": 0.8,
+      "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+      "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+      "outer_seed": 0,
+      "population_size": 32,
+      "quantile_points": 50,
+      "random_immigrant_rate": 0.2,
+      "removed_candidates": [
+        "K1"
+      ],
+      "split_seed": 0,
+      "split_strategy": "blocked_per_run",
+      "stagnation_generations": 6,
+      "target_accuracy": 0.97,
+      "target_accuracy_source": "explicit",
+      "tournament_size": 2
+    },
+    "validation": {
+      "accuracy": 0.9701420271142672,
+      "annealing_accepted_moves": 4492,
+      "annealing_elapsed_seconds": 2.574802400020417,
+      "annealing_evaluations": 7178,
+      "annealing_iterations": 8000,
+      "coordinate_descent_elapsed_seconds": 0.2916067999904044,
+      "coordinate_descent_evaluations": 625,
+      "coordinate_descent_passes": 2,
+      "correct": 6011,
+      "elapsed_seconds": 2.8664092000108212,
+      "evaluations": 7803,
+      "expected_cost": 956.6260392954251,
+      "feasible": true,
+      "macro_accuracy": 0.9689403102426195,
+      "method": "simulated_annealing_plus_coordinate_descent",
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9954128440366973,
+          "correct": 1519,
+          "total": 1526
+        },
+        "gle350": {
+          "accuracy": 0.9930354033662218,
+          "correct": 1711,
+          "total": 1723
+        },
+        "miata": {
+          "accuracy": 0.9485791610284168,
+          "correct": 1402,
+          "total": 1478
+        },
+        "mustang": {
+          "accuracy": 0.9387338325391422,
+          "correct": 1379,
+          "total": 1469
+        }
+      },
+      "route_counts": {
+        "K0": 2,
+        "K3": 4277,
+        "K4": 1332,
+        "detector": 585
+      },
+      "target_accuracy": 0.97,
+      "thresholds": {
+        "K0": 0.9962268216269357,
+        "K2": 0.9961051940917969,
+        "K3@initial[1]": 0.7913912534713745,
+        "K3@specialized[K0:coupe][0]": 0.667218702180045,
+        "K3@specialized[K0:suv][1]": 0.5286086031368801,
+        "K4": 0.9588181291307721
+      },
+      "total": 6196,
+      "worst_class_accuracy": 0.9387338325391422
+    }
+  }
+}

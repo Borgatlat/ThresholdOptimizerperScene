@@ -189,7 +189,7 @@
     }
   },
   "completed_layouts": 5545,
-  "elapsed_seconds_this_invocation": 17066.19995509999,
+  "elapsed_seconds_this_invocation": 0.0,
   "expected_total_layouts": 5545,
   "fig1_reference": {
     "holdout_accuracy": 0.9851612903225806,

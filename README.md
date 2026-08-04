@@ -104,6 +104,64 @@ uses each run's final contiguous segment block for holdout rather than mixing
 nearby windows randomly. The current h24 table has one class per run, so this
 keeps all classes in both partitions; a whole-run holdout would not.
 
+## Joint hierarchy and threshold optimization
+
+`joint_optimize_hierarchy_ga.py` approximates the completed K1-free brute
+force with a constrained memetic genetic algorithm. The GA evolves a legal
+initial chain plus K0's coupe and SUV branches. Every new non-detector-only
+topology receives the same independent threshold optimization as the
+exhaustive experiment: 8,000 simulated-annealing steps, 50 confidence
+quantiles, inner seed 0, and the coordinate-descent polish. The detector-only
+topology is scored directly in both methods. Validation selects the winner;
+holdout is evaluated once only after the layout and thresholds have been
+frozen.
+
+```bash
+# Inspect the search budget and measured runtime estimate.
+python joint_optimize_hierarchy_ga.py --dry-run
+
+# Default: at most 512 unique layouts (9.23% of 5,545), about 26 minutes
+# sequential at the measured exhaustive-run rate.
+python joint_optimize_hierarchy_ga.py
+
+# Optional outer annealing: linearly move from diverse exploration toward
+# stronger selection/refinement as unique_evaluations / 512 increases.
+# This writes to checkpoints/joint_ga_annealed_k1_free_h24 by default.
+python joint_optimize_hierarchy_ga.py --annealed-outer-schedule
+
+# Parallelize the independent inner optimizations within each generation.
+python joint_optimize_hierarchy_ga.py --workers 8
+
+# Repeat only the stochastic outer search; keep split and inner seeds fixed.
+python joint_optimize_hierarchy_ga.py --outer-seed 1 \
+  --output-dir checkpoints/joint_ga_k1_free_h24_seed1
+```
+
+The run automatically resumes from `checkpoint.json` and caches each layout
+in `evaluations.jsonl`. Its final `summary.json` includes best-so-far history,
+a validation cost/accuracy Pareto archive, winner-only holdout metrics, and—if
+the exhaustive files are present—a post-search optimality gap, exact rank, and
+an equal-budget uniform-random control. Exhaustive results are never read by
+the search itself. See [JOINT_OPTIMIZATION_RESEARCH.md](JOINT_OPTIMIZATION_RESEARCH.md)
+for the method comparison, prior work, budget rationale, and oracle-replay
+results.
+
+Outer annealing does not change a candidate's fitness calculation: the inner
+8,000-step threshold anneal, 50 quantiles, seed, split, target, hard accuracy
+constraint, coordinate polish, evaluation budget, and restart rule remain the
+same. Only GA population controls are interpolated, and each applied value is
+stored in the generation history.
+
+The completed exhaustive validation table can replay both outer schedules
+over many paired seeds without repeating the expensive inner anneals:
+
+```bash
+python benchmark_ga_outer_schedules.py --runs 1000 --no-output
+```
+
+This is an outer-search diagnostic only; it deliberately excludes holdout and
+does not replace a final independent checkpoint run.
+
 Every final baseline, optimized, and holdout report includes
 `per_class_accuracy`, `macro_accuracy`, and `worst_class_accuracy`. A class
 with no evaluated samples is reported with `accuracy: null` rather than being
@@ -183,7 +241,7 @@ The threshold optimizer can use either:
   `O(q^n)` evaluations.
 - **simulated annealing with coordinate descent**, which evaluates a limited
   number of random proposals for `t` iterations, then greedily polishes the
-  best policy it found.
+  best policy it found. This runs in `O(t)`
 
 ### Terms for the Optimizer
 
@@ -235,7 +293,7 @@ best_policy = None
 for policy in every_combination(threshold_grids):
     metrics = replay_cached_outcomes(policy)
 
-    if policy_key(metrics) is better than policy_key(best_policy):
+    if policy_key(metrics) > policy_key(best_policy):
         best_policy = metrics
 
 return best_policy
@@ -265,8 +323,8 @@ At each iteration, the annealer chooses one threshold slot:
   The maximum step decreases as the search progresses.
 - **20% chance**: jump to a random threshold index in that occurrence's grid.
 
-```text
-current = grid value nearest to each occurrence's current threshold
+```python
+current = grid value nearest to each occurrence current threshold
 current_metrics = replay_cached_outcomes(current)
 best = current
 best_metrics = current_metrics
@@ -281,7 +339,7 @@ for iteration in range(n_iterations):
     if random() < 0.8:
         proposal[slot] = clamp(current[slot] + random_local_step(progress))
     else:
-        proposal[slot] = random index from that occurrence's grid
+        proposal[slot] = random index from that occurrence grid
 
     proposal_metrics = replay_cached_outcomes(proposal)
     delta = energy(proposal_metrics) - energy(current_metrics)
@@ -304,7 +362,7 @@ fixed except one, tries every value in that occurrence's grid, and keeps an
 improvement according to the policy key. It repeats full passes until no
 occurrence improves or the maximum number of passes is reached.
 
-```text
+```python
 for pass in range(max_passes):
     changed = false
 
@@ -318,6 +376,168 @@ for pass in range(max_passes):
 
 return current policy
 ```
+
+## Algorithm for Joint Optimizer
+The joint optimizer can use either:
+
+- **brute-force search** over every combination of layouts. This has a time complexity of around `O(n!)`
+- **Memetic Genetic Algorithm**, this is a genetic algorithm which evaluates `q` layouts for `t` generations. Thresholds are optimized using previous SA algorithm. This runs in around `O(qt)`
+
+### Terms for the Optimizer
+
+- **Tournament Sampler**: We sample $n$ different layouts from our layout pool and perform a tournament on them and return the best one. Usually $n = 2$ so we just sample 2 and return the better of the 2  
+- **Module**: This is a trunk or branch
+- **Trunk**: This is the main branch of the hierarchy/layout which you would follow given repeated IDK classifications. Each layout only has 1 trunk and it only contains global models or intermediates.
+- **Branch**: This is the section of the hierarchy/layout after a specialized decision has already been made. For this repository, each hierarchy has a "Coupe" and "SUV" branch. Branches are allowed to be empty.
+
+### Brute Force Search
+
+This is the brute-force baseline that we aim to match. It explores every possible layout of the cascade and optimizes the thresholds of each layout to reach the target accuracy using the previous SA technique. It then selects the layout and threshold with the lowest cost. This method is extremely slow even for low classifer counts but should theoretically discover the best `layout x threshold` configuration possible that is within the budget for our threshold optimization.
+
+```text
+best_policy = None
+
+for layout in every_combination(cascade_models):
+    optimized_layout = threshold_optimize_SA(layout)
+    metrics = replay_cached_outcomes(optimized_layout)
+
+    if policy_key(metrics) > policy_key(best_policy):
+        best_policy = metrics
+
+return best_policy
+```
+
+### Memetic Genetic Algorithm
+
+This is a genetic optimization search over cascade layouts. This search does not consider thresholds as a criteria for optimization.
+
+We initially start off with a population of random layouts. Each layout's thresholds are optimized using the previous SA technique. The 4 best layouts are considered the elites and are added to the next population. To determine the rest of the layouts for the next population, we either chose a layout from the current population using a `tournament sampler` and then alter it through `crossovers` and/or `mutations` (determined by a crossover rate and mutation rate), or just created it from scratch (called an `immigrant`, determined by immigrant rate). The `tournament sampler` is a heuristic to have generally select good layouts, while still considering worse layouts. 
+
+`crossovers` allow for 2 layouts to "breed" through the combination of their `modules` (`trunks` and `branches`). It does this through the `recombine` function which runs on each module of the 2 layouts. After each of the modules has been recombined, we run a `repair` function on the final layout.
+- `recombine` produces a new module based on 2 modules, 1 from each layout. These modules have a probability to `select` or `mix`. `select` chooses 1 of the 2 modules to become the new module. `mix` forms a breed between the 2 modules, going through each of their classifiers, where a classifier which appears in both is always kept, while one that is in either has a 50-50 chance to be kept. The ordering of the classifier gives priority to the primary parent, which is decided randomly.
+- `repair` takes in a layout and removes classifiers which are repeated, specialized branches if there are no intermediates and classifiers which would be run twice.
+
+`mutations` allow for the layout to be directly changed. It does this by first conducting a weighted probability of which module to select (trunk - 0.4, each branch - 0.3. if there are no branches, it always edits trunk). It then performs a change, which is either `local` or a complete `resampling` (local 70%, complete resampling 30%). After this the new layout is passed through `repair`.
+- `local` mutations are characterized as one of the following: a random `insertion`, `deletion`, `replacement`, `swap` or `relocation` of any classifier.
+- `resampling` mutations completely discard the module and generate a new random order. The length of this order is also generated randomly.
+- `repair` takes in a layout and removes classifiers which are repeated and also removes specialized branches if there are no intermediates.
+
+`immigrants` purely create a new cascade from scratch without any prior influence.
+
+We do not select layouts that we have already tried (except for elites). We do not select layouts that are already in the next population.
+
+This entire process is repeated for t generations, or until no unseen legal layouts are proposed.
+
+
+```python
+# algorithm previously discussed
+def optimize_thresholds(layout):
+  ... 
+
+def tournament_sample(layouts, n):
+  random_layouts = random.choose_n(layouts, n)
+
+  tournament = run_tournament(random_layouts)
+
+  return tournament.winner
+
+def repair(layout):
+  remove_specialized branches(layout)
+  remove_repeated_classifiers(layout)
+
+def mutate(layout)
+  module = random.weighted_choice(["trunk", "SUV", "Coupe"], [0.4, 0.3, 0.3])
+  change_type = random.weighted_choice(["local", "resampling"], [0.7, 0.3])
+  if change_type == "local":
+    random_classifier = random.select_classifier(layout, module)
+    valid_changes = get_valid_changes([insertion, deletion, replacement, swap, relocation], module)
+
+    random_change = random.choice(valid_changes)
+
+    random_change(random_classifier)
+  
+  elif change_type == "resampling":
+    module = random.generate_allowed_module(module)
+
+  repair(layout)
+  return layout
+
+
+def crossover(layout1, layout2):
+  
+  def recombine(module1, module2):
+    new_module = Module()
+    parent, other = random.shuffle([module1, module2])
+    for classifiers in (parent ∪ other):
+      if classifier in both:
+        new_module.add(classifier)
+      else:
+        if random() < 0.5:
+          new_module.add(classifier)
+    return new_module
+
+  new_layout = Layout()
+
+  for module1, module2 in layout1.modules, layout2.modules:
+    change_type = random.weighted_choice(["select", "mix"], [0.7, 0.3])
+    new_module = None
+
+    if change_type == "select":
+      new_module = random.choice([module1, module2])
+
+    elif change_type == "mix":
+      new_module = recombine(module1, module2)
+
+    new_layout.add(new_module)
+
+  repair(new_layout)
+
+  return new_layout
+
+def get_immigrant():
+  return random.create_layout()
+
+def GA_joint_optimizer():
+  current_population = create_starting_population()
+
+  for n_generations:
+
+    for layout in current_population:
+      optimize_thresholds(layout)
+
+    next_population = []
+
+    elites = select_top_n(current_population, n_elites)
+    next_population.add(elites)
+
+    for population_count - n_elites:
+      new_layout = None
+      
+      if random() < immigrant_rate:
+        new_layout = get_immigrant()
+
+      else:
+        new_layout = tournament_sample(current_population)
+
+        if random() < crossover_rate:
+          secondary = tournament_sample(current_population)
+
+          new_layout = crossover(new_layout, secondary)
+        
+        if random() < mutation_rate:
+          new_layout = mutate(new_layout)
+
+
+      if tried_before(new_layout) or already_inside_next_population(new_layout):
+        redo
+
+      next_population.add(new_layout)
+
+    current_population = next_population
+    
+  return select_top_n(current_population, 1)
+```
+
 
 # Notes and Limitations
 - Performance differs quite a bit. It performs worse when we use a real deterministic classifier compared to the 10000ms one referenced in the paper
