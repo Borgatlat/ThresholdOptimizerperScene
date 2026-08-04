@@ -232,21 +232,30 @@ matching the existing per-Ki profiler.
   and evaluator rather than an arbitrary choice of one vehicle per segment.
 - **Memory on large scenes**: processing is file-by-file; use `--scenes` to run one scene at a time.
 
+# Explanation and  Pseudo-Code
+
+### General Terms for Hierarchical IDK Cascades
+- **model**: This is the trained unit of the cascade which takes in the input and returns either a class or IDK based on whether the classification met its confidence threshold. Models are either `Intermediate`, `Specialized`, `Global` or `Deterministic`
+  - `Intermediate`: classifies into sub-classes which require further classification. This can only be run in the trunk of the hierarchy. (SUV or COUPE)
+  - `Specialized`: classifies known sub-class into general class. This can only be run in branch of Intermediate Classifier (COUPE -> (MUSTANG or MX 5) or SUV -> (CX 30 or GLE 350))
+  - `Global`: classifies into general class. This can be run anywhere in the hierarchy (MUSTANG, MX 5, CX 30, GLE 350)
+  - `Deterministic`: Same as Global classifer but does not return IDK. This is always run at the end of a module (MUSTANG, MX 5, CX 30, GLE 350)
+- **classifier**: This is an instance of a model in the cascade. The same model can appear multiple times in the layout (e.g. once at SUV branch and another at COUPE branch). However, classifiers are location dependent and therefore unique.
+
 ## Algorithm for Threshold Optimization
 
 The threshold optimizer can use either:
 
 - **exhaustive search** over every combination of the allowed thresholds. If
-  every one of `n` models has roughly `q` threshold values, this is
-  `O(q^n)` evaluations.
+  every one of the `n` `classifiers` has `q` threshold values, this is
+  `O(q^n)` evaluations. **Note** that thresholds are determined by `classifiers` and not `models`. So if the same `model` appears twice, they can have different thresholds.
 - **simulated annealing with coordinate descent**, which evaluates a limited
   number of random proposals for `t` iterations, then greedily polishes the
   best policy it found. This runs in `O(t)`
 
 ### Terms for the Optimizer
-
 - **Cached confidence score**: the maximum softmax probability produced by a
-  model for one saved sample. These scores are collected once in
+  `model` for one saved sample. These scores are collected once in
   `empirical_outcomes.pkl`; threshold tuning does not rerun the models.
 
 - **Quantile points**: the number of equally spaced *percentiles* sampled
@@ -255,25 +264,14 @@ The threshold optimizer can use either:
   to one. A quantile is not an accuracy or recall value; it is a way of
   choosing thresholds where confidence values actually occur.
 
-- **Threshold slot**: one occurrence of a model in the fixed cascade. A model
-  used once keeps its normal id (`K3`). If it appears more than once, each
-  occurrence gets a location-qualified id such as `K3@initial[1]` or
-  `K3@specialized[K0:suv][0]`. Those slots are optimized independently.
-
-- **Threshold grid**: the allowed confidence thresholds for one threshold
-  slot. It contains the selected confidence quantiles, the model's current
+- **Threshold grid**: the allowed confidence thresholds for each classifier (each classifier has its own grid). It contains the selected confidence quantiles, the model's current
   threshold,
   `0.0` (accept every cached sample), and a value just above the maximum
   confidence (reject every cached sample). Between two adjacent cached
   confidence values, changing the threshold cannot change any cached route,
   so a continuous search would mostly repeat equivalent policies.
 
-- **Policy**: one chosen threshold from every active occurrence's grid.
-  Replaying a policy gives end-to-end accuracy, expected runtime, routes, and
-  per-class metrics. For backward compatibility, a bare model key in an input
-  policy or custom grid is used as the fallback for all occurrences of that
-  model; optimized output always writes distinct location keys when needed.
-
+- **Policy**:  This is the collection of the  threshold slots. Replaying a policy gives end-to-end accuracy, expected runtime, routes, and per-class metrics. 
 - **Policy key**: the hard final ranking rule used by both optimizers. A
   policy that meets the target accuracy always beats one that misses it. Among
   feasible policies, lower expected runtime wins; accuracy breaks an exact
@@ -282,7 +280,7 @@ The threshold optimizer can use either:
 
 ### Exhaustive Search
 
-This is the brute-force baseline. It evaluates every Cartesian product of the
+This is the brute-force baseline. It evaluates every combination of the
 threshold grids, then selects the policy with the best policy key. It is exact
 for that discrete grid, but becomes impractical once many occurrences or many
 thresholds are used.
@@ -324,35 +322,43 @@ At each iteration, the annealer chooses one threshold slot:
 - **20% chance**: jump to a random threshold index in that occurrence's grid.
 
 ```python
-current = grid value nearest to each occurrence current threshold
-current_metrics = replay_cached_outcomes(current)
-best = current
-best_metrics = current_metrics
 
-for iteration in range(n_iterations):
+def SA_threshold_optimize(cascade):
+  for n_iterations:
     progress = iteration / (n_iterations - 1)
     temperature = exponential_decay(start_temperature, end_temperature, progress)
 
-    slot = random active occurrence
-    proposal = copy(current)
+    previous_metric = evaluator.evaluate(cascade, cached_runs)
 
+    classifier = random.choose_random_classifier(cascade)
+
+    # step
     if random() < 0.8:
-        proposal[slot] = clamp(current[slot] + random_local_step(progress))
-    else:
-        proposal[slot] = random index from that occurrence grid
+      max_step = max(1, int((1.0 - progress) * q_thresholds))
 
-    proposal_metrics = replay_cached_outcomes(proposal)
-    delta = energy(proposal_metrics) - energy(current_metrics)
+      new_threshold_index = clamp(classifer.threshold_index + random.int(-max_step, max_step + 1))
+
+      classifier.threshold = classifier.threshold_grid[new_threshold_index]
+
+    # completely new threshold
+    else:
+      classifier.threshold = random.choice(classifier.threshold_grid)
+
+    proposal_metric = evaluator.evaluate(cascade, cached_runs)
+
+    delta = energy(proposal_metrics) - energy(previous_metrics)
 
     if delta <= 0 or random() < exp(-delta / temperature):
-        current = proposal
-        current_metrics = proposal_metrics
+      keep change
+    else:
+      discard change
 
-    if policy_key(proposal_metrics) is better than policy_key(best_metrics):
-        best = proposal
-        best_metrics = proposal_metrics
+    if policy_key(proposal_metric) better than policy_key(best_metric):
+      best_metric = proposal_metric
+      best = cascade
 
-return coordinate_descent(best)
+  return coordinated_descent(best)
+
 ```
 
 ### Coordinate Descent Polish
@@ -363,18 +369,19 @@ improvement according to the policy key. It repeats full passes until no
 occurrence improves or the maximum number of passes is reached.
 
 ```python
-for pass in range(max_passes):
+def coordinated_descent(cascade):
+  for max_passes:
     changed = false
 
-    for slot in active occurrences:
-        try every threshold for slot while holding all other thresholds fixed
+    for classifier in cascade:
+        try every threshold for classifier while holding all other thresholds fixed
         keep the best value if it improves the policy key
         changed = changed or an improvement was kept
 
     if not changed:
         break
 
-return current policy
+  return current policy
 ```
 
 ## Algorithm for Joint Optimizer
