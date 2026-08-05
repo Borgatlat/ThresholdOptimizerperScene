@@ -43,7 +43,6 @@ from hierarchy_optimizer import (
     HierarchyOptimizer,
     optimize_empirical_hierarchy,
 )
-from utils.labels import GLOBAL_CLASS_NAMES
 
 
 DEFAULT_TARGET_ACCURACY = 0.95
@@ -154,6 +153,7 @@ class FixedLayoutThresholdEvaluator:
         self.cascade = cascade
         self.candidates = optimizer.candidates
         self.detector_id = optimizer.detector_id
+        self.global_class_names = tuple(optimizer.global_class_names)
         self.sample_ids, self.true_global = self._load_true_labels()
         self.sample_count = len(self.sample_ids)
 
@@ -198,7 +198,7 @@ class FixedLayoutThresholdEvaluator:
         self._intermediate_idx_to_group = dict(optimizer._intermediate_idx_to_group)
         self._specialized_groups = set(optimizer.groups)
         self._global_name_to_idx = {
-            name: idx for idx, name in enumerate(GLOBAL_CLASS_NAMES)
+            name: idx for idx, name in enumerate(self.global_class_names)
         }
         ending_ids = [*self.tunable_model_ids, self.detector_id]
         if optimizer.detector_mode == "trained":
@@ -218,7 +218,9 @@ class FixedLayoutThresholdEvaluator:
                 "Regenerate empirical outcomes before threshold optimization."
             )
 
-        label_to_idx = {name: idx for idx, name in enumerate(GLOBAL_CLASS_NAMES)}
+        label_to_idx = {
+            name: idx for idx, name in enumerate(self.global_class_names)
+        }
         true_global = labels["true_global_label"].map(label_to_idx)
         if true_global.isna().any():
             unknown = sorted(labels.loc[true_global.isna(), "true_global_label"].unique())
@@ -355,7 +357,7 @@ class FixedLayoutThresholdEvaluator:
         if include_class_metrics:
             per_class: dict[str, dict[str, float | int | None]] = {}
             represented_accuracies: list[float] = []
-            for class_index, class_name in enumerate(GLOBAL_CLASS_NAMES):
+            for class_index, class_name in enumerate(self.global_class_names):
                 class_mask = self.true_global == class_index
                 support = int(np.sum(class_mask))
                 correct = int(np.sum(correct_mask & class_mask))
@@ -532,6 +534,13 @@ def _subset_empirical_payload(payload: dict, sample_ids: np.ndarray) -> dict:
     subset_outcomes["sample_id"] = subset_outcomes["sample_id"].map(id_map).astype(int)
 
     return {
+        "schema_version": payload.get("schema_version", "empirical-outcomes/v2"),
+        "profile": dict(payload["profile"]),
+        **(
+            {"collection": dict(payload["collection"])}
+            if "collection" in payload
+            else {}
+        ),
         "labels": subset_labels,
         "candidates": payload["candidates"].copy(),
         "detector": dict(payload["detector"]),
@@ -545,13 +554,11 @@ def split_empirical_outcomes(
     split_strategy: str = "blocked_per_run",
     random_seed: int = 0,
 ) -> tuple[dict, dict, dict]:
-    """Split outcomes into validation and holdout partitions.
+    """Return explicit validation/test partitions or split a legacy table.
 
-    ``blocked_per_run`` is the default because consecutive M3N-VC segments
-    are strongly correlated.  It assigns the final fraction of each run to
-    holdout, preserving every class in both partitions for the current h24
-    table, where each run has exactly one class.  ``random_per_run`` is
-    provided only as a less conservative comparison point.
+    New dataset adapters should provide a ``partition`` label column. Legacy
+    tables are divided within the profile's ``split_group_column`` using a
+    blocked or random strategy.
     """
     if not 0.0 < holdout_fraction < 1.0:
         raise ValueError("holdout_fraction must be strictly between 0 and 1.")
@@ -568,25 +575,56 @@ def split_empirical_outcomes(
             "before they can be split. Regenerate empirical outcomes."
         )
 
+    if "partition" in labels.columns:
+        partitions = labels["partition"].astype(str).str.lower()
+        validation_ids = sample_ids[partitions == "validation"]
+        test_name = "test" if (partitions == "test").any() else "holdout"
+        holdout_ids = sample_ids[partitions == test_name]
+        if not len(validation_ids) or not len(holdout_ids):
+            raise ValueError(
+                "Explicit outcomes require non-empty validation and test/holdout rows."
+            )
+        return (
+            _subset_empirical_payload(payload, validation_ids),
+            _subset_empirical_payload(payload, holdout_ids),
+            {
+                "strategy": "predefined",
+                "validation_partition": "validation",
+                "holdout_partition": test_name,
+                "validation_samples": int(len(validation_ids)),
+                "holdout_samples": int(len(holdout_ids)),
+            },
+        )
+
+    split_group_column = str(
+        payload["profile"].get("split_group_column") or "true_global_label"
+    )
+    if split_group_column not in labels.columns:
+        raise ValueError(
+            f"Legacy split column {split_group_column!r} is missing from labels."
+        )
+
     rng = np.random.default_rng(random_seed)
     holdout_mask = np.zeros(len(labels), dtype=bool)
-    per_run: dict[str, dict[str, int]] = {}
-    for run_id, run_labels in labels.groupby("run_id", sort=False):
-        run_sample_ids = run_labels["sample_id"].to_numpy(dtype=int)
-        holdout_count = int(round(len(run_sample_ids) * holdout_fraction))
-        holdout_count = min(max(holdout_count, 1), len(run_sample_ids) - 1)
+    per_group: dict[str, dict[str, int]] = {}
+    for group_id, group_labels in labels.groupby(split_group_column, sort=False):
+        group_sample_ids = group_labels["sample_id"].to_numpy(dtype=int)
+        holdout_count = int(round(len(group_sample_ids) * holdout_fraction))
+        holdout_count = min(max(holdout_count, 1), len(group_sample_ids) - 1)
         if holdout_count <= 0:
             raise ValueError(
-                f"Run {run_id!r} has too few samples for a train/holdout split."
+                f"Group {group_id!r} has too few samples for a validation/holdout split."
             )
 
         if split_strategy == "blocked_per_run":
-            selected = run_sample_ids[-holdout_count:]
+            selected = group_sample_ids[-holdout_count:]
         else:
-            selected = rng.choice(run_sample_ids, size=holdout_count, replace=False)
+            selected = rng.choice(
+                group_sample_ids, size=holdout_count, replace=False
+            )
         holdout_mask[selected] = True
-        per_run[str(run_id)] = {
-            "validation": int(len(run_sample_ids) - holdout_count),
+        per_group[str(group_id)] = {
+            "validation": int(len(group_sample_ids) - holdout_count),
             "holdout": int(holdout_count),
         }
 
@@ -601,7 +639,9 @@ def split_empirical_outcomes(
             "holdout_fraction": float(holdout_fraction),
             "validation_samples": int(len(validation_ids)),
             "holdout_samples": int(len(holdout_ids)),
-            "per_run": per_run,
+            "split_group_column": split_group_column,
+            "per_group": per_group,
+            **({"per_run": per_group} if split_group_column == "run_id" else {}),
         },
     )
 

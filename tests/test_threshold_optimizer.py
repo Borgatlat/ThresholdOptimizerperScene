@@ -63,6 +63,7 @@ def repeated_model_evaluator() -> FixedLayoutThresholdEvaluator:
         detector_mode="paper",
         detector_outcome_id="Kdet",
         detector_cost=10.0,
+        global_class_names=("gle350", "other"),
         identifier_ids=("K0",),
         groups=("suv",),
         _intermediate_idx_to_group={0: "suv", 1: "coupe", 2: "background"},

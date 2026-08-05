@@ -1,6 +1,44 @@
-# ThresholdOptimizerperScene
+# Hierarchical Cascade Optimizer
 
-Per-scene IDK cascade threshold optimization on the [M3N-VC](https://github.com/UMBC-VEECO/M3N-VC) dataset. Frozen **h24**-trained Ki classifiers (K0–K6 + Kdet) are evaluated zero-shot on each scene; `run_all_scenes.py` preprocesses raw parquet into spectrogram arrays and collects empirical per-segment outcomes for the hierarchy optimizer.
+Dataset-neutral joint layout and occurrence-specific threshold optimization
+for depth-one hierarchical cascades. The reusable root modules consume a
+hierarchy profile, validation/test sets, and pretrained classifier adapters.
+They cache joint empirical outcomes, construct router/group modules
+dynamically, and optimize layouts and thresholds. The original
+[M3N-VC](https://github.com/UMBC-VEECO/M3N-VC) experiments now live under
+`experiments/m3n_vc/`.
+
+## Repository architecture
+
+| Layer | Files |
+|---|---|
+| Dataset profile and empirical cache | `cascade_profile.py`, `empirical_outcomes.py` |
+| Generic hierarchy and threshold replay | `hierarchy_optimizer.py`, `threshold_optimizer.py` |
+| Dynamic layout and memetic search | `layout_search.py`, `joint_optimize_hierarchy_ga.py` |
+| End-to-end API | `optimization_pipeline.py` |
+| Standard results and packet-only figures | `result_packets.py`, `plot_result_packets.py` |
+| M3N-VC collection, training, and experiments | `experiments/m3n_vc/` |
+
+New datasets use `ensure_and_optimize_joint()` from
+`optimization_pipeline.py`. A profile declares leaf classes, superclass
+groups, and router outputs. For example, two CIFAR-100 intermediate
+classifiers and 20 superclasses create 40 independent branch modules
+automatically. Intermediate depth is intentionally limited to one.
+
+Figures consume only `cascade-result/v1` JSON packets. Each packet contains
+the layout, thresholds, validation/test accuracy, expected cost, terminal
+routes, sample counts, target, dataset fingerprint, and provenance.
+
+```bash
+# Convert completed historical h24 reports to the standard packet schema.
+python -m experiments.m3n_vc.export_h24_result_packets
+
+# Regenerate h24 comparison cost/routing figures from packets only.
+python -m experiments.m3n_vc.plot_h24_method_comparison
+
+# Plot any set of result packets from any dataset.
+python plot_result_packets.py result_a.json result_b.json --output-dir figures
+```
 
 ## Prerequisites
 
@@ -16,7 +54,7 @@ Per-scene IDK cascade threshold optimization on the [M3N-VC](https://github.com/
 pip install -r requirements.txt
 
 # 2. Verify checkpoints and (optional) raw scene data
-python verify_setup.py
+python -m experiments.m3n_vc.verify_setup
 
 # 3. Place M3N-VC scenes under datasets/ (any layout below works)
 #    datasets/h24/h24/          <- nested (M3N-VC default)
@@ -24,10 +62,10 @@ python verify_setup.py
 #    datasets/s31/s31/
 
 # 4. Run all scenes (process raw parquet + empirical outcomes)
-python run_all_scenes.py
+python -m experiments.m3n_vc.run_all_scenes
 
 # Or one scene, skip preprocessing if arrays already exist:
-python run_all_scenes.py --scenes h08 --skip-process
+python -m experiments.m3n_vc.run_all_scenes --scenes h08 --skip-process
 ```
 
 ## M3N-VC data layout
@@ -38,7 +76,7 @@ Each scene needs `*_mic.parquet`, `*_geo.parquet`, `run_ids.parquet`, and `senso
 |--------|---------|
 | Nested | `datasets/h24/h24/run0_rs1_mic.parquet` |
 | Flat | `datasets/h08/run0_rs1_mic.parquet` |
-| Custom | `python run_all_scenes.py --data-root /path/to/M3N-VC` |
+| Custom | `python -m experiments.m3n_vc.run_all_scenes --data-root /path/to/M3N-VC` |
 
 Scenes: **h24**, **h08**, **s31**, **a06**, **i29**, **i22**.
 
@@ -54,9 +92,9 @@ Download from the M3N-VC release and unzip so scene folders sit under `datasets/
 ## Individual commands
 
 ```bash
-python process_data.py --scene h08
-python empirical_outcomes.py --scene h08
-python diagnose_scene.py
+python -m experiments.m3n_vc.process_data --scene h08
+python -m experiments.m3n_vc.collect_empirical_outcomes --scene h08
+python -m experiments.m3n_vc.diagnose_scene
 ```
 
 ## Fixed-layout threshold optimization
@@ -106,7 +144,7 @@ keeps all classes in both partitions; a whole-run holdout would not.
 
 ## Joint hierarchy and threshold optimization
 
-`joint_optimize_hierarchy_ga.py` approximates the completed K1-free brute
+`experiments/m3n_vc/joint_optimize_hierarchy_ga.py` approximates the completed K1-free brute
 force with a constrained memetic genetic algorithm. The GA evolves a legal
 initial chain plus K0's coupe and SUV branches. Every new non-detector-only
 topology receives the same independent threshold optimization as the
@@ -118,22 +156,22 @@ frozen.
 
 ```bash
 # Inspect the search budget and measured runtime estimate.
-python joint_optimize_hierarchy_ga.py --dry-run
+python -m experiments.m3n_vc.joint_optimize_hierarchy_ga --dry-run
 
 # Default: at most 512 unique layouts (9.23% of 5,545), about 26 minutes
 # sequential at the measured exhaustive-run rate.
-python joint_optimize_hierarchy_ga.py
+python -m experiments.m3n_vc.joint_optimize_hierarchy_ga
 
 # Optional outer annealing: linearly move from diverse exploration toward
 # stronger selection/refinement as unique_evaluations / 512 increases.
 # This writes to checkpoints/joint_ga_annealed_k1_free_h24 by default.
-python joint_optimize_hierarchy_ga.py --annealed-outer-schedule
+python -m experiments.m3n_vc.joint_optimize_hierarchy_ga --annealed-outer-schedule
 
 # Parallelize the independent inner optimizations within each generation.
-python joint_optimize_hierarchy_ga.py --workers 8
+python -m experiments.m3n_vc.joint_optimize_hierarchy_ga --workers 8
 
 # Repeat only the stochastic outer search; keep split and inner seeds fixed.
-python joint_optimize_hierarchy_ga.py --outer-seed 1 \
+python -m experiments.m3n_vc.joint_optimize_hierarchy_ga --outer-seed 1 \
   --output-dir checkpoints/joint_ga_k1_free_h24_seed1
 ```
 
@@ -142,7 +180,7 @@ in `evaluations.jsonl`. Its final `summary.json` includes best-so-far history,
 a validation cost/accuracy Pareto archive, winner-only holdout metrics, and—if
 the exhaustive files are present—a post-search optimality gap, exact rank, and
 an equal-budget uniform-random control. Exhaustive results are never read by
-the search itself. See [JOINT_OPTIMIZATION_RESEARCH.md](JOINT_OPTIMIZATION_RESEARCH.md)
+the search itself. See [JOINT_OPTIMIZATION_RESEARCH.md](experiments/m3n_vc/JOINT_OPTIMIZATION_RESEARCH.md)
 for the method comparison, prior work, budget rationale, and oracle-replay
 results.
 
@@ -156,7 +194,7 @@ The completed exhaustive validation table can replay both outer schedules
 over many paired seeds without repeating the expensive inner anneals:
 
 ```bash
-python benchmark_ga_outer_schedules.py --runs 1000 --no-output
+python -m experiments.m3n_vc.benchmark_ga_outer_schedules --runs 1000 --no-output
 ```
 
 This is an outer-search diagnostic only; it deliberately excludes holdout and
@@ -178,17 +216,17 @@ at least one validation-feasible starting policy. Results are written to
 
 ```bash
 # Run every available cached scene. Missing outcomes, such as i22, are skipped.
-python optimize_all_scenes.py
+python -m experiments.m3n_vc.optimize_all_scenes
 
 # Run a selected subset or use a denser threshold grid.
-python optimize_all_scenes.py --scenes a06 h08 s31 --quantile-points 25
+python -m experiments.m3n_vc.optimize_all_scenes --scenes a06 h08 s31 --quantile-points 25
 ```
 
 Generate two figures per completed scene, plus a machine-readable collection
 of the plotted values:
 
 ```bash
-python plot_paper_kdet_results.py
+python -m experiments.m3n_vc.plot_paper_kdet_results
 ```
 
 Figures are saved in `checkpoints/figures/paper_kdet_baseline_target/` and
@@ -205,14 +243,14 @@ metrics file so this comparison cannot silently mix two different fallbacks.
 
 ```bash
 # Reproduce the saved holdout partition, then time 250 live cascade executions.
-python live_cascade_benchmark.py --timed-samples 250 \
+python -m experiments.m3n_vc.live_cascade_benchmark --timed-samples 250 \
   --output checkpoints/live_cascade_benchmark.json
 
 # Benchmark a random 250-sample subset of every processed h24 input.
-python live_cascade_benchmark.py --scene h24 --partition all --timed-samples 250
+python -m experiments.m3n_vc.live_cascade_benchmark --scene h24 --partition all --timed-samples 250
 
 # Use the full holdout partition for both live accuracy and timing.
-python live_cascade_benchmark.py --timed-samples 0
+python -m experiments.m3n_vc.live_cascade_benchmark --timed-samples 0
 ```
 
 The report contains `avg_ms`, `median_ms`, `p95_ms`, `p99_ms`, `wcet_ms`
@@ -225,7 +263,7 @@ matching the existing per-Ki profiler.
 
 ## Troubleshooting
 
-- **Missing checkpoints**: run `python verify_setup.py`; weights live in `checkpoints/K*.pt`.
+- **Missing checkpoints**: run `python -m experiments.m3n_vc.verify_setup`; weights live in `checkpoints/K*.pt`.
 - **Scene skipped (data not found)**: download that scene from M3N-VC and place under `datasets/<scene>/`.
 - **i22 multi-target runs**: i22 currently has no single-vehicle runs. The
   single-label Ki cascade cannot process it; it needs a multi-label cascade
@@ -559,10 +597,10 @@ classifiers or run scene switching (those are separate, later experiments).
 
 ```bash
 # Full suite (writes checkpoints/threshold_experiments/)
-python experiment_threshold_variants.py
+python -m experiments.m3n_vc.experiment_threshold_variants
 
 # Subset
-python experiment_threshold_variants.py --suites layouts targets transfer
+python -m experiments.m3n_vc.experiment_threshold_variants --suites layouts targets transfer
 ```
 
 See `checkpoints/threshold_experiments/MASTER_SUMMARY.md` for the latest table.
@@ -570,7 +608,7 @@ See `checkpoints/threshold_experiments/MASTER_SUMMARY.md` for the latest table.
 ### Paper figures
 
 ```bash
-python plot_threshold_experiments.py
+python -m experiments.m3n_vc.plot_threshold_experiments
 ```
 
 PNGs (300 DPI, serif, print-safe colors) land in
@@ -591,8 +629,8 @@ PNGs (300 DPI, serif, print-safe colors) land in
 ### Per-scene threshold bank
 
 ```bash
-python experiment_per_scene_thresholds.py
-python plot_threshold_experiments.py   # regenerates fig9 / fig10 too
+python -m experiments.m3n_vc.experiment_per_scene_thresholds
+python -m experiments.m3n_vc.plot_threshold_experiments   # regenerates fig9 / fig10 too
 ```
 
 Writes:

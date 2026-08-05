@@ -53,7 +53,7 @@ import numpy as np
 import pandas as pd
 
 from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
-from utils.labels import GLOBAL_CLASS_NAMES, INTERMEDIATE_CLASS_NAMES
+from cascade_profile import profile_from_payload
 
 PAPER_DETECTOR_COST_MS = 10_000.0
 
@@ -81,23 +81,27 @@ class HierarchyOptimizer:
         detector_mode: str = "paper",
         detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
     ):
+        self.profile = profile_from_payload(payload)
+        self.global_class_names = self.profile.global_classes
+        self.router_output_names = self.profile.router_outputs
         self.candidates = payload["candidates"].set_index("id", drop=False)
         self.outcomes = payload["outcomes"]
         self.labels = payload["labels"]
         self.sample_count = len(self.labels)
         self.detector_mode = detector_mode
         self.detector_outcome_id = payload.get("detector", {}).get("id", "Kdet")
-        self.true_global = self.labels["true_global_label"].map(
-            {name: idx for idx, name in enumerate(GLOBAL_CLASS_NAMES)}
-        ).to_numpy(dtype=int)
+        mapped_true_global = self.labels["true_global_label"].map(
+            self.profile.global_index
+        )
+        if mapped_true_global.isna().any():
+            raise ValueError("Empirical labels contain classes outside the profile.")
+        self.true_global = mapped_true_global.to_numpy(dtype=int)
 
         self.global_ids = tuple(self.candidates[self.candidates["kind"] == "global"].index)
         self.identifier_ids = tuple(self.candidates[self.candidates["kind"] == "identifier"].index)
         self.initial_ids = tuple(self.global_ids + self.identifier_ids)
 
-        self.groups = tuple(
-            sorted(g for g in self.candidates["group"].dropna().unique())
-        )
+        self.groups = self.profile.group_ids
         self.specialized_by_group = {
             group: tuple(
                 self.candidates[
@@ -107,19 +111,15 @@ class HierarchyOptimizer:
             for group in self.groups
         }
 
-        # router (identifier) -> which raw prediction value means "this group"
-        # K0/K1 predict into INTERMEDIATE_CLASS_NAMES order; group names here
-        # ("suv", "coupe") must match that same shared label schema produced
-        # by cascade/empirical_outcomes.py's _map_intermediate.
+        # Router predictions and group names share the profile's declared
+        # router-output order, regardless of the dataset's concrete labels.
         self._group_to_intermediate_idx = {
-            name: idx for idx, name in enumerate(INTERMEDIATE_CLASS_NAMES) if name in self.groups
+            name: self.profile.router_index[name] for name in self.groups
         }
         self._intermediate_idx_to_group = {
-            idx: name for idx, name in enumerate(INTERMEDIATE_CLASS_NAMES)
+            idx: name for idx, name in enumerate(self.router_output_names)
         }
-        self._global_name_to_idx = {
-            name: idx for idx, name in enumerate(GLOBAL_CLASS_NAMES)
-        }
+        self._global_name_to_idx = self.profile.global_index
 
         self.accepted = {}
         self.prediction = {}
@@ -476,16 +476,10 @@ def compare_kdet_costs(
     path: str | Path = DEFAULT_OUTPUT_PATH,
     detector_costs_ms: list[float] = (10.85, 100, 250, 1000, 10_000),
 ) -> dict[float, Cascade]:
-    """Print h24's DP-optimal cascade structure side by side for several
-    candidate synthetic Kdet costs, so you can eyeball how much richer the
-    chain gets as the assumed Kdet cost increases -- instead of debating
-    it in the abstract or committing to one value blind.
+    """Compare the DP-optimal structure across synthetic detector costs.
 
-    10.85 is included as a reference point: that's the REAL measured Kdet
-    cost (detector_mode="trained"), i.e. what the DP would choose if Kdet
-    weren't artificially inflated at all -- usually a very short chain,
-    useful as a baseline to see how much the synthetic values are actually
-    buying you in chain depth.
+    The default list retains 10.85 ms as a historical M3N-VC reference; callers
+    should pass detector costs appropriate for their own dataset.
     """
     results: dict[float, Cascade] = {}
     for cost in detector_costs_ms:
