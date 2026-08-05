@@ -291,7 +291,7 @@ best_policy = None
 for policy in every_combination(threshold_grids):
     metrics = replay_cached_outcomes(policy)
 
-    if policy_key(metrics) > policy_key(best_policy):
+    if policy_key(metrics) < policy_key(best_policy):
         best_policy = metrics
 
 return best_policy
@@ -353,7 +353,7 @@ def SA_threshold_optimize(cascade):
     else:
       discard change
 
-    if policy_key(proposal_metric) better than policy_key(best_metric):
+    if policy_key(proposal_metric) < policy_key(best_metric):
       best_metric = proposal_metric
       best = cascade
 
@@ -408,7 +408,7 @@ for layout in every_combination(cascade_models):
     optimized_layout = threshold_optimize_SA(layout)
     metrics = replay_cached_outcomes(optimized_layout)
 
-    if policy_key(metrics) > policy_key(best_policy):
+    if policy_key(metrics) < policy_key(best_policy):
         best_policy = metrics
 
 return best_policy
