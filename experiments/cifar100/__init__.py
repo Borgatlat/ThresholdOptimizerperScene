@@ -1,0 +1,41 @@
+"""CIFAR-100 training and empirical-outcome experiment support."""
+
+from .models import (
+    CHECKPOINT_SCHEMA_VERSION,
+    CONVNEXT_V2_LARGE_PRETRAINED_MODEL,
+    CandidateRegistry,
+    CandidateSpec,
+    TransferReport,
+    WideResNet,
+    build_model,
+    build_resnet18,
+    build_wrn_16_2,
+    build_wrn_28_10,
+    candidate_specs,
+    config_hash,
+    file_sha256,
+    load_checkpoint,
+    load_checkpoint_metadata,
+    save_checkpoint,
+    transfer_wrn_base_features,
+)
+
+__all__ = [
+    "CHECKPOINT_SCHEMA_VERSION",
+    "CONVNEXT_V2_LARGE_PRETRAINED_MODEL",
+    "CandidateRegistry",
+    "CandidateSpec",
+    "TransferReport",
+    "WideResNet",
+    "build_model",
+    "build_resnet18",
+    "build_wrn_16_2",
+    "build_wrn_28_10",
+    "candidate_specs",
+    "config_hash",
+    "file_sha256",
+    "load_checkpoint",
+    "load_checkpoint_metadata",
+    "save_checkpoint",
+    "transfer_wrn_base_features",
+]

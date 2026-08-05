@@ -1,4 +1,5 @@
 /datasets
+/checkpoints/cifar100/
 __pycache__/
 .venv/
 *.pyc

@@ -533,19 +533,26 @@ def _subset_empirical_payload(payload: dict, sample_ids: np.ndarray) -> dict:
     ].copy()
     subset_outcomes["sample_id"] = subset_outcomes["sample_id"].map(id_map).astype(int)
 
-    return {
-        "schema_version": payload.get("schema_version", "empirical-outcomes/v2"),
-        "profile": dict(payload["profile"]),
-        **(
-            {"collection": dict(payload["collection"])}
-            if "collection" in payload
-            else {}
-        ),
-        "labels": subset_labels,
-        "candidates": payload["candidates"].copy(),
-        "detector": dict(payload["detector"]),
-        "outcomes": subset_outcomes,
-    }
+    subset = dict(payload)
+    subset["schema_version"] = payload.get(
+        "schema_version", "empirical-outcomes/v2"
+    )
+    subset["profile"] = dict(payload["profile"])
+    if "collection" in payload:
+        subset["collection"] = dict(payload["collection"])
+    subset["labels"] = subset_labels
+    subset["candidates"] = payload["candidates"].copy()
+    subset["detector_status"] = payload.get(
+        "detector_status",
+        "available" if payload.get("detector") is not None else "external_pending",
+    )
+    subset["detector"] = (
+        dict(payload["detector"])
+        if payload.get("detector") is not None
+        else None
+    )
+    subset["outcomes"] = subset_outcomes
+    return subset
 
 
 def split_empirical_outcomes(

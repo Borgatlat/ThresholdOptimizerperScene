@@ -48,6 +48,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import Mapping
 
 import numpy as np
 import pandas as pd
@@ -81,15 +82,35 @@ class HierarchyOptimizer:
         detector_mode: str = "paper",
         detector_cost_ms: float = PAPER_DETECTOR_COST_MS,
     ):
+        detector_metadata = payload.get("detector")
+        detector_status = str(
+            payload.get(
+                "detector_status",
+                "available"
+                if isinstance(detector_metadata, Mapping)
+                else "external_pending",
+            )
+        )
+        if detector_status != "available" or not isinstance(
+            detector_metadata, Mapping
+        ):
+            raise ValueError(
+                "Hierarchy optimization requires measured deterministic-endpoint "
+                "metadata and outcomes. This empirical bundle marks the detector "
+                "as external_pending; merge the separately evaluated endpoint "
+                "before optimizing."
+            )
         self.profile = profile_from_payload(payload)
         self.global_class_names = self.profile.global_classes
         self.router_output_names = self.profile.router_outputs
         self.candidates = payload["candidates"].set_index("id", drop=False)
         self.outcomes = payload["outcomes"]
-        self.labels = payload["labels"]
+        self.labels = (
+            payload["labels"].sort_values("sample_id").reset_index(drop=True)
+        )
         self.sample_count = len(self.labels)
         self.detector_mode = detector_mode
-        self.detector_outcome_id = payload.get("detector", {}).get("id", "Kdet")
+        self.detector_outcome_id = str(detector_metadata["id"])
         mapped_true_global = self.labels["true_global_label"].map(
             self.profile.global_index
         )
@@ -138,7 +159,7 @@ class HierarchyOptimizer:
             # (see synthesize()'s docstring note on accuracy bookkeeping).
             self.detector_cost = float(detector_cost_ms)
         elif detector_mode == "trained":
-            self.detector_cost = float(payload["detector"]["cost"])
+            self.detector_cost = float(detector_metadata["cost"])
         else:
             raise ValueError(f"Unknown detector_mode: {detector_mode!r}")
 

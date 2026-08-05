@@ -185,8 +185,8 @@ def build_empirical_outcomes(
     if len(ids) != len(set(ids)):
         raise ValueError("Classifier ids must be unique.")
     detector_candidates = [item for item in classifiers if item.kind == "detector"]
-    if len(detector_candidates) != 1:
-        raise ValueError("Exactly one detector classifier is required.")
+    if len(detector_candidates) > 1:
+        raise ValueError("At most one detector classifier is allowed.")
     for classifier in classifiers:
         _validate_classifier(classifier, profile)
 
@@ -278,7 +278,7 @@ def build_empirical_outcomes(
         }
         for item in classifiers
     ]
-    detector = detector_candidates[0]
+    detector = detector_candidates[0] if detector_candidates else None
     payload: dict[str, object] = {
         "schema_version": "empirical-outcomes/v2",
         "profile": profile.as_dict(),
@@ -290,17 +290,146 @@ def build_empirical_outcomes(
         },
         "labels": pd.concat(labels_frames, ignore_index=True),
         "candidates": pd.DataFrame(candidate_rows),
-        "detector": {
-            "id": detector.id,
-            "kind": "detector",
-            "name": detector.name or detector.id,
-            "cost": float(detector.expected_cost_ms),
-            "wcet": detector.wcet_ms,
-        },
+        "detector_status": "available" if detector is not None else "external_pending",
+        "detector": (
+            {
+                "id": detector.id,
+                "kind": "detector",
+                "name": detector.name or detector.id,
+                "cost": float(detector.expected_cost_ms),
+                "wcet": detector.wcet_ms,
+            }
+            if detector is not None
+            else None
+        ),
         "outcomes": pd.concat(outcome_frames, ignore_index=True),
     }
     validate_empirical_outcomes(payload)
     return payload
+
+
+def _is_missing_scalar(value: object) -> bool:
+    """Return whether one metadata cell is null without treating arrays as cells."""
+
+    missing = pd.isna(value)
+    return isinstance(missing, (bool, np.bool_)) and bool(missing)
+
+
+def _validated_candidate_metadata(
+    candidates: pd.DataFrame, profile: HierarchyProfile
+) -> dict[str, dict[str, object]]:
+    """Validate candidate roles and resolve their legal shared predictions."""
+
+    allowed_kinds = {"identifier", "global", "specialized", "detector"}
+    has_output_labels = "output_labels" in candidates.columns
+    result: dict[str, dict[str, object]] = {}
+    for row in candidates.to_dict(orient="records"):
+        raw_id = row["id"]
+        if _is_missing_scalar(raw_id) or not str(raw_id):
+            raise ValueError("Candidate ids must not be empty.")
+        candidate_id = str(raw_id)
+        kind = str(row["kind"])
+        if kind not in allowed_kinds:
+            raise ValueError(
+                f"Candidate {candidate_id!r} has unknown kind {kind!r}."
+            )
+        if "role" in candidates.columns:
+            raw_role = row["role"]
+            role = None if _is_missing_scalar(raw_role) else str(raw_role)
+            expected_role = {
+                "identifier": "intermediate",
+                "global": "global",
+                "specialized": "specialized",
+                "detector": "detector",
+            }[kind]
+            if role != expected_role:
+                raise ValueError(
+                    f"Candidate {candidate_id!r} role {role!r} does not match "
+                    f"kind {kind!r}; expected {expected_role!r}."
+                )
+
+        raw_group = row["group"]
+        group = None if _is_missing_scalar(raw_group) else str(raw_group)
+        if kind == "specialized":
+            if group not in profile.groups:
+                raise ValueError(
+                    f"Specialized candidate {candidate_id!r} has unknown group "
+                    f"{group!r}."
+                )
+        elif group is not None:
+            raise ValueError(
+                f"Only specialized candidates may set group; {candidate_id!r} "
+                f"sets {group!r}."
+            )
+
+        raw_threshold = row["threshold"]
+        threshold = None if _is_missing_scalar(raw_threshold) else float(raw_threshold)
+        if kind != "detector" and threshold is None:
+            raise ValueError(
+                f"Candidate {candidate_id!r} requires a confidence threshold."
+            )
+        if threshold is not None and (
+            not np.isfinite(threshold) or not 0.0 <= threshold <= 1.0
+        ):
+            raise ValueError(
+                f"Candidate {candidate_id!r} threshold must be within [0, 1]."
+            )
+
+        try:
+            cost = float(row["cost"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"Candidate {candidate_id!r} has a nonnumeric cost."
+            ) from exc
+        if not np.isfinite(cost) or cost < 0.0:
+            raise ValueError(
+                f"Candidate {candidate_id!r} requires a finite, nonnegative cost."
+            )
+
+        shared_labels = (
+            profile.router_outputs if kind == "identifier" else profile.global_classes
+        )
+        permitted_labels = (
+            profile.groups[group] if kind == "specialized" else shared_labels
+        )
+        if has_output_labels:
+            raw_outputs = row["output_labels"]
+            if isinstance(raw_outputs, (str, bytes)) or not isinstance(
+                raw_outputs, (list, tuple, np.ndarray, pd.Index)
+            ):
+                raise ValueError(
+                    f"Candidate {candidate_id!r} output_labels must be a sequence."
+                )
+            if any(_is_missing_scalar(item) for item in raw_outputs):
+                raise ValueError(
+                    f"Candidate {candidate_id!r} output_labels contain null values."
+                )
+            output_labels = tuple(str(item) for item in raw_outputs)
+            if not output_labels or len(set(output_labels)) != len(output_labels):
+                raise ValueError(
+                    f"Candidate {candidate_id!r} output_labels must be non-empty "
+                    "and unique."
+                )
+            unknown_outputs = set(output_labels) - set(permitted_labels)
+            if unknown_outputs:
+                raise ValueError(
+                    f"Candidate {candidate_id!r} outputs labels outside its "
+                    f"{kind} label space: {sorted(unknown_outputs)}"
+                )
+        else:
+            # Original M3N-VC packets predate per-candidate output mappings.
+            # Their predictions are already indices in the shared role space.
+            output_labels = tuple(permitted_labels)
+
+        shared_index = {label: index for index, label in enumerate(shared_labels)}
+        result[candidate_id] = {
+            "kind": kind,
+            "threshold": threshold,
+            "allowed_predictions": frozenset(
+                shared_index[label] for label in output_labels
+            ),
+        }
+    return result
 
 
 def validate_empirical_outcomes(payload: Mapping[str, object]) -> None:
@@ -334,8 +463,35 @@ def validate_empirical_outcomes(payload: Mapping[str, object]) -> None:
         raise ValueError(f"Unknown true labels: {sorted(unknown_labels)}")
     if labels["sample_id"].duplicated().any():
         raise ValueError("labels.sample_id values must be unique.")
+    if candidates.empty:
+        raise ValueError("At least one candidate is required.")
     if candidates["id"].astype(str).duplicated().any():
         raise ValueError("Candidate ids must be unique.")
+    candidate_metadata = _validated_candidate_metadata(candidates, profile)
+    detector_rows = candidates[candidates["kind"].astype(str) == "detector"]
+    if len(detector_rows) > 1:
+        raise ValueError("At most one detector candidate is allowed.")
+    detector = payload.get("detector")
+    detector_status = str(
+        payload.get(
+            "detector_status",
+            "available" if isinstance(detector, Mapping) else "external_pending",
+        )
+    )
+    if detector_status not in {"available", "external_pending"}:
+        raise ValueError(f"Unknown detector_status: {detector_status!r}")
+    if detector_status == "external_pending":
+        if detector is not None or len(detector_rows):
+            raise ValueError(
+                "external_pending outcomes must not contain detector metadata or rows."
+            )
+    else:
+        if not isinstance(detector, Mapping) or len(detector_rows) != 1:
+            raise ValueError(
+                "available detector outcomes require exactly one detector candidate."
+            )
+        if str(detector.get("id")) != str(detector_rows.iloc[0]["id"]):
+            raise ValueError("Detector metadata id does not match its candidate row.")
     expected_ids = set(candidates["id"].astype(str))
     if set(outcomes["candidate_id"].astype(str)) != expected_ids:
         raise ValueError("Outcome candidate ids do not match candidate metadata.")
@@ -350,6 +506,77 @@ def validate_empirical_outcomes(payload: Mapping[str, object]) -> None:
         counts == expected_rows
     ).all():
         raise ValueError("Every classifier must have one outcome per sample.")
+
+    try:
+        confidence = pd.to_numeric(outcomes["confidence"], errors="raise").to_numpy(
+            dtype=float
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Outcome confidence values must be numeric.") from exc
+    if not np.isfinite(confidence).all() or (
+        (confidence < 0.0) | (confidence > 1.0)
+    ).any():
+        raise ValueError("Outcome confidence values must be finite and within [0, 1].")
+
+    accepted_series = outcomes["accepted"]
+    if accepted_series.isna().any() or not all(
+        isinstance(value, (bool, np.bool_)) for value in accepted_series
+    ):
+        raise ValueError("Outcome accepted values must be Boolean and non-null.")
+    accepted = accepted_series.to_numpy(dtype=bool)
+
+    try:
+        numeric_prediction = pd.to_numeric(
+            outcomes["prediction"], errors="raise"
+        ).to_numpy(dtype=float)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Outcome predictions must be integer indices.") from exc
+    if not np.isfinite(numeric_prediction).all() or not np.equal(
+        numeric_prediction, np.floor(numeric_prediction)
+    ).all():
+        raise ValueError("Outcome predictions must be finite integer indices.")
+    prediction = numeric_prediction.astype(np.int64)
+
+    outcome_candidate_ids = outcomes["candidate_id"].astype(str).to_numpy()
+    legacy_without_output_labels = "output_labels" not in candidates.columns
+    for candidate_id, metadata in candidate_metadata.items():
+        mask = outcome_candidate_ids == candidate_id
+        candidate_accepted = accepted[mask]
+        candidate_prediction = prediction[mask]
+        candidate_confidence = confidence[mask]
+        kind = str(metadata["kind"])
+
+        legacy_idk = candidate_prediction == -1
+        if legacy_idk.any() and (
+            not legacy_without_output_labels or candidate_accepted[legacy_idk].any()
+        ):
+            raise ValueError(
+                f"Candidate {candidate_id!r} uses -1 outside a rejected legacy row."
+            )
+        allowed_predictions = metadata["allowed_predictions"]
+        invalid_prediction = ~np.isin(
+            candidate_prediction[~legacy_idk], list(allowed_predictions)
+        )
+        if invalid_prediction.any():
+            invalid_values = sorted(
+                set(candidate_prediction[~legacy_idk][invalid_prediction].tolist())
+            )
+            raise ValueError(
+                f"Candidate {candidate_id!r} has predictions outside its shared "
+                f"{kind} mapping: {invalid_values}"
+            )
+
+        threshold = metadata["threshold"]
+        expected_accepted = (
+            np.ones(mask.sum(), dtype=bool)
+            if kind == "detector"
+            else candidate_confidence >= float(threshold)
+        )
+        if not np.array_equal(candidate_accepted, expected_accepted):
+            raise ValueError(
+                f"Candidate {candidate_id!r} accepted values do not match its "
+                "confidence threshold."
+            )
 
 
 def save_empirical_outcomes(payload: Mapping[str, object], path: str | Path) -> Path:

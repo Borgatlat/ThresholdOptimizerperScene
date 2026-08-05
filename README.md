@@ -18,12 +18,19 @@ dynamically, and optimize layouts and thresholds. The original
 | End-to-end API | `optimization_pipeline.py` |
 | Standard results and packet-only figures | `result_packets.py`, `plot_result_packets.py` |
 | M3N-VC collection, training, and experiments | `experiments/m3n_vc/` |
+| CIFAR-100 training and empirical collection | `experiments/cifar100/` |
 
 New datasets use `ensure_and_optimize_joint()` from
 `optimization_pipeline.py`. A profile declares leaf classes, superclass
 groups, and router outputs. For example, two CIFAR-100 intermediate
 classifiers and 20 superclasses create 40 independent branch modules
 automatically. Intermediate depth is intentionally limited to one.
+
+The CIFAR-100 fixed-split, candidate-training, pretrained ConvNeXt V2-L
+endpoint, CPU-latency, and empirical workflow is documented in
+[`experiments/cifar100/README.md`](experiments/cifar100/README.md). It keeps
+the official test set untouched and records measured endpoint outcomes rather
+than substituting a perfect detector.
 
 Figures consume only `cascade-result/v1` JSON packets. Each packet contains
 the layout, thresholds, validation/test accuracy, expected cost, terminal
