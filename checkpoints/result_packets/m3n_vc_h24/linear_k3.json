@@ -1,0 +1,108 @@
+{
+  "dataset": {
+    "id": "m3n_vc/h24",
+    "profile_fingerprint": "e55becd2600bbf1ef0cfc54689671bafa9fb4c0110d53e9c3b3cd9ac0bd51aed"
+  },
+  "layout": {
+    "branches": {},
+    "detector": "detector",
+    "initial": [
+      "K3"
+    ]
+  },
+  "method": {
+    "id": "linear_k3",
+    "label": "Annealed K3 -> Kdet (0.9662)",
+    "target_accuracy": 0.9662
+  },
+  "partitions": {
+    "test": {
+      "accuracy": 0.967741935483871,
+      "expected_cost_ms": 741.7078310667139,
+      "feasible": true,
+      "macro_accuracy": 0.966614434723162,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9921465968586387,
+          "correct": 379,
+          "total": 382
+        },
+        "gle350": {
+          "accuracy": 0.988399071925754,
+          "correct": 426,
+          "total": 431
+        },
+        "miata": {
+          "accuracy": 0.9567567567567568,
+          "correct": 354,
+          "total": 370
+        },
+        "mustang": {
+          "accuracy": 0.9291553133514986,
+          "correct": 341,
+          "total": 367
+        }
+      },
+      "routes": {
+        "K3": 1437,
+        "detector": 113
+      },
+      "samples": 1550,
+      "thresholds": {
+        "K3": 0.7307737725121635
+      },
+      "worst_class_accuracy": 0.9291553133514986
+    },
+    "validation": {
+      "accuracy": 0.9677211103938025,
+      "expected_cost_ms": 829.3314800389957,
+      "feasible": true,
+      "macro_accuracy": 0.9664054483741364,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9941022280471822,
+          "correct": 1517,
+          "total": 1526
+        },
+        "gle350": {
+          "accuracy": 0.9930354033662218,
+          "correct": 1711,
+          "total": 1723
+        },
+        "miata": {
+          "accuracy": 0.9451962110960758,
+          "correct": 1397,
+          "total": 1478
+        },
+        "mustang": {
+          "accuracy": 0.9332879509870661,
+          "correct": 1371,
+          "total": 1469
+        }
+      },
+      "routes": {
+        "K3": 5690,
+        "detector": 506
+      },
+      "samples": 6196,
+      "thresholds": {
+        "K3": 0.7307737725121635
+      },
+      "worst_class_accuracy": 0.9332879509870661
+    }
+  },
+  "provenance": {
+    "source": "checkpoints\\brute_force_k1_free_h24_target_096\\results_shard_00000_of_00001.jsonl"
+  },
+  "schema_version": "cascade-result/v1"
+}

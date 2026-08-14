@@ -1,0 +1,125 @@
+{
+  "dataset": {
+    "id": "m3n_vc/h24",
+    "profile_fingerprint": "e55becd2600bbf1ef0cfc54689671bafa9fb4c0110d53e9c3b3cd9ac0bd51aed"
+  },
+  "layout": {
+    "branches": {
+      "K0:coupe": [
+        "K6"
+      ],
+      "K0:suv": []
+    },
+    "detector": "detector",
+    "initial": [
+      "K3",
+      "K0",
+      "K2"
+    ]
+  },
+  "method": {
+    "id": "approximate_joint",
+    "label": "Approx. joint (0.9662)",
+    "target_accuracy": 0.9662
+  },
+  "partitions": {
+    "test": {
+      "accuracy": 0.9670967741935483,
+      "expected_cost_ms": 710.0749796755563,
+      "feasible": true,
+      "macro_accuracy": 0.9659332358130803,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9921465968586387,
+          "correct": 379,
+          "total": 382
+        },
+        "gle350": {
+          "accuracy": 0.988399071925754,
+          "correct": 426,
+          "total": 431
+        },
+        "miata": {
+          "accuracy": 0.9567567567567568,
+          "correct": 354,
+          "total": 370
+        },
+        "mustang": {
+          "accuracy": 0.9264305177111717,
+          "correct": 340,
+          "total": 367
+        }
+      },
+      "routes": {
+        "K2": 4,
+        "K3": 1437,
+        "K6": 1,
+        "detector": 108
+      },
+      "samples": 1550,
+      "thresholds": {
+        "K0": 0.9999319314956665,
+        "K2": 0.9487942116601127,
+        "K3": 0.7307737725121635,
+        "K6": 0.9003422771181379
+      },
+      "worst_class_accuracy": 0.9264305177111717
+    },
+    "validation": {
+      "accuracy": 0.9662685603615235,
+      "expected_cost_ms": 786.4488681883986,
+      "feasible": true,
+      "macro_accuracy": 0.9648842961949693,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9934469200524246,
+          "correct": 1516,
+          "total": 1526
+        },
+        "gle350": {
+          "accuracy": 0.9930354033662218,
+          "correct": 1711,
+          "total": 1723
+        },
+        "miata": {
+          "accuracy": 0.942489851150203,
+          "correct": 1393,
+          "total": 1478
+        },
+        "mustang": {
+          "accuracy": 0.9305650102110279,
+          "correct": 1367,
+          "total": 1469
+        }
+      },
+      "routes": {
+        "K2": 17,
+        "K3": 5690,
+        "K6": 10,
+        "detector": 479
+      },
+      "samples": 6196,
+      "thresholds": {
+        "K0": 0.9999319314956665,
+        "K2": 0.9487942116601127,
+        "K3": 0.7307737725121635,
+        "K6": 0.9003422771181379
+      },
+      "worst_class_accuracy": 0.9305650102110279
+    }
+  },
+  "provenance": {
+    "source": "checkpoints\\joint_ga_k1_free_h24_target_096\\summary.json"
+  },
+  "schema_version": "cascade-result/v1"
+}

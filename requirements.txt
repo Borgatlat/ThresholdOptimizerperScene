@@ -2,6 +2,8 @@ numpy
 pandas
 pyarrow
 torch
+torchvision
+timm
 scikit-learn
 tqdm
 matplotlib

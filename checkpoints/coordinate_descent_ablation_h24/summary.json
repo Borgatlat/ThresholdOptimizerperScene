@@ -1,0 +1,372 @@
+{
+  "elapsed_seconds": 726.2042665999979,
+  "results": {
+    "identical_sa_trajectory_checks_failed": 0,
+    "layout_best_cost": {
+      "bootstrap_95pct_mean_delta_ms": [
+        -2.4951801338549444,
+        -0.1808793897369469
+      ],
+      "improvements": 4,
+      "layouts_compared": 10,
+      "mean_delta_ms": -1.091279788786153,
+      "median_delta_ms": 0.0,
+      "regressions": 0,
+      "ties": 6,
+      "two_sided_sign_test_pvalue": 0.125
+    },
+    "layouts": [
+      {
+        "best_cost_delta_ms": 0.0,
+        "best_cost_with": 829.3314800389957,
+        "best_cost_without": 829.3314800389957,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K3",
+            "detector"
+          ],
+          "specialized": {}
+        },
+        "layout_id": "30c403bae16c4152",
+        "layout_index": 0
+      },
+      {
+        "best_cost_delta_ms": -0.6679667475264068,
+        "best_cost_with": 780.5382118280786,
+        "best_cost_without": 781.206178575605,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K0",
+            "K3",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K3",
+              "detector"
+            ],
+            "K0:suv": [
+              "K2",
+              "K4",
+              "K3",
+              "detector"
+            ]
+          }
+        },
+        "layout_id": "07c9a6cd5b0ba849",
+        "layout_index": 1
+      },
+      {
+        "best_cost_delta_ms": 0.0,
+        "best_cost_with": 820.3469633943157,
+        "best_cost_without": 820.3469633943157,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K2",
+            "K3",
+            "detector"
+          ],
+          "specialized": {}
+        },
+        "layout_id": "6196b7fb8eec2e4f",
+        "layout_index": 2
+      },
+      {
+        "best_cost_delta_ms": 0.0,
+        "best_cost_with": 3680.0491311853275,
+        "best_cost_without": 3680.0491311853275,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K2",
+            "detector"
+          ],
+          "specialized": {}
+        },
+        "layout_id": "b2242d7a8911f6ba",
+        "layout_index": 3
+      },
+      {
+        "best_cost_delta_ms": 0.0,
+        "best_cost_with": 814.7127574962888,
+        "best_cost_without": 814.7127574962888,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K2",
+            "K3",
+            "K0",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "detector"
+            ],
+            "K0:suv": [
+              "K4",
+              "detector"
+            ]
+          }
+        },
+        "layout_id": "9796c6cbc53360d4",
+        "layout_index": 4
+      },
+      {
+        "best_cost_delta_ms": -6.449088150422426,
+        "best_cost_with": 769.3638012495475,
+        "best_cost_without": 775.8128893999699,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K3",
+            "K0",
+            "K2",
+            "K1",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K6",
+              "K2",
+              "detector"
+            ],
+            "K0:suv": [
+              "detector"
+            ],
+            "K1:coupe": [
+              "K5",
+              "K6",
+              "detector"
+            ],
+            "K1:suv": [
+              "K4",
+              "detector"
+            ]
+          }
+        },
+        "layout_id": "1e9856101a1f4750",
+        "layout_index": 5
+      },
+      {
+        "best_cost_delta_ms": -1.808793897369469,
+        "best_cost_with": 2730.7807918042427,
+        "best_cost_without": 2732.589585701612,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K0",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K5",
+              "K2",
+              "K3",
+              "K6",
+              "detector"
+            ],
+            "K0:suv": [
+              "K2",
+              "K4",
+              "detector"
+            ]
+          }
+        },
+        "layout_id": "b1d35e73144b52ef",
+        "layout_index": 6
+      },
+      {
+        "best_cost_delta_ms": 0.0,
+        "best_cost_with": 1428.6140052051571,
+        "best_cost_without": 1428.6140052051571,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K2",
+            "K0",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K6",
+              "K3",
+              "K5",
+              "detector"
+            ],
+            "K0:suv": [
+              "K4",
+              "K3",
+              "detector"
+            ]
+          }
+        },
+        "layout_id": "39c35774eebacce1",
+        "layout_index": 7
+      },
+      {
+        "best_cost_delta_ms": 0.0,
+        "best_cost_with": 2777.595986408378,
+        "best_cost_without": 2777.595986408378,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K2",
+            "K0",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K3",
+              "K6",
+              "detector"
+            ],
+            "K0:suv": [
+              "K4",
+              "detector"
+            ]
+          }
+        },
+        "layout_id": "e2c01c7c66be7cc6",
+        "layout_index": 8
+      },
+      {
+        "best_cost_delta_ms": -1.9869490925432274,
+        "best_cost_with": 810.01532254675,
+        "best_cost_without": 812.0022716392932,
+        "feasible_trials_with": 10,
+        "feasible_trials_without": 10,
+        "layout": {
+          "initial": [
+            "K1",
+            "K0",
+            "K2",
+            "K3",
+            "detector"
+          ],
+          "specialized": {
+            "K0:coupe": [
+              "K3",
+              "K2",
+              "K5",
+              "K6",
+              "detector"
+            ],
+            "K0:suv": [
+              "K2",
+              "K3",
+              "detector"
+            ],
+            "K1:coupe": [
+              "K6",
+              "detector"
+            ],
+            "K1:suv": [
+              "K4",
+              "detector"
+            ]
+          }
+        },
+        "layout_id": "f9c5017d5ca902eb",
+        "layout_index": 9
+      }
+    ],
+    "paired_feasible_trials": 100,
+    "paired_trials": 100,
+    "selection_improved_after_coordinate_descent": 60,
+    "trial_cost_improvements": 60,
+    "trial_cost_regressions": 0,
+    "trial_cost_ties": 40,
+    "trial_delta_cost_ms": {
+      "maximum": 0.0,
+      "mean": -3.8588503161745336,
+      "median": -0.17445638697779486,
+      "minimum": -41.96255648805709
+    }
+  },
+  "settings": {
+    "coordinate_descent_passes": 25,
+    "dataset": "m3n_vc/h24",
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "holdout_usage": "not_evaluated",
+    "iterations": 8000,
+    "layout_count": 10,
+    "layout_seed": 20260814,
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+    "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+    "partition": "validation",
+    "quantile_points": 50,
+    "split_seed": 0,
+    "split_strategy": "blocked_per_run",
+    "target_accuracy": 0.9662,
+    "trial_count_per_layout": 10,
+    "trial_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "split": {
+    "holdout_fraction": 0.2,
+    "holdout_samples": 1550,
+    "per_group": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "per_run": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "random_seed": 0,
+    "split_group_column": "run_id",
+    "strategy": "blocked_per_run",
+    "validation_samples": 6196
+  }
+}
