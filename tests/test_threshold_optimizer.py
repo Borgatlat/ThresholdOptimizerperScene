@@ -132,6 +132,31 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
             0.85,
         )
 
+    def test_annealer_can_skip_coordinate_descent(self) -> None:
+        evaluator = repeated_model_evaluator()
+        result = optimize_fixed_layout_thresholds_simulated_annealing(
+            evaluator,
+            target_accuracy=1.0,
+            grids={"K0": [0.5], "K2": [0.65, 0.85]},
+            n_iterations=1,
+            random_seed=0,
+            coordinate_descent_passes=0,
+            show_progress=False,
+        )
+
+        self.assertEqual(result["method"], "simulated_annealing")
+        self.assertEqual(result["coordinate_descent_passes"], 0)
+        self.assertEqual(result["coordinate_descent_evaluations"], 0)
+        self.assertEqual(result["evaluations"], result["annealing_evaluations"])
+
+    def test_annealer_rejects_negative_coordinate_descent_passes(self) -> None:
+        with self.assertRaisesRegex(ValueError, "cannot be negative"):
+            optimize_fixed_layout_thresholds_simulated_annealing(
+                repeated_model_evaluator(),
+                coordinate_descent_passes=-1,
+                show_progress=False,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

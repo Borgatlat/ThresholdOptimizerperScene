@@ -19,7 +19,7 @@
   "early_stopping_patience": 30,
   "epochs": {
     "wrn16_2_base": 200,
-    "specialized": 100,
+    "specialized": 60,
     "identifier": 150,
     "global": 200
   },

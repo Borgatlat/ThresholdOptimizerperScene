@@ -1056,16 +1056,19 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     accuracy_penalty: float | None = None,
     show_progress: bool = True,
 ) -> dict:
-    """Anneal per occurrence, then polish with coordinate descent.
+    """Anneal per occurrence, optionally polishing with coordinate descent.
 
     The energy is a Lagrangian-style runtime plus an accuracy-shortfall
     penalty.  The returned winner is still selected by the hard constraint:
     a feasible policy always beats an infeasible one regardless of energy.
+    Set ``coordinate_descent_passes=0`` for an unpolished SA result.
     """
     if not 0.0 <= target_accuracy <= 1.0:
         raise ValueError("target_accuracy must be between 0 and 1.")
     if n_iterations < 1:
         raise ValueError("n_iterations must be at least 1.")
+    if coordinate_descent_passes < 0:
+        raise ValueError("coordinate_descent_passes cannot be negative.")
     threshold_grids = _validate_grids(evaluator, grids, quantile_points)
     slot_ids = evaluator.tunable_ids
     grid_indices = {
@@ -1155,19 +1158,33 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
                 t_iter.set_postfix(loss=proposal_energy, status="Active")
 
     annealing_elapsed = perf_counter() - started
-    polished = coordinate_descent_thresholds(
-        evaluator,
-        target_accuracy,
-        grids=threshold_grids,
-        initial_thresholds=policy_from_indices(best_indices),
-        max_passes=coordinate_descent_passes,
-    )
     best_before_polish = _result(
         evaluator.evaluate(best_metrics["thresholds"]),
         target_accuracy,
         evaluations,
         annealing_elapsed,
         method="simulated_annealing",
+    )
+    if coordinate_descent_passes == 0:
+        best_before_polish.update(
+            {
+                "annealing_iterations": int(n_iterations),
+                "annealing_evaluations": int(evaluations),
+                "annealing_elapsed_seconds": float(annealing_elapsed),
+                "annealing_accepted_moves": int(accepted_moves),
+                "coordinate_descent_evaluations": 0,
+                "coordinate_descent_elapsed_seconds": 0.0,
+                "coordinate_descent_passes": 0,
+            }
+        )
+        return best_before_polish
+
+    polished = coordinate_descent_thresholds(
+        evaluator,
+        target_accuracy,
+        grids=threshold_grids,
+        initial_thresholds=policy_from_indices(best_indices),
+        max_passes=coordinate_descent_passes,
     )
     if _policy_key(polished, target_accuracy) < _policy_key(best_before_polish, target_accuracy):
         winner = dict(polished)
