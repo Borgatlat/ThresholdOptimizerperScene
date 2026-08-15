@@ -1,5 +1,3 @@
-# ASSISTANCE FROM CODEX
-
 """Utilities for processing the original M3N-VC h24 subset."""
 
 from pathlib import Path

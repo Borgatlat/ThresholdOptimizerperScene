@@ -11,7 +11,7 @@ import json
 import hashlib
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Mapping, Protocol, Sequence
+from typing import Any, Mapping, Protocol, Sequence
 
 import numpy as np
 import pandas as pd

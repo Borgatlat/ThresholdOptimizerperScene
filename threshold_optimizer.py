@@ -33,8 +33,9 @@ from itertools import product
 from pathlib import Path
 from time import perf_counter
 from typing import Mapping, Sequence
-from tqdm import *
+
 import numpy as np
+from tqdm import trange
 
 from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
 from hierarchy_optimizer import (
@@ -1111,6 +1112,8 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     final_temperature = max(1e-6, initial_temperature * 1e-3)
 
 
+    # trange is tqdm's range(): same loop, plus an optional progress bar.
+    # `disable=not show_progress` keeps tests silent when show_progress=False.
     with trange(
         n_iterations,
         desc="Simulated annealing",

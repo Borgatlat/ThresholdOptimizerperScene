@@ -16,7 +16,6 @@ from pathlib import Path
 from time import perf_counter
 from typing import Mapping
 
-import numpy as np
 
 from cascade_profile import HierarchyProfile
 from empirical_outcomes import load_empirical_outcomes
