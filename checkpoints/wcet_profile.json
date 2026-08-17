@@ -1,0 +1,82 @@
+[
+  {
+    "ki": "K0",
+    "modality": "both",
+    "batch_size": 1,
+    "num_classes": 3,
+    "avg_ms": 1.966572997334879,
+    "wcet_ms": 3.344600001582876,
+    "p95_ms": 2.7036449930164963,
+    "batches": 100
+  },
+  {
+    "ki": "K1",
+    "modality": "both",
+    "batch_size": 1,
+    "num_classes": 3,
+    "avg_ms": 8.791406999807805,
+    "wcet_ms": 24.52199999243021,
+    "p95_ms": 9.773559977475088,
+    "batches": 100
+  },
+  {
+    "ki": "K2",
+    "modality": "both",
+    "batch_size": 1,
+    "num_classes": 5,
+    "avg_ms": 6.711494000046514,
+    "wcet_ms": 8.73840000713244,
+    "p95_ms": 8.302895000088029,
+    "batches": 100
+  },
+  {
+    "ki": "K3",
+    "modality": "both",
+    "batch_size": 1,
+    "num_classes": 5,
+    "avg_ms": 12.67557300219778,
+    "wcet_ms": 122.24950001109391,
+    "p95_ms": 12.016015012341084,
+    "batches": 100
+  },
+  {
+    "ki": "K4",
+    "modality": "mic",
+    "batch_size": 1,
+    "num_classes": 2,
+    "avg_ms": 2.264197000185959,
+    "wcet_ms": 2.9414999880827963,
+    "p95_ms": 2.7697049867128953,
+    "batches": 100
+  },
+  {
+    "ki": "K5",
+    "modality": "mic",
+    "batch_size": 1,
+    "num_classes": 2,
+    "avg_ms": 2.300529997155536,
+    "wcet_ms": 7.83619997673668,
+    "p95_ms": 2.5877499996568076,
+    "batches": 100
+  },
+  {
+    "ki": "K6",
+    "modality": "both",
+    "batch_size": 1,
+    "num_classes": 2,
+    "avg_ms": 1.8817610014230013,
+    "wcet_ms": 2.8609000146389008,
+    "p95_ms": 2.5003999951877627,
+    "batches": 100
+  },
+  {
+    "ki": "Kdet",
+    "modality": "both",
+    "batch_size": 1,
+    "num_classes": 5,
+    "avg_ms": 28.28079699887894,
+    "wcet_ms": 144.39010003115982,
+    "p95_ms": 43.23529497196432,
+    "batches": 100
+  }
+]

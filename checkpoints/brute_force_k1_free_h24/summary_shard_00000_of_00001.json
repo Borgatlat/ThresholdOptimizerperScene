@@ -1,0 +1,223 @@
+{
+  "assigned_layouts": 5545,
+  "best": {
+    "holdout": {
+      "accuracy": 0.984516129032258,
+      "correct": 1526,
+      "expected_cost": 1530.9425544711232,
+      "feasible": true,
+      "macro_accuracy": 0.98416456582418,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9947643979057592,
+          "correct": 380,
+          "total": 382
+        },
+        "gle350": {
+          "accuracy": 0.9907192575406032,
+          "correct": 427,
+          "total": 431
+        },
+        "miata": {
+          "accuracy": 0.972972972972973,
+          "correct": 360,
+          "total": 370
+        },
+        "mustang": {
+          "accuracy": 0.9782016348773842,
+          "correct": 359,
+          "total": 367
+        }
+      },
+      "route_counts": {
+        "K3": 1314,
+        "K6": 1,
+        "detector": 235
+      },
+      "thresholds": {
+        "K0": 0.9962268216269357,
+        "K2@specialized[K0:coupe][3]": 0.9799265350614275,
+        "K2@specialized[K0:suv][1]": 0.625724332673209,
+        "K3@initial[1]": 0.8982217822756086,
+        "K3@specialized[K0:coupe][0]": 0.9184247851371764,
+        "K3@specialized[K0:suv][0]": 0.6029707193374634,
+        "K4": 0.5415380852563041,
+        "K5": 0.8342599698475429,
+        "K6": 0.9978548543793815
+      },
+      "total": 1550,
+      "worst_class_accuracy": 0.972972972972973
+    },
+    "holdout_feasible": true,
+    "layout": {
+      "initial": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "specialized": {
+        "K0:coupe": [
+          "K3",
+          "K5",
+          "K6",
+          "K2",
+          "detector"
+        ],
+        "K0:suv": [
+          "K3",
+          "K2",
+          "K4",
+          "detector"
+        ]
+      }
+    },
+    "layout_id": "0a663035cfa442ba",
+    "layout_index": 3057,
+    "settings": {
+      "detector_cost_ms": 10000.0,
+      "detector_mode": "paper",
+      "holdout_fraction": 0.2,
+      "iterations": 8000,
+      "num_shards": 1,
+      "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+      "quantile_points": 50,
+      "removed_candidates": [
+        "K1"
+      ],
+      "seed": 0,
+      "shard_index": 0,
+      "split_strategy": "blocked_per_run",
+      "target_accuracy": 0.9833763718528082,
+      "target_accuracy_source": "fig1_K3_validation_baseline"
+    },
+    "split": {
+      "holdout_fraction": 0.2,
+      "holdout_samples": 1550,
+      "per_run": {
+        "run1": {
+          "holdout": 431,
+          "validation": 1723
+        },
+        "run3": {
+          "holdout": 382,
+          "validation": 1526
+        },
+        "run5": {
+          "holdout": 367,
+          "validation": 1469
+        },
+        "run7": {
+          "holdout": 370,
+          "validation": 1478
+        }
+      },
+      "random_seed": 0,
+      "strategy": "blocked_per_run",
+      "validation_samples": 6196
+    },
+    "validation": {
+      "accuracy": 0.9833763718528082,
+      "annealing_accepted_moves": 5459,
+      "annealing_elapsed_seconds": 2.451985399995465,
+      "annealing_evaluations": 7152,
+      "annealing_iterations": 8000,
+      "coordinate_descent_elapsed_seconds": 0.6933717000065371,
+      "coordinate_descent_evaluations": 1405,
+      "coordinate_descent_passes": 3,
+      "correct": 6093,
+      "elapsed_seconds": 3.145357100002002,
+      "evaluations": 8557,
+      "expected_cost": 1627.2298352506248,
+      "feasible": true,
+      "macro_accuracy": 0.9827113526837388,
+      "method": "simulated_annealing_plus_coordinate_descent",
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9980340760157274,
+          "correct": 1523,
+          "total": 1526
+        },
+        "gle350": {
+          "accuracy": 0.995937318630296,
+          "correct": 1716,
+          "total": 1723
+        },
+        "miata": {
+          "accuracy": 0.9702300405953992,
+          "correct": 1434,
+          "total": 1478
+        },
+        "mustang": {
+          "accuracy": 0.966643975493533,
+          "correct": 1420,
+          "total": 1469
+        }
+      },
+      "route_counts": {
+        "K0": 2,
+        "K2": 8,
+        "K3": 5174,
+        "K4": 1,
+        "K5": 11,
+        "K6": 1,
+        "detector": 999
+      },
+      "target_accuracy": 0.9833763718528082,
+      "thresholds": {
+        "K0": 0.9962268216269357,
+        "K2@specialized[K0:coupe][3]": 0.9799265350614275,
+        "K2@specialized[K0:suv][1]": 0.625724332673209,
+        "K3@initial[1]": 0.8982217822756086,
+        "K3@specialized[K0:coupe][0]": 0.9184247851371764,
+        "K3@specialized[K0:suv][0]": 0.6029707193374634,
+        "K4": 0.5415380852563041,
+        "K5": 0.8342599698475429,
+        "K6": 0.9978548543793815
+      },
+      "total": 6196,
+      "worst_class_accuracy": 0.966643975493533
+    }
+  },
+  "completed_layouts": 5545,
+  "elapsed_seconds_this_invocation": 0.0,
+  "expected_total_layouts": 5545,
+  "fig1_reference": {
+    "holdout_accuracy": 0.9851612903225806,
+    "holdout_cost_ms": 1561.0626697763914,
+    "layout": {
+      "initial": [
+        "K3",
+        "detector"
+      ],
+      "specialized": {}
+    },
+    "validation_target_accuracy": 0.9833763718528082
+  },
+  "settings": {
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "holdout_fraction": 0.2,
+    "iterations": 8000,
+    "num_shards": 1,
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+    "quantile_points": 50,
+    "removed_candidates": [
+      "K1"
+    ],
+    "seed": 0,
+    "shard_index": 0,
+    "split_strategy": "blocked_per_run",
+    "target_accuracy": 0.9833763718528082,
+    "target_accuracy_source": "fig1_K3_validation_baseline"
+  }
+}

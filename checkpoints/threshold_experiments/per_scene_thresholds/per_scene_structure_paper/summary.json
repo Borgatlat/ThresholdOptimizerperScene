@@ -1,0 +1,346 @@
+{
+  "detector_mode": "paper",
+  "mode": "per_scene_structure",
+  "scenes": {
+    "a06": {
+      "baseline_holdout_acc": 0.6464395099540582,
+      "baseline_holdout_cost_ms": 3773.391242623302,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_route_counts": {
+        "K2": 548,
+        "K3": 1928,
+        "K4": 222,
+        "detector": 2526
+      },
+      "holdout_speedup_vs_baseline": 0.7767932250686886,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.7429173047473201,
+      "opt_holdout_cost_ms": 4857.652102063115,
+      "opt_holdout_macro_acc": 0.7453299361404075,
+      "opt_holdout_worst_class_acc": 0.6267095736122285,
+      "opt_validation_acc": 0.7666794295012922,
+      "report": "checkpoints/threshold_experiments/per_scene_thresholds/per_scene_structure_paper/a06.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K3",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K2",
+          "K3",
+          "detector"
+        ],
+        "K1:coupe": [
+          "K6",
+          "detector"
+        ],
+        "K1:suv": [
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.7665837082416005,
+      "threshold_bank_row": {
+        "K0": 0.998713070032548,
+        "K1": 0.998279094696045,
+        "K2": 0.7961869385777687,
+        "K3": 0.950329269681658,
+        "K4": 0.8232631744170675,
+        "K5": 0.95,
+        "K6": 0.736756799172382
+      },
+      "thresholds": {
+        "K0": 0.998713070032548,
+        "K1": 0.998279094696045,
+        "K2": 0.7961869385777687,
+        "K3": 0.950329269681658,
+        "K4": 0.8232631744170675,
+        "K6": 0.736756799172382
+      }
+    },
+    "h08": {
+      "baseline_holdout_acc": 0.9157171581769437,
+      "baseline_holdout_cost_ms": 2939.504323457822,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_route_counts": {
+        "K0": 27,
+        "K2": 3,
+        "K3": 4030,
+        "K6": 515,
+        "detector": 1393
+      },
+      "holdout_speedup_vs_baseline": 1.249916787148054,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9137064343163539,
+      "opt_holdout_cost_ms": 2351.7600160926827,
+      "opt_holdout_macro_acc": 0.9134083985837542,
+      "opt_holdout_worst_class_acc": 0.8855172413793103,
+      "opt_validation_acc": 0.9070994764397906,
+      "report": "checkpoints/threshold_experiments/per_scene_thresholds/per_scene_structure_paper/h08.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "K1:coupe": [
+          "K6",
+          "detector"
+        ],
+        "K1:suv": [
+          "K4",
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.9070994764397906,
+      "threshold_bank_row": {
+        "K0": 0.9874880557157555,
+        "K1": 0.9996927976608277,
+        "K2": 0.9972176916745245,
+        "K3": 0.7474969455174038,
+        "K4": 1.0000000000000002,
+        "K5": 0.95,
+        "K6": 0.9899134100699911
+      },
+      "thresholds": {
+        "K0": 0.9874880557157555,
+        "K1": 0.9996927976608277,
+        "K2": 0.9972176916745245,
+        "K3": 0.7474969455174038,
+        "K4": 1.0000000000000002,
+        "K6": 0.9899134100699911
+      }
+    },
+    "h24": {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_route_counts": {
+        "K2": 6,
+        "K3": 1128,
+        "K4": 213,
+        "K6": 97,
+        "detector": 106
+      },
+      "holdout_speedup_vs_baseline": 1.8187863521071408,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9670967741935483,
+      "opt_holdout_cost_ms": 697.6040755889691,
+      "opt_holdout_macro_acc": 0.9659332358130803,
+      "opt_holdout_worst_class_acc": 0.9264305177111717,
+      "opt_validation_acc": 0.9654615881213686,
+      "report": "checkpoints/threshold_experiments/per_scene_thresholds/per_scene_structure_paper/h24.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "K1:coupe": [
+          "K6",
+          "detector"
+        ],
+        "K1:suv": [
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.9654615881213686,
+      "threshold_bank_row": {
+        "K0": 0.9992000460624695,
+        "K1": 0.9365274906158447,
+        "K2": 0.9396532348224095,
+        "K3": 0.7307737725121635,
+        "K4": 0.9588181291307721,
+        "K5": 0.95,
+        "K6": 0.9994381581033979
+      },
+      "thresholds": {
+        "K0": 0.9992000460624695,
+        "K1": 0.9365274906158447,
+        "K2": 0.9396532348224095,
+        "K3": 0.7307737725121635,
+        "K4": 0.9588181291307721,
+        "K6": 0.9994381581033979
+      }
+    },
+    "i29": {
+      "baseline_holdout_acc": 0.7398489140698773,
+      "baseline_holdout_cost_ms": 5971.264103134385,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_route_counts": {
+        "K0": 104,
+        "K1": 28,
+        "K2": 173,
+        "K3": 3734,
+        "K4": 227,
+        "K6": 273,
+        "detector": 6051
+      },
+      "holdout_speedup_vs_baseline": 1.0404849910416445,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.7390934844192635,
+      "opt_holdout_cost_ms": 5738.92382354931,
+      "opt_holdout_macro_acc": 0.7374047487076563,
+      "opt_holdout_worst_class_acc": 0.6715530903328051,
+      "opt_validation_acc": 0.727603219942872,
+      "report": "checkpoints/threshold_experiments/per_scene_thresholds/per_scene_structure_paper/i29.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K2",
+          "K3",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K3",
+          "K2",
+          "detector"
+        ],
+        "K1:coupe": [
+          "K6",
+          "detector"
+        ],
+        "K1:suv": [
+          "K4",
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.7274615802270957,
+      "threshold_bank_row": {
+        "K0": 0.9960715527437171,
+        "K1": 0.9517098993671184,
+        "K2": 0.9896456866848226,
+        "K3": 0.7764108229656609,
+        "K4": 0.9364873450629565,
+        "K5": 0.95,
+        "K6": 0.6674875361578805
+      },
+      "thresholds": {
+        "K0": 0.9960715527437171,
+        "K1": 0.9517098993671184,
+        "K2": 0.9896456866848226,
+        "K3": 0.7764108229656609,
+        "K4": 0.9364873450629565,
+        "K6": 0.6674875361578805
+      }
+    },
+    "s31": {
+      "baseline_holdout_acc": 0.7867063492063492,
+      "baseline_holdout_cost_ms": 4505.314911567509,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_route_counts": {
+        "K2": 243,
+        "K3": 2758,
+        "K6": 33,
+        "detector": 2006
+      },
+      "holdout_speedup_vs_baseline": 1.125963669210418,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.7817460317460317,
+      "opt_holdout_cost_ms": 4001.296875526064,
+      "opt_holdout_macro_acc": 0.7816483117853005,
+      "opt_holdout_worst_class_acc": 0.7589869281045751,
+      "opt_validation_acc": 0.7843536065085822,
+      "report": "checkpoints/threshold_experiments/per_scene_thresholds/per_scene_structure_paper/s31.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K2",
+          "K3",
+          "K5",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K2",
+          "K3",
+          "detector"
+        ],
+        "K1:coupe": [
+          "K6",
+          "K5",
+          "detector"
+        ],
+        "K1:suv": [
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.7843536065085822,
+      "threshold_bank_row": {
+        "K0": 1.0,
+        "K1": 0.9877910954611642,
+        "K2": 0.9323674245756499,
+        "K3": 0.7956160562379018,
+        "K4": 0.9977021424137816,
+        "K5": 0.0,
+        "K6": 0.530511279495395
+      },
+      "thresholds": {
+        "K0": 1.0,
+        "K1": 0.9877910954611642,
+        "K2": 0.9323674245756499,
+        "K3": 0.7956160562379018,
+        "K4": 0.9977021424137816,
+        "K5": 0.0,
+        "K6": 0.530511279495395
+      }
+    }
+  },
+  "target_accuracy_source": "baseline_validation"
+}

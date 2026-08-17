@@ -1,0 +1,285 @@
+{
+  "annealing": {
+    "accuracy_gap": -0.007160498969158047,
+    "cost_gap_ms": -0.05202223988360277,
+    "holdout": {
+      "accuracy": 0.9083870967741936,
+      "correct": 1408,
+      "expected_cost": 6.2735663132069845,
+      "macro_accuracy": 0.9049999357285462,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9633507853403142,
+          "correct": 368,
+          "total": 382
+        },
+        "gle350": {
+          "accuracy": 0.974477958236659,
+          "correct": 420,
+          "total": 431
+        },
+        "miata": {
+          "accuracy": 0.8810810810810811,
+          "correct": 326,
+          "total": 370
+        },
+        "mustang": {
+          "accuracy": 0.8010899182561307,
+          "correct": 294,
+          "total": 367
+        }
+      },
+      "route_counts": {
+        "K0": 25,
+        "K3": 312,
+        "K4": 667,
+        "K6": 546
+      },
+      "thresholds": {
+        "K0": 0.7988758683204651,
+        "K1": 0.6367648158754621,
+        "K2": 0.9799265350614275,
+        "K3": 0.0,
+        "K4": 0.8524788192340306,
+        "K6": 0.0
+      },
+      "total": 1550,
+      "worst_class_accuracy": 0.8010899182561307
+    },
+    "holdout_feasible": true,
+    "validation": {
+      "accuracy": 0.9012265978050356,
+      "annealing_accepted_moves": 6052,
+      "annealing_elapsed_seconds": 3.651010623005277,
+      "annealing_evaluations": 7026,
+      "annealing_iterations": 8000,
+      "coordinate_descent_elapsed_seconds": 0.13968729299813276,
+      "coordinate_descent_evaluations": 313,
+      "coordinate_descent_passes": 1,
+      "correct": 5584,
+      "elapsed_seconds": 3.7906979160034098,
+      "evaluations": 7339,
+      "expected_cost": 6.325588553090587,
+      "feasible": true,
+      "macro_accuracy": 0.8978254135277344,
+      "method": "simulated_annealing_plus_coordinate_descent",
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9593709043250328,
+          "correct": 1464,
+          "total": 1526
+        },
+        "gle350": {
+          "accuracy": 0.9686593151479976,
+          "correct": 1669,
+          "total": 1723
+        },
+        "miata": {
+          "accuracy": 0.8504736129905277,
+          "correct": 1257,
+          "total": 1478
+        },
+        "mustang": {
+          "accuracy": 0.8127978216473791,
+          "correct": 1194,
+          "total": 1469
+        }
+      },
+      "route_counts": {
+        "K0": 71,
+        "K3": 1261,
+        "K4": 2668,
+        "K6": 2196
+      },
+      "target_accuracy": 0.9,
+      "thresholds": {
+        "K0": 0.7988758683204651,
+        "K1": 0.6367648158754621,
+        "K2": 0.9799265350614275,
+        "K3": 0.0,
+        "K4": 0.8524788192340306,
+        "K6": 0.0
+      },
+      "total": 6196,
+      "worst_class_accuracy": 0.8127978216473791
+    }
+  },
+  "baseline": {
+    "accuracy_gap": -0.0035706699431474753,
+    "cost_gap_ms": -9.164963346136574,
+    "holdout": {
+      "accuracy": 0.9690322580645161,
+      "correct": 1502,
+      "expected_cost": 1268.7927718555352,
+      "macro_accuracy": 0.9680146276604393,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9895287958115183,
+          "correct": 378,
+          "total": 382
+        },
+        "gle350": {
+          "accuracy": 0.988399071925754,
+          "correct": 426,
+          "total": 431
+        },
+        "miata": {
+          "accuracy": 0.9513513513513514,
+          "correct": 352,
+          "total": 370
+        },
+        "mustang": {
+          "accuracy": 0.9427792915531336,
+          "correct": 346,
+          "total": 367
+        }
+      },
+      "route_counts": {
+        "K0": 8,
+        "K2": 20,
+        "K3": 462,
+        "K4": 528,
+        "K6": 337,
+        "detector": 195
+      },
+      "thresholds": {
+        "K0": 0.95,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K4": 0.95,
+        "K6": 0.95
+      },
+      "total": 1550,
+      "worst_class_accuracy": 0.9427792915531336
+    },
+    "holdout_feasible": true,
+    "validation": {
+      "accuracy": 0.9654615881213686,
+      "correct": 5982,
+      "expected_cost": 1277.9577352016718,
+      "macro_accuracy": 0.9642317120940487,
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9868938401048493,
+          "correct": 1506,
+          "total": 1526
+        },
+        "gle350": {
+          "accuracy": 0.9901334881021474,
+          "correct": 1706,
+          "total": 1723
+        },
+        "miata": {
+          "accuracy": 0.9364005412719891,
+          "correct": 1384,
+          "total": 1478
+        },
+        "mustang": {
+          "accuracy": 0.943498978897209,
+          "correct": 1386,
+          "total": 1469
+        }
+      },
+      "route_counts": {
+        "K0": 31,
+        "K2": 98,
+        "K3": 1958,
+        "K4": 2076,
+        "K6": 1248,
+        "detector": 785
+      },
+      "thresholds": {
+        "K0": 0.95,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K4": 0.95,
+        "K6": 0.95
+      },
+      "total": 6196,
+      "worst_class_accuracy": 0.9364005412719891
+    }
+  },
+  "detector": {
+    "cost_ms": 10000.0,
+    "id": "Kdet"
+  },
+  "detector_mode": "paper",
+  "split": {
+    "holdout_fraction": 0.2,
+    "holdout_samples": 1550,
+    "initial_layout": [
+      "K0",
+      "K3",
+      "K2",
+      "K1",
+      "detector"
+    ],
+    "layout_source": "validation_dp",
+    "per_run": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "random_seed": 0,
+    "specialized_layout": {
+      "K0:coupe": [
+        "K6",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "K0:suv": [
+        "K4",
+        "K3",
+        "K2",
+        "detector"
+      ],
+      "K1:coupe": [
+        "K6",
+        "detector"
+      ],
+      "K1:suv": [
+        "detector"
+      ]
+    },
+    "strategy": "blocked_per_run",
+    "validation_samples": 6196
+  },
+  "target_accuracy": 0.9,
+  "target_accuracy_source": "explicit"
+}

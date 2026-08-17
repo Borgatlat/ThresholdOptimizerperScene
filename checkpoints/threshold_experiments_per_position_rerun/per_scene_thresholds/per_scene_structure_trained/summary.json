@@ -1,0 +1,280 @@
+{
+  "detector_mode": "trained",
+  "mode": "per_scene_structure",
+  "scenes": {
+    "a06": {
+      "baseline_holdout_acc": 0.32924961715160794,
+      "baseline_holdout_cost_ms": 27.301226459563527,
+      "detector_mode": "trained",
+      "holdout_feasible": false,
+      "holdout_route_counts": {
+        "K0": 6,
+        "K4": 4104,
+        "K6": 63,
+        "Kdet": 1051
+      },
+      "holdout_speedup_vs_baseline": 2.886649886922186,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.34245788667687593,
+      "opt_holdout_cost_ms": 9.457754673765697,
+      "opt_holdout_macro_acc": 0.34089092684197336,
+      "opt_holdout_worst_class_acc": 0.07398373983739838,
+      "opt_validation_acc": 0.3439264860725567,
+      "report": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\threshold_experiments_per_position_rerun\\per_scene_thresholds\\per_scene_structure_trained\\a06.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K3",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.3434957404039437,
+      "threshold_bank_row": {
+        "K0": 0.8588543461293591,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9214253656718195,
+        "K4": 0.0,
+        "K5": 0.95,
+        "K6": 0.0
+      },
+      "thresholds": {
+        "K0": 0.8588543461293591,
+        "K3": 0.9214253656718195,
+        "K4": 0.0,
+        "K6": 0.0
+      }
+    },
+    "h08": {
+      "baseline_holdout_acc": 0.7742962466487936,
+      "baseline_holdout_cost_ms": 20.610792824000384,
+      "detector_mode": "trained",
+      "holdout_feasible": true,
+      "holdout_route_counts": {
+        "K0": 342,
+        "K3": 3172,
+        "K4": 168,
+        "K6": 1115,
+        "Kdet": 1171
+      },
+      "holdout_speedup_vs_baseline": 1.3012032550278694,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.761896782841823,
+      "opt_holdout_cost_ms": 15.83979500847386,
+      "opt_holdout_macro_acc": 0.7609094842406374,
+      "opt_holdout_worst_class_acc": 0.6841379310344827,
+      "opt_validation_acc": 0.7249842931937173,
+      "report": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\threshold_experiments_per_position_rerun\\per_scene_thresholds\\per_scene_structure_trained\\h08.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K3",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K3",
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.7249424083769633,
+      "threshold_bank_row": {
+        "K0": 0.7419269449856816,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.0,
+        "K4": 0.9997279291250267,
+        "K5": 0.95,
+        "K6": 0.9769513363740882
+      },
+      "thresholds": {
+        "K0": 0.7419269449856816,
+        "K3@specialized[K0:coupe][1]": 0.0,
+        "K3@specialized[K0:suv][1]": 0.0,
+        "K4": 0.9997279291250267,
+        "K6": 0.9769513363740882
+      }
+    },
+    "h24": {
+      "baseline_holdout_acc": 0.944516129032258,
+      "baseline_holdout_cost_ms": 12.921894083128896,
+      "detector_mode": "trained",
+      "holdout_feasible": true,
+      "holdout_route_counts": {
+        "K0": 8,
+        "K3": 617,
+        "K4": 561,
+        "K6": 351,
+        "Kdet": 13
+      },
+      "holdout_speedup_vs_baseline": 1.4650723979032978,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.932258064516129,
+      "opt_holdout_cost_ms": 8.819969649023315,
+      "opt_holdout_macro_acc": 0.929727564476383,
+      "opt_holdout_worst_class_acc": 0.8501362397820164,
+      "opt_validation_acc": 0.9267269205939316,
+      "report": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\threshold_experiments_per_position_rerun\\per_scene_thresholds\\per_scene_structure_trained\\h24.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K3",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K3",
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.9265655261459006,
+      "threshold_bank_row": {
+        "K0": 0.9454332164355687,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K3": 0.9,
+        "K3@initial[1]": 0.31238147616386414,
+        "K3@specialized[K0:coupe][1]": 0.6029707193374634,
+        "K3@specialized[K0:suv][1]": 0.5286086031368801,
+        "K4": 0.9045340418815613,
+        "K5": 0.95,
+        "K6": 0.9394601498331342
+      },
+      "thresholds": {
+        "K0": 0.9454332164355687,
+        "K3@initial[1]": 0.31238147616386414,
+        "K3@specialized[K0:coupe][1]": 0.6029707193374634,
+        "K3@specialized[K0:suv][1]": 0.5286086031368801,
+        "K4": 0.9045340418815613,
+        "K6": 0.9394601498331342
+      }
+    },
+    "i29": {
+      "baseline_holdout_acc": 0.2395656279508971,
+      "baseline_holdout_cost_ms": 25.15470805208499,
+      "detector_mode": "trained",
+      "holdout_feasible": false,
+      "holdout_route_counts": {
+        "K0": 3434,
+        "K4": 3020,
+        "K6": 61,
+        "Kdet": 4075
+      },
+      "holdout_speedup_vs_baseline": 1.6263020392304774,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.25316336166194525,
+      "opt_holdout_cost_ms": 15.46742698790904,
+      "opt_holdout_macro_acc": 0.2522998383516278,
+      "opt_holdout_worst_class_acc": 0.16323296354992076,
+      "opt_validation_acc": 0.30499752130497393,
+      "report": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\threshold_experiments_per_position_rerun\\per_scene_thresholds\\per_scene_structure_trained\\i29.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K2",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.3049267014470858,
+      "threshold_bank_row": {
+        "K0": 0.0,
+        "K1": 0.95,
+        "K2": 0.9999990463256837,
+        "K3": 0.9,
+        "K4": 0.9090003724000892,
+        "K5": 0.95,
+        "K6": 0.9999986886978149
+      },
+      "thresholds": {
+        "K0": 0.0,
+        "K2": 0.9999990463256837,
+        "K4": 0.9090003724000892,
+        "K6": 0.9999986886978149
+      }
+    },
+    "s31": {
+      "baseline_holdout_acc": 0.49484126984126986,
+      "baseline_holdout_cost_ms": 24.423705986209537,
+      "detector_mode": "trained",
+      "holdout_feasible": true,
+      "holdout_route_counts": {
+        "K0": 222,
+        "K2": 133,
+        "K4": 780,
+        "K6": 425,
+        "Kdet": 3480
+      },
+      "holdout_speedup_vs_baseline": 1.053158601871509,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.4928571428571429,
+      "opt_holdout_cost_ms": 23.190909652931232,
+      "opt_holdout_macro_acc": 0.4929097564692593,
+      "opt_holdout_worst_class_acc": 0.4319286871961102,
+      "opt_validation_acc": 0.48278599067367794,
+      "report": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\threshold_experiments_per_position_rerun\\per_scene_thresholds\\per_scene_structure_trained\\s31.json",
+      "specialized_layout": {
+        "K0:coupe": [
+          "K6",
+          "K2",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "K2",
+          "detector"
+        ]
+      },
+      "status": "ok",
+      "target_accuracy": 0.48278599067367794,
+      "threshold_bank_row": {
+        "K0": 0.9382889051826633,
+        "K1": 0.95,
+        "K2": 0.9,
+        "K2@specialized[K0:coupe][1]": 0.998507887733226,
+        "K2@specialized[K0:suv][1]": 0.8762508825379975,
+        "K3": 0.9,
+        "K4": 0.8955016209154713,
+        "K5": 0.95,
+        "K6": 0.9260283903199799
+      },
+      "thresholds": {
+        "K0": 0.9382889051826633,
+        "K2@specialized[K0:coupe][1]": 0.998507887733226,
+        "K2@specialized[K0:suv][1]": 0.8762508825379975,
+        "K4": 0.8955016209154713,
+        "K6": 0.9260283903199799
+      }
+    }
+  },
+  "target_accuracy_source": "baseline_validation"
+}

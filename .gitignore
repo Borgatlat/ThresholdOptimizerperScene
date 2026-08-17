@@ -1,0 +1,7 @@
+/datasets
+/checkpoints/cifar100/
+__pycache__/
+.venv/
+*.pyc
+.pytest_cache/
+/Cacheing

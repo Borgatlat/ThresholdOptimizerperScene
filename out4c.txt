@@ -1,0 +1,54 @@
+Fri Aug 14 12:31:05 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 575.57.08              Driver Version: 575.57.08      CUDA Version: 12.9     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  Tesla V100-PCIE-16GB           Off |   00000000:05:00.0 Off |                    0 |
+| N/A   27C    P0             24W /  250W |       0MiB /  16384MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+torch: 2.5.1
+torchvision: 0.20.1
+timm: 1.0.28
+GPU: Tesla V100-PCIE-16GB
+Downloading https://cave.cs.toronto.edu/kriz/cifar-100-python.tar.gz to datasets/cifar100/cifar-100-python.tar.gz
+Extracting datasets/cifar100/cifar-100-python.tar.gz to datasets/cifar100
+{
+  "official_training_samples": 50000,
+  "train": 42500,
+  "model_selection": 2500,
+  "cascade_validation": 5000,
+  "indices": "checkpoints/cifar100/splits/cifar100_split_indices.npz",
+  "manifest": "checkpoints/cifar100/splits/cifar100_split_indices.json",
+  "official_test_used": false
+}
+{
+  "manifest": "checkpoints/cifar100/training/training_manifest.json",
+  "candidate_models": 24,
+  "models_in_manifest": 25,
+  "complete_candidate_set": true
+}
+{
+  "checkpoint": "/project/amcheng/Tcarroll/Athan_testing/ThresholdOptimizerperScene/checkpoints/cifar100/training/convnextv2_large_detector/best.pt",
+  "training_manifest": "checkpoints/cifar100/training/training_manifest.json",
+  "model_selection_accuracy": 0.0156,
+  "detector_available": true
+}
+{
+  "manifest": "/project/amcheng/Tcarroll/Athan_testing/ThresholdOptimizerperScene/checkpoints/cifar100/training/training_manifest.json",
+  "candidate_models": 24,
+  "complete_candidate_set": true,
+  "initializer_available": true,
+  "detector_available": true
+}

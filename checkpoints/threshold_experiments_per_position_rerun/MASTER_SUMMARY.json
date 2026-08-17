@@ -1,0 +1,881 @@
+{
+  "suites": [
+    "layouts",
+    "targets",
+    "scenes_trained",
+    "transfer",
+    "search_settings",
+    "layouts_by_scene"
+  ],
+  "table": [
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.5237892987310493,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9716129032258064,
+      "opt_holdout_cost_ms": 832.6563081340281,
+      "run": "dp_optimal",
+      "suite": "layouts",
+      "target_accuracy": 0.9654615881213686
+    },
+    {
+      "baseline_holdout_acc": 0.9703225806451613,
+      "baseline_holdout_cost_ms": 1360.7494429965102,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.403725154570589,
+      "layout": [
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9754838709677419,
+      "opt_holdout_cost_ms": 969.3845255717274,
+      "run": "global_only",
+      "suite": "layouts",
+      "target_accuracy": 0.9701420271142672
+    },
+    {
+      "baseline_holdout_acc": 0.9851612903225806,
+      "baseline_holdout_cost_ms": 1561.0626697763914,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.0,
+      "layout": [
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9851612903225806,
+      "opt_holdout_cost_ms": 1561.0626697763914,
+      "run": "single_global",
+      "suite": "layouts",
+      "target_accuracy": 0.9833763718528082
+    },
+    {
+      "baseline_holdout_acc": 0.9896774193548387,
+      "baseline_holdout_cost_ms": 4384.055025039743,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.0272046794421388,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9870967741935484,
+      "opt_holdout_cost_ms": 4267.946897808784,
+      "run": "hierarchy_classic",
+      "suite": "layouts",
+      "target_accuracy": 0.9838605551969012
+    },
+    {
+      "baseline_holdout_acc": 0.9864516129032258,
+      "baseline_holdout_cost_ms": 7863.964605651565,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 4.100368117419641,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9890322580645161,
+      "opt_holdout_cost_ms": 1917.8679524511456,
+      "run": "three_linear",
+      "suite": "layouts",
+      "target_accuracy": 0.986120077469335
+    },
+    {
+      "baseline_holdout_acc": 0.9703225806451613,
+      "baseline_holdout_cost_ms": 1360.7494429965102,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.403725154570589,
+      "layout": [
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9754838709677419,
+      "opt_holdout_cost_ms": 969.3845255717274,
+      "run": "three_global",
+      "suite": "layouts",
+      "target_accuracy": 0.9701420271142672
+    },
+    {
+      "baseline_holdout_acc": 0.9696774193548388,
+      "baseline_holdout_cost_ms": 1332.7999991102538,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.4926289310491276,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9729032258064516,
+      "opt_holdout_cost_ms": 892.9211885056158,
+      "run": "k0_k2_k3_hierarchy",
+      "suite": "layouts",
+      "target_accuracy": 0.9664299548095545
+    },
+    {
+      "baseline_holdout_acc": 0.9722580645161291,
+      "baseline_holdout_cost_ms": 2211.237995475051,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 2.2563692161294537,
+      "layout": [
+        "K0",
+        "K1",
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9748387096774194,
+      "opt_holdout_cost_ms": 979.9982997765675,
+      "run": "both_identifiers",
+      "suite": "layouts",
+      "target_accuracy": 0.9693350548741123
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.5237892987310493,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9716129032258064,
+      "opt_holdout_cost_ms": 832.6563081340281,
+      "run": "paper_baseline",
+      "suite": "targets",
+      "target_accuracy": 0.9654615881213686
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 192.02965235099717,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9077419354838709,
+      "opt_holdout_cost_ms": 6.60727526359523,
+      "run": "paper_acc_0.90",
+      "suite": "targets",
+      "target_accuracy": 0.9
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 3.2608585023112266,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9516129032258065,
+      "opt_holdout_cost_ms": 389.09777009834744,
+      "run": "paper_acc_0.95",
+      "suite": "targets",
+      "target_accuracy": 0.95
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 0.8893727545572377,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.984516129032258,
+      "opt_holdout_cost_ms": 1426.6152919055708,
+      "run": "paper_acc_0.98",
+      "suite": "targets",
+      "target_accuracy": 0.98
+    },
+    {
+      "baseline_holdout_acc": 0.944516129032258,
+      "baseline_holdout_cost_ms": 12.921894083128896,
+      "detector_mode": "trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.4650723979032978,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.932258064516129,
+      "opt_holdout_cost_ms": 8.819969649023315,
+      "run": "trained_baseline",
+      "suite": "targets",
+      "target_accuracy": 0.9265655261459006
+    },
+    {
+      "baseline_holdout_acc": 0.944516129032258,
+      "baseline_holdout_cost_ms": 12.921894083128896,
+      "detector_mode": "trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 2.069279206061128,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9109677419354839,
+      "opt_holdout_cost_ms": 6.244635351903872,
+      "run": "trained_acc_0.90",
+      "suite": "targets",
+      "target_accuracy": 0.9
+    },
+    {
+      "baseline_holdout_acc": 0.944516129032258,
+      "baseline_holdout_cost_ms": 12.921894083128896,
+      "detector_mode": "trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 0.952622648487855,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.94,
+      "opt_holdout_cost_ms": 13.564546364334772,
+      "run": "trained_acc_0.95",
+      "suite": "targets",
+      "target_accuracy": 0.95
+    },
+    {
+      "baseline_holdout_acc": 0.944516129032258,
+      "baseline_holdout_cost_ms": 12.921894083128896,
+      "detector_mode": "trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 0.952622648487855,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.94,
+      "opt_holdout_cost_ms": 13.564546364334772,
+      "run": "trained_acc_0.98",
+      "suite": "targets",
+      "target_accuracy": 0.98
+    },
+    {
+      "baseline_holdout_acc": 0.944516129032258,
+      "baseline_holdout_cost_ms": 12.921894083128896,
+      "detector_mode": "trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.4650723979032978,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.932258064516129,
+      "opt_holdout_cost_ms": 8.819969649023315,
+      "run": "h24",
+      "suite": "scenes_trained",
+      "target_accuracy": 0.9265655261459006
+    },
+    {
+      "baseline_holdout_acc": 0.7742962466487936,
+      "baseline_holdout_cost_ms": 20.610792824000384,
+      "detector_mode": "trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.3012032550278694,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.761896782841823,
+      "opt_holdout_cost_ms": 15.83979500847386,
+      "run": "h08",
+      "suite": "scenes_trained",
+      "target_accuracy": 0.7249424083769633
+    },
+    {
+      "baseline_holdout_acc": 0.49484126984126986,
+      "baseline_holdout_cost_ms": 24.423705986209537,
+      "detector_mode": "trained",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.053158601871509,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.4928571428571429,
+      "opt_holdout_cost_ms": 23.190909652931232,
+      "run": "s31",
+      "suite": "scenes_trained",
+      "target_accuracy": 0.48278599067367794
+    },
+    {
+      "baseline_holdout_acc": 0.32924961715160794,
+      "baseline_holdout_cost_ms": 27.301226459563527,
+      "detector_mode": "trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 2.886649886922186,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.34245788667687593,
+      "opt_holdout_cost_ms": 9.457754673765697,
+      "run": "a06",
+      "suite": "scenes_trained",
+      "target_accuracy": 0.3434957404039437
+    },
+    {
+      "baseline_holdout_acc": 0.2395656279508971,
+      "baseline_holdout_cost_ms": 25.15470805208499,
+      "detector_mode": "trained",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 1.6263020392304774,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.25316336166194525,
+      "opt_holdout_cost_ms": 15.46742698790904,
+      "run": "i29",
+      "suite": "scenes_trained",
+      "target_accuracy": 0.3049267014470858
+    },
+    {
+      "opt_holdout_acc": 0.9666924864446166,
+      "opt_holdout_cost_ms": 858.942615695801,
+      "run": "h24",
+      "suite": "transfer_zero_shot"
+    },
+    {
+      "opt_holdout_acc": 0.9048017960660791,
+      "opt_holdout_cost_ms": 2731.0344092640885,
+      "run": "h08",
+      "suite": "transfer_zero_shot"
+    },
+    {
+      "opt_holdout_acc": 0.777244225732201,
+      "opt_holdout_cost_ms": 3880.3131562947196,
+      "run": "s31",
+      "suite": "transfer_zero_shot"
+    },
+    {
+      "opt_holdout_acc": 0.6903667968450877,
+      "opt_holdout_cost_ms": 3823.3854074321716,
+      "run": "a06",
+      "suite": "transfer_zero_shot"
+    },
+    {
+      "opt_holdout_acc": 0.7117523748371135,
+      "opt_holdout_cost_ms": 4940.333261204234,
+      "run": "i29",
+      "suite": "transfer_zero_shot"
+    },
+    {
+      "holdout_speedup_vs_baseline": 1.5237892987310493,
+      "opt_holdout_acc": 0.9716129032258064,
+      "opt_holdout_cost_ms": 832.6563081340281,
+      "run": "h24",
+      "suite": "transfer_retune"
+    },
+    {
+      "holdout_speedup_vs_baseline": 1.2398203167739354,
+      "opt_holdout_acc": 0.9158847184986595,
+      "opt_holdout_cost_ms": 2370.9109496829174,
+      "run": "h08",
+      "suite": "transfer_retune"
+    },
+    {
+      "holdout_speedup_vs_baseline": 1.0963782446911094,
+      "opt_holdout_acc": 0.7851190476190476,
+      "opt_holdout_cost_ms": 4116.510854710199,
+      "run": "s31",
+      "suite": "transfer_retune"
+    },
+    {
+      "holdout_speedup_vs_baseline": 0.8464321742118092,
+      "opt_holdout_acc": 0.7138208269525268,
+      "opt_holdout_cost_ms": 4456.426504333585,
+      "run": "a06",
+      "suite": "transfer_retune"
+    },
+    {
+      "holdout_speedup_vs_baseline": 1.0417792844524945,
+      "opt_holdout_acc": 0.7377714825306894,
+      "opt_holdout_cost_ms": 5732.1404142706915,
+      "run": "i29",
+      "suite": "transfer_retune"
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.4982667325299774,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9658064516129032,
+      "opt_holdout_cost_ms": 846.8403818277725,
+      "run": "q10_blocked",
+      "suite": "search_settings",
+      "target_accuracy": 0.9654615881213686
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.2778156595332297,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9748387096774194,
+      "opt_holdout_cost_ms": 992.9388189834906,
+      "run": "q25_blocked",
+      "suite": "search_settings",
+      "target_accuracy": 0.9654615881213686
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.5237892987310493,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9716129032258064,
+      "opt_holdout_cost_ms": 832.6563081340281,
+      "run": "q50_blocked",
+      "suite": "search_settings",
+      "target_accuracy": 0.9654615881213686
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.7837895385700082,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.967741935483871,
+      "opt_holdout_cost_ms": 711.290622812305,
+      "run": "q100_blocked",
+      "suite": "search_settings",
+      "target_accuracy": 0.9654615881213686
+    },
+    {
+      "baseline_holdout_acc": 0.9619354838709677,
+      "baseline_holdout_cost_ms": 1391.8148131865448,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 1.598467266056512,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9554838709677419,
+      "opt_holdout_cost_ms": 870.7183704926359,
+      "run": "q50_random",
+      "suite": "search_settings",
+      "target_accuracy": 0.9672369270497095
+    },
+    {
+      "baseline_holdout_acc": 0.9690322580645161,
+      "baseline_holdout_cost_ms": 1268.7927718555352,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.5237892987310493,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9716129032258064,
+      "opt_holdout_cost_ms": 832.6563081340281,
+      "run": "h24__dp_optimal",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9654615881213686
+    },
+    {
+      "baseline_holdout_acc": 0.9703225806451613,
+      "baseline_holdout_cost_ms": 1360.7494429965102,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.403725154570589,
+      "layout": [
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9754838709677419,
+      "opt_holdout_cost_ms": 969.3845255717274,
+      "run": "h24__global_only",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9701420271142672
+    },
+    {
+      "baseline_holdout_acc": 0.9896774193548387,
+      "baseline_holdout_cost_ms": 4384.055025039743,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.0272046794421388,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9870967741935484,
+      "opt_holdout_cost_ms": 4267.946897808784,
+      "run": "h24__hierarchy_classic",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9838605551969012
+    },
+    {
+      "baseline_holdout_acc": 0.9864516129032258,
+      "baseline_holdout_cost_ms": 7863.964605651565,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 4.100368117419641,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9890322580645161,
+      "opt_holdout_cost_ms": 1917.8679524511456,
+      "run": "h24__three_linear",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.986120077469335
+    },
+    {
+      "baseline_holdout_acc": 0.9157171581769437,
+      "baseline_holdout_cost_ms": 2939.504323457822,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.2055949172191665,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9142091152815014,
+      "opt_holdout_cost_ms": 2438.218908750962,
+      "run": "h08__dp_optimal",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9070994764397906
+    },
+    {
+      "baseline_holdout_acc": 0.92828418230563,
+      "baseline_holdout_cost_ms": 3187.8269228830536,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.180911893870355,
+      "layout": [
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9254356568364611,
+      "opt_holdout_cost_ms": 2699.462118579547,
+      "run": "h08__global_only",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9226806282722513
+    },
+    {
+      "baseline_holdout_acc": 0.9612935656836461,
+      "baseline_holdout_cost_ms": 6487.642655437491,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 0.9915789624168101,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9656501340482574,
+      "opt_holdout_cost_ms": 6542.739309056066,
+      "run": "h08__hierarchy_classic",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9589947643979058
+    },
+    {
+      "baseline_holdout_acc": 0.9691689008042895,
+      "baseline_holdout_cost_ms": 7784.428443019654,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.8525643799827876,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9745308310991957,
+      "opt_holdout_cost_ms": 4201.974585677816,
+      "run": "h08__three_linear",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9694240837696335
+    },
+    {
+      "baseline_holdout_acc": 0.7867063492063492,
+      "baseline_holdout_cost_ms": 4505.314911567509,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.04371189421983,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.7880952380952381,
+      "opt_holdout_cost_ms": 4316.626970065538,
+      "run": "s31__dp_optimal",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.7843536065085822
+    },
+    {
+      "baseline_holdout_acc": 0.8246031746031746,
+      "baseline_holdout_cost_ms": 5039.688173284374,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 1.0932500755466603,
+      "layout": [
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.8162698412698413,
+      "opt_holdout_cost_ms": 4609.8219300505125,
+      "run": "s31__global_only",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.8219565433078678
+    },
+    {
+      "baseline_holdout_acc": 0.8976190476190476,
+      "baseline_holdout_cost_ms": 7722.950531243171,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.039277718500937,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.8940476190476191,
+      "opt_holdout_cost_ms": 7431.074864553838,
+      "run": "s31__hierarchy_classic",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.8939378906637563
+    },
+    {
+      "baseline_holdout_acc": 0.8958333333333334,
+      "baseline_holdout_cost_ms": 7660.508922286972,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 1.29979900305742,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.8882936507936507,
+      "opt_holdout_cost_ms": 5893.610399967787,
+      "run": "s31__three_linear",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.8915567020537751
+    },
+    {
+      "baseline_holdout_acc": 0.6464395099540582,
+      "baseline_holdout_cost_ms": 3773.391242623302,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 0.8678149837724717,
+      "layout": [
+        "K0",
+        "K3",
+        "K2",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.7109494640122511,
+      "opt_holdout_cost_ms": 4348.151752600563,
+      "run": "a06__dp_optimal",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.7665837082416005
+    },
+    {
+      "baseline_holdout_acc": 0.6998468606431854,
+      "baseline_holdout_cost_ms": 4401.967504579017,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 1.3147302034111268,
+      "layout": [
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.6299770290964778,
+      "opt_holdout_cost_ms": 3348.190749066169,
+      "run": "a06__global_only",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.7977409782712741
+    },
+    {
+      "baseline_holdout_acc": 0.9017993874425727,
+      "baseline_holdout_cost_ms": 8468.14720376066,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 0.9626947312472138,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9297473200612557,
+      "opt_holdout_cost_ms": 8796.295366434382,
+      "run": "a06__hierarchy_classic",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9357710347468172
+    },
+    {
+      "baseline_holdout_acc": 0.9184532924961715,
+      "baseline_holdout_cost_ms": 7937.485014198783,
+      "detector_mode": "paper",
+      "holdout_feasible": false,
+      "holdout_speedup_vs_baseline": 1.217905899231129,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.843989280245023,
+      "opt_holdout_cost_ms": 6517.322084743791,
+      "run": "a06__three_linear",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.9485976835455154
+    },
+    {
+      "baseline_holdout_acc": 0.7398489140698773,
+      "baseline_holdout_cost_ms": 5971.264103134383,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.050735967547418,
+      "layout": [
+        "K0",
+        "K2",
+        "K3",
+        "K1",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.7391879131255902,
+      "opt_holdout_cost_ms": 5682.934902354439,
+      "run": "i29__dp_optimal",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.7274615802270957
+    },
+    {
+      "baseline_holdout_acc": 0.7749763928234183,
+      "baseline_holdout_cost_ms": 6416.856222583421,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.0557629321005673,
+      "layout": [
+        "K2",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.7673276676109537,
+      "opt_holdout_cost_ms": 6077.932864924813,
+      "run": "i29__global_only",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.7664597153041713
+    },
+    {
+      "baseline_holdout_acc": 0.8674220963172804,
+      "baseline_holdout_cost_ms": 8006.27461721294,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 0.9960279114362529,
+      "layout": [
+        "K0",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.8897072710103872,
+      "opt_holdout_cost_ms": 8038.203071707145,
+      "run": "i29__hierarchy_classic",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.8745780316800831
+    },
+    {
+      "baseline_holdout_acc": 0.8619452313503305,
+      "baseline_holdout_cost_ms": 8223.838997614761,
+      "detector_mode": "paper",
+      "holdout_feasible": true,
+      "holdout_speedup_vs_baseline": 1.0234490069218791,
+      "layout": [
+        "K0",
+        "K3",
+        "detector"
+      ],
+      "opt_holdout_acc": 0.9153918791312559,
+      "opt_holdout_cost_ms": 8035.416461391412,
+      "run": "i29__three_linear",
+      "suite": "layouts_by_scene",
+      "target_accuracy": 0.8922121762942329
+    }
+  ]
+}

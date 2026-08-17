@@ -1,0 +1,43 @@
+{
+  "schema_version": "cifar100-training/v1",
+  "seed": 2025,
+  "batch_size": 8,
+  "num_workers": 0,
+  "optimizer": {
+    "name": "sgd",
+    "learning_rate": 0.01,
+    "momentum": 0.9,
+    "weight_decay": 0.0005,
+    "nesterov": true
+  },
+  "scheduler": {
+    "name": "cosine",
+    "warmup_epochs": 0,
+    "minimum_learning_rate": 0.0001
+  },
+  "label_smoothing": 0.0,
+  "early_stopping_patience": 1,
+  "epochs": {
+    "wrn16_2_base": 1,
+    "specialized": 1,
+    "identifier": 1,
+    "global": 1
+  },
+  "resnet18_imagenet_pretrained": false,
+  "detector": {
+    "pretrained_model": "convnextv2_large.fcmae_ft_in1k",
+    "input_resolution": 224,
+    "feature_batch_size": 2,
+    "head_batch_size": 16,
+    "epochs": 2,
+    "early_stopping_patience": 1,
+    "optimizer": {
+      "name": "adamw",
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001
+    }
+  },
+  "collection_threshold": 0.0,
+  "max_train_samples": 32,
+  "max_validation_samples": 16
+}

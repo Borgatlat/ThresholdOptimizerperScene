@@ -1,0 +1,98 @@
+
+[per_scene_structure/paper] h24
+  holdout acc=0.9716  cost=832.66ms  speedup=1.52x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 0.9974, 'K1': 0.9796, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9588, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.7914, 'K2@initial[2]': 0.9397, 'K6@specialized[K0:coupe][0]': 0.999, 'K3@specialized[K0:coupe][1]': 0.0, 'K2@specialized[K0:coupe][2]': 0.2872, 'K3@specialized[K0:suv][1]': 0.5286, 'K2@specialized[K0:suv][2]': 0.8869, 'K6@specialized[K1:coupe][0]': 0.0}
+
+[per_scene_structure/paper] h08
+  holdout acc=0.9142  cost=2438.22ms  speedup=1.21x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 0.9989, 'K1': 0.9697, 'K2': 0.9, 'K3': 0.9, 'K4': 0.95, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.7705, 'K2@initial[2]': 0.9995, 'K6@specialized[K0:coupe][0]': 0.9987, 'K3@specialized[K0:coupe][1]': 0.5126, 'K2@specialized[K0:coupe][2]': 0.4447, 'K4@specialized[K0:suv][0]': 0.5812, 'K3@specialized[K0:suv][1]': 0.0, 'K2@specialized[K0:suv][2]': 0.0, 'K6@specialized[K1:coupe][0]': 0.9598, 'K4@specialized[K1:suv][0]': 0.0}
+
+[per_scene_structure/paper] s31
+  holdout acc=0.7881  cost=4316.63ms  speedup=1.04x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 0.9916, 'K1': 0.8087, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9549, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.8812, 'K2@initial[2]': 0.9223, 'K6@specialized[K0:coupe][0]': 0.9858, 'K2@specialized[K0:coupe][1]': 0.9985, 'K3@specialized[K0:coupe][2]': 0.4685, 'K5@specialized[K0:coupe][3]': 0.5098, 'K2@specialized[K0:suv][1]': 0.6016, 'K3@specialized[K0:suv][2]': 0.4395, 'K6@specialized[K1:coupe][0]': 0.5903, 'K5@specialized[K1:coupe][1]': 0.0}
+
+[per_scene_structure/paper] a06
+  holdout acc=0.7109  cost=4348.15ms  speedup=0.87x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 1.0, 'K1': 0.8837, 'K2': 0.9, 'K3': 0.9, 'K4': 0.6159, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.911, 'K2@initial[2]': 0.8853, 'K6@specialized[K0:coupe][0]': 0.0, 'K3@specialized[K0:coupe][1]': 0.6138, 'K2@specialized[K0:suv][1]': 0.0, 'K3@specialized[K0:suv][2]': 0.0, 'K6@specialized[K1:coupe][0]': 0.0}
+
+[per_scene_structure/paper] i29
+  holdout acc=0.7392  cost=5682.93ms  speedup=1.05x  layout=['K0', 'K2', 'K3', 'K1', 'detector']
+  thresholds={'K0': 0.969, 'K1': 0.942, 'K2': 0.9, 'K3': 0.9, 'K4': 0.95, 'K5': 0.95, 'K6': 0.95, 'K2@initial[1]': 0.9896, 'K3@initial[2]': 0.8459, 'K6@specialized[K0:coupe][0]': 0.7518, 'K2@specialized[K0:coupe][1]': 0.7146, 'K3@specialized[K0:coupe][2]': 0.4164, 'K4@specialized[K0:suv][0]': 0.9986, 'K3@specialized[K0:suv][1]': 0.6883, 'K2@specialized[K0:suv][2]': 0.0, 'K6@specialized[K1:coupe][0]': 0.6446, 'K4@specialized[K1:suv][0]': 0.0}
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\scene_threshold_bank_paper.json
+Wrote checkpoints\scene_threshold_bank_paper.json
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\per_scene_structure_paper\summary.json
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\scene_threshold_bank_per_scene_structure_paper.json
+
+[shared_h24_structure/paper] synthesizing frozen h24 layout...
+  frozen layout: ['K0', 'K3', 'K2', 'K1', 'detector']
+
+[shared_h24_structure/paper] h24
+  holdout acc=0.9716  cost=832.66ms  speedup=1.52x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 0.9974, 'K1': 0.9796, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9588, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.7914, 'K2@initial[2]': 0.9397, 'K6@specialized[K0:coupe][0]': 0.999, 'K3@specialized[K0:coupe][1]': 0.0, 'K2@specialized[K0:coupe][2]': 0.2872, 'K3@specialized[K0:suv][1]': 0.5286, 'K2@specialized[K0:suv][2]': 0.8869, 'K6@specialized[K1:coupe][0]': 0.0}
+
+[shared_h24_structure/paper] h08
+  holdout acc=0.9159  cost=2370.91ms  speedup=1.24x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 0.9967, 'K1': 0.9789, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9597, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.7705, 'K2@initial[2]': 0.993, 'K6@specialized[K0:coupe][0]': 0.966, 'K3@specialized[K0:coupe][1]': 0.0, 'K2@specialized[K0:coupe][2]': 0.5932, 'K3@specialized[K0:suv][1]': 0.2607, 'K2@specialized[K0:suv][2]': 0.9953, 'K6@specialized[K1:coupe][0]': 0.0}
+
+[shared_h24_structure/paper] s31
+  holdout acc=0.7851  cost=4116.51ms  speedup=1.10x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 1.0, 'K1': 0.8424, 'K2': 0.9, 'K3': 0.9, 'K4': 0.7815, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.7956, 'K2@initial[2]': 0.9741, 'K6@specialized[K0:coupe][0]': 0.8814, 'K3@specialized[K0:coupe][1]': 0.4901, 'K2@specialized[K0:coupe][2]': 0.8498, 'K3@specialized[K0:suv][1]': 1.0, 'K2@specialized[K0:suv][2]': 0.6624, 'K6@specialized[K1:coupe][0]': 0.7735}
+
+[shared_h24_structure/paper] a06
+  holdout acc=0.7138  cost=4456.43ms  speedup=0.85x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 0.9974, 'K1': 0.9983, 'K2': 0.9, 'K3': 0.9, 'K4': 0.8641, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.9319, 'K2@initial[2]': 0.8092, 'K6@specialized[K0:coupe][0]': 0.7611, 'K3@specialized[K0:coupe][1]': 0.9, 'K2@specialized[K0:coupe][2]': 0.4683, 'K3@specialized[K0:suv][1]': 0.9319, 'K2@specialized[K0:suv][2]': 0.9093, 'K6@specialized[K1:coupe][0]': 0.9773}
+
+[shared_h24_structure/paper] i29
+  holdout acc=0.7378  cost=5732.14ms  speedup=1.04x  layout=['K0', 'K3', 'K2', 'K1', 'detector']
+  thresholds={'K0': 0.95, 'K1': 0.942, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9968, 'K5': 0.95, 'K6': 0.95, 'K3@initial[1]': 0.9, 'K2@initial[2]': 0.9951, 'K6@specialized[K0:coupe][0]': 0.0, 'K3@specialized[K0:coupe][1]': 0.8742, 'K2@specialized[K0:coupe][2]': 0.9755, 'K3@specialized[K0:suv][1]': 0.0, 'K2@specialized[K0:suv][2]': 0.358, 'K6@specialized[K1:coupe][0]': 1.0}
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\shared_h24_structure_paper\summary.json
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\scene_threshold_bank_shared_h24_structure_paper.json
+
+[per_scene_structure/trained] h24
+  holdout acc=0.9323  cost=8.82ms  speedup=1.47x  layout=['K0', 'K3', 'detector']
+  thresholds={'K0': 0.9454, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9045, 'K5': 0.95, 'K6': 0.9395, 'K3@initial[1]': 0.3124, 'K3@specialized[K0:coupe][1]': 0.603, 'K3@specialized[K0:suv][1]': 0.5286}
+
+[per_scene_structure/trained] h08
+  holdout acc=0.7619  cost=15.84ms  speedup=1.30x  layout=['K0', 'detector']
+  thresholds={'K0': 0.7419, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9997, 'K5': 0.95, 'K6': 0.977, 'K3@specialized[K0:coupe][1]': 0.0, 'K3@specialized[K0:suv][1]': 0.0}
+
+[per_scene_structure/trained] s31
+  holdout acc=0.4929  cost=23.19ms  speedup=1.05x  layout=['K0', 'detector']
+  thresholds={'K0': 0.9383, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9, 'K4': 0.8955, 'K5': 0.95, 'K6': 0.926, 'K2@specialized[K0:coupe][1]': 0.9985, 'K2@specialized[K0:suv][1]': 0.8763}
+
+[per_scene_structure/trained] a06
+  holdout acc=0.3425  cost=9.46ms  speedup=2.89x  layout=['K0', 'detector']
+  thresholds={'K0': 0.8589, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9214, 'K4': 0.0, 'K5': 0.95, 'K6': 0.0}
+
+[per_scene_structure/trained] i29
+  holdout acc=0.2532  cost=15.47ms  speedup=1.63x  layout=['K0', 'detector']
+  thresholds={'K0': 0.0, 'K1': 0.95, 'K2': 1.0, 'K3': 0.9, 'K4': 0.909, 'K5': 0.95, 'K6': 1.0}
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\scene_threshold_bank_trained.json
+Wrote checkpoints\scene_threshold_bank_trained.json
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\per_scene_structure_trained\summary.json
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\scene_threshold_bank_per_scene_structure_trained.json
+
+[shared_h24_structure/trained] synthesizing frozen h24 layout...
+  frozen layout: ['K0', 'K3', 'detector']
+
+[shared_h24_structure/trained] h24
+  holdout acc=0.9323  cost=8.82ms  speedup=1.47x  layout=['K0', 'K3', 'detector']
+  thresholds={'K0': 0.9454, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9045, 'K5': 0.95, 'K6': 0.9395, 'K3@initial[1]': 0.3124, 'K3@specialized[K0:coupe][1]': 0.603, 'K3@specialized[K0:suv][1]': 0.5286}
+
+[shared_h24_structure/trained] h08
+  holdout acc=0.7634  cost=10.64ms  speedup=1.95x  layout=['K0', 'K3', 'detector']
+  thresholds={'K0': 0.9177, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9, 'K4': 0.9406, 'K5': 0.95, 'K6': 0.9143, 'K3@initial[1]': 0.0, 'K3@specialized[K0:coupe][1]': 0.0, 'K3@specialized[K0:suv][1]': 0.0}
+
+[shared_h24_structure/trained] s31
+  holdout acc=0.4937  cost=11.90ms  speedup=2.24x  layout=['K0', 'K3', 'detector']
+  thresholds={'K0': 0.9521, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9, 'K4': 0.88, 'K5': 0.95, 'K6': 0.8939, 'K3@initial[1]': 0.0, 'K3@specialized[K0:coupe][1]': 0.0, 'K3@specialized[K0:suv][1]': 0.0}
+
+[shared_h24_structure/trained] a06
+  holdout acc=0.4110  cost=11.87ms  speedup=2.12x  layout=['K0', 'K3', 'detector']
+  thresholds={'K0': 0.9924, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9, 'K4': 0.0, 'K5': 0.95, 'K6': 0.5, 'K3@initial[1]': 0.4222, 'K3@specialized[K0:coupe][1]': 0.9319, 'K3@specialized[K0:suv][1]': 1.0}
+
+[shared_h24_structure/trained] i29
+  holdout acc=0.2613  cost=5.96ms  speedup=5.28x  layout=['K0', 'K3', 'detector']
+  thresholds={'K0': 0.0, 'K1': 0.95, 'K2': 0.9, 'K3': 0.9, 'K4': 0.8981, 'K5': 0.95, 'K6': 0.0, 'K3@initial[1]': 1.0, 'K3@specialized[K0:coupe][1]': 0.0, 'K3@specialized[K0:suv][1]': 0.2314}
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\shared_h24_structure_trained\summary.json
+Wrote C:\Users\TheSandwichCoder\Documents\GitHub\ThresholdOptimizerperScene\checkpoints\threshold_experiments_per_position_rerun\per_scene_thresholds\scene_threshold_bank_shared_h24_structure_trained.json

@@ -1,0 +1,54 @@
+{
+  "description": "Publication figures for threshold-optimizer experiments.",
+  "focus": [
+    "accuracy",
+    "expected_cost_ms",
+    "speedup"
+  ],
+  "figures": [
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig0_main_summary.png",
+      "name": "fig0_main_summary.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig1_layouts_accuracy_cost.png",
+      "name": "fig1_layouts_accuracy_cost.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig2_layouts_pareto.png",
+      "name": "fig2_layouts_pareto.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig3_layouts_speedup.png",
+      "name": "fig3_layouts_speedup.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig4_targets_accuracy_cost.png",
+      "name": "fig4_targets_accuracy_cost.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig5_scenes_trained_kdet.png",
+      "name": "fig5_scenes_trained_kdet.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig6_transfer_zero_shot_vs_retune.png",
+      "name": "fig6_transfer_zero_shot_vs_retune.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig7_layouts_by_scene_heatmaps.png",
+      "name": "fig7_layouts_by_scene_heatmaps.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig8_search_settings.png",
+      "name": "fig8_search_settings.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig9_per_scene_thresholds.png",
+      "name": "fig9_per_scene_thresholds.png"
+    },
+    {
+      "file": "checkpoints/figures/threshold_experiments/fig10_per_scene_threshold_values.png",
+      "name": "fig10_per_scene_threshold_values.png"
+    }
+  ]
+}

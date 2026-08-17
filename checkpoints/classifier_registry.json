@@ -1,0 +1,484 @@
+{
+  "classifiers": [
+    {
+      "name": "K0",
+      "level": "intermediate",
+      "class_names": [
+        "suv",
+        "coupe",
+        "background"
+      ],
+      "runtime_ms": 1.966572997334879,
+      "wcet_ms": 3.344600001582876,
+      "p_idk": 0.2917516428733288,
+      "p_correct": 0.9169499206888738,
+      "confusion_matrix": [
+        [
+          3917,
+          122,
+          23
+        ],
+        [
+          401,
+          3121,
+          162
+        ],
+        [
+          9,
+          16,
+          1055
+        ]
+      ],
+      "allowed_next": {
+        "IDK": [
+          "K1",
+          "K2",
+          "K3",
+          "Kdet"
+        ],
+        "suv": [
+          "K4",
+          "K2",
+          "K3",
+          "Kdet"
+        ],
+        "coupe": [
+          "K5",
+          "K6",
+          "K2",
+          "K3",
+          "Kdet"
+        ],
+        "background": [
+          "Kdet"
+        ]
+      },
+      "threshold_hi": 0.95,
+      "loss_key": "weighted_ce",
+      "modality": "both",
+      "num_params": 141379,
+      "checkpoint": "K0.pt",
+      "macro_f1": 0.9141198979229795,
+      "p_success": 0.9169499206888738
+    },
+    {
+      "name": "K1",
+      "level": "intermediate",
+      "class_names": [
+        "suv",
+        "coupe",
+        "background"
+      ],
+      "runtime_ms": 8.791406999807805,
+      "wcet_ms": 24.52199999243021,
+      "p_idk": 0.6093360525719466,
+      "p_correct": 0.9341717652390664,
+      "confusion_matrix": [
+        [
+          3867,
+          147,
+          48
+        ],
+        [
+          208,
+          3320,
+          156
+        ],
+        [
+          4,
+          18,
+          1058
+        ]
+      ],
+      "allowed_next": {
+        "IDK": [
+          "K0",
+          "K2",
+          "K3",
+          "Kdet"
+        ],
+        "suv": [
+          "K4",
+          "K2",
+          "K3",
+          "Kdet"
+        ],
+        "coupe": [
+          "K5",
+          "K6",
+          "K2",
+          "K3",
+          "Kdet"
+        ],
+        "background": [
+          "Kdet"
+        ]
+      },
+      "threshold_hi": 0.95,
+      "loss_key": "focal",
+      "modality": "both",
+      "num_params": 354827,
+      "checkpoint": "K1.pt",
+      "macro_f1": 0.9265724979492346,
+      "p_success": 0.9341717652390664
+    },
+    {
+      "name": "K2",
+      "level": "global",
+      "class_names": [
+        "gle350",
+        "cx30",
+        "mustang",
+        "miata",
+        "background"
+      ],
+      "runtime_ms": 6.711494000046514,
+      "wcet_ms": 8.73840000713244,
+      "p_idk": 0.4251076365284387,
+      "p_correct": 0.8420575572173125,
+      "confusion_matrix": [
+        [
+          1952,
+          77,
+          57,
+          55,
+          13
+        ],
+        [
+          98,
+          1630,
+          103,
+          57,
+          20
+        ],
+        [
+          35,
+          126,
+          1424,
+          123,
+          128
+        ],
+        [
+          12,
+          33,
+          327,
+          1379,
+          97
+        ],
+        [
+          0,
+          5,
+          18,
+          10,
+          1047
+        ]
+      ],
+      "allowed_next": {
+        "IDK": [
+          "K0",
+          "K1",
+          "K3",
+          "K4",
+          "K5",
+          "K6",
+          "Kdet"
+        ],
+        "gle350": [
+          "Kdet"
+        ],
+        "cx30": [
+          "Kdet"
+        ],
+        "mustang": [
+          "Kdet"
+        ],
+        "miata": [
+          "Kdet"
+        ],
+        "background": [
+          "Kdet"
+        ]
+      },
+      "threshold_hi": 0.9,
+      "loss_key": "weighted_ce",
+      "modality": "both",
+      "num_params": 141637,
+      "checkpoint": "K2.pt",
+      "macro_f1": 0.8419634781586083,
+      "p_success": 0.8420575572173125
+    },
+    {
+      "name": "K3",
+      "level": "global",
+      "class_names": [
+        "gle350",
+        "cx30",
+        "mustang",
+        "miata",
+        "background"
+      ],
+      "runtime_ms": 12.67557300219778,
+      "wcet_ms": 122.24950001109391,
+      "p_idk": 0.1512576478585996,
+      "p_correct": 0.9389304328121459,
+      "confusion_matrix": [
+        [
+          2108,
+          23,
+          8,
+          7,
+          8
+        ],
+        [
+          19,
+          1860,
+          23,
+          4,
+          2
+        ],
+        [
+          19,
+          37,
+          1563,
+          147,
+          70
+        ],
+        [
+          1,
+          20,
+          73,
+          1681,
+          73
+        ],
+        [
+          0,
+          3,
+          1,
+          1,
+          1075
+        ]
+      ],
+      "allowed_next": {
+        "IDK": [
+          "K0",
+          "K1",
+          "K2",
+          "K4",
+          "K5",
+          "K6",
+          "Kdet"
+        ],
+        "gle350": [
+          "Kdet"
+        ],
+        "cx30": [
+          "Kdet"
+        ],
+        "mustang": [
+          "Kdet"
+        ],
+        "miata": [
+          "Kdet"
+        ],
+        "background": [
+          "Kdet"
+        ]
+      },
+      "threshold_hi": 0.9,
+      "loss_key": "focal",
+      "modality": "both",
+      "num_params": 1218173,
+      "checkpoint": "K3.pt",
+      "macro_f1": 0.9362981940989548,
+      "p_success": 0.9389304328121459
+    },
+    {
+      "name": "K4",
+      "level": "specialized_suv",
+      "class_names": [
+        "gle350",
+        "cx30"
+      ],
+      "runtime_ms": 2.264197000185959,
+      "wcet_ms": 2.9414999880827963,
+      "p_idk": 0.2291974396848843,
+      "p_correct": 0.94903988183161,
+      "confusion_matrix": [
+        [
+          2058,
+          96
+        ],
+        [
+          111,
+          1797
+        ]
+      ],
+      "allowed_next": {
+        "IDK": [
+          "K2",
+          "K3",
+          "Kdet"
+        ],
+        "gle350": [
+          "Kdet"
+        ],
+        "cx30": [
+          "Kdet"
+        ]
+      },
+      "threshold_hi": 0.95,
+      "loss_key": "weighted_ce",
+      "modality": "mic",
+      "num_params": 37858,
+      "checkpoint": "K4.pt",
+      "macro_f1": 0.9488286164512388,
+      "p_success": 0.94903988183161
+    },
+    {
+      "name": "K5",
+      "level": "specialized_coupe",
+      "class_names": [
+        "mustang",
+        "miata"
+      ],
+      "runtime_ms": 2.300529997155536,
+      "wcet_ms": 7.83619997673668,
+      "p_idk": 0.8650922909880565,
+      "p_correct": 0.8553203040173725,
+      "confusion_matrix": [
+        [
+          1691,
+          145
+        ],
+        [
+          388,
+          1460
+        ]
+      ],
+      "allowed_next": {
+        "IDK": [
+          "K2",
+          "K3",
+          "K6",
+          "Kdet"
+        ],
+        "mustang": [
+          "Kdet"
+        ],
+        "miata": [
+          "Kdet"
+        ]
+      },
+      "threshold_hi": 0.95,
+      "loss_key": "focal",
+      "modality": "mic",
+      "num_params": 37858,
+      "checkpoint": "K5.pt",
+      "macro_f1": 0.8547492157965809,
+      "p_success": 0.8553203040173725
+    },
+    {
+      "name": "K6",
+      "level": "specialized_coupe",
+      "class_names": [
+        "mustang",
+        "miata"
+      ],
+      "runtime_ms": 1.8817610014230013,
+      "wcet_ms": 2.8609000146389008,
+      "p_idk": 0.31650380021715524,
+      "p_correct": 0.8797502714440825,
+      "confusion_matrix": [
+        [
+          1604,
+          232
+        ],
+        [
+          211,
+          1637
+        ]
+      ],
+      "allowed_next": {
+        "IDK": [
+          "K2",
+          "K3",
+          "K5",
+          "Kdet"
+        ],
+        "mustang": [
+          "Kdet"
+        ],
+        "miata": [
+          "Kdet"
+        ]
+      },
+      "threshold_hi": 0.95,
+      "loss_key": "weighted_ce",
+      "modality": "both",
+      "num_params": 141250,
+      "checkpoint": "K6.pt",
+      "macro_f1": 0.8797406218823152,
+      "p_success": 0.8797502714440825
+    },
+    {
+      "name": "Kdet",
+      "level": "deterministic",
+      "class_names": [
+        "gle350",
+        "cx30",
+        "mustang",
+        "miata",
+        "background"
+      ],
+      "runtime_ms": 28.28079699887894,
+      "wcet_ms": 144.39010003115982,
+      "p_idk": 0.0,
+      "p_correct": 0.9401767505098573,
+      "confusion_matrix": [
+        [
+          2117,
+          14,
+          11,
+          2,
+          10
+        ],
+        [
+          27,
+          1832,
+          40,
+          4,
+          5
+        ],
+        [
+          23,
+          34,
+          1642,
+          69,
+          68
+        ],
+        [
+          5,
+          23,
+          109,
+          1636,
+          75
+        ],
+        [
+          1,
+          2,
+          5,
+          1,
+          1071
+        ]
+      ],
+      "allowed_next": {},
+      "threshold_hi": null,
+      "loss_key": "weighted_ce",
+      "modality": "both",
+      "num_params": 4500869,
+      "checkpoint": "Kdet.pt",
+      "macro_f1": 0.9375320985544662,
+      "p_success": 0.9401767505098573
+    }
+  ]
+}

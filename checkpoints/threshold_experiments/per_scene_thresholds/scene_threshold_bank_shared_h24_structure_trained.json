@@ -1,0 +1,70 @@
+{
+  "description": "Per-scene optimized IDK thresholds for M3N-VC. mode=shared_h24_structure, detector_mode=trained, target=each scene's baseline validation accuracy.",
+  "detector_mode": "trained",
+  "mode": "shared_h24_structure",
+  "notes": "i22 omitted from optimization (no usable single-label outcomes). Unused Ki slots filled with registry default thresholds. Keys are scene_id, not sensor_id.",
+  "scene_ids": [
+    "h24",
+    "h08",
+    "s31",
+    "a06",
+    "i29",
+    "i22"
+  ],
+  "threshold_bank": {
+    "a06": {
+      "K0": 0.9942390553805293,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.0,
+      "K4": 0.5717249524836637,
+      "K5": 0.95,
+      "K6": 0.7487083235565497
+    },
+    "h08": {
+      "K0": 0.9465644031154866,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.0,
+      "K4": 0.9158859508378165,
+      "K5": 0.95,
+      "K6": 0.7976272227812786
+    },
+    "h24": {
+      "K0": 0.90748188325337,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.6029707193374634,
+      "K4": 0.9303704925945827,
+      "K5": 0.95,
+      "K6": 0.8820360813822065
+    },
+    "i22": {
+      "K0": 0.0,
+      "K1": 0.0,
+      "K2": 0.0,
+      "K3": 0.0,
+      "K4": 0.0,
+      "K5": 0.0,
+      "K6": 0.0
+    },
+    "i29": {
+      "K0": 0.0,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.0,
+      "K4": 0.8981400728225708,
+      "K5": 0.95,
+      "K6": 0.0
+    },
+    "s31": {
+      "K0": 0.9584658109411901,
+      "K1": 0.95,
+      "K2": 0.9,
+      "K3": 0.0,
+      "K4": 0.7560025319761159,
+      "K5": 0.95,
+      "K6": 0.9344999194145203
+    }
+  }
+}

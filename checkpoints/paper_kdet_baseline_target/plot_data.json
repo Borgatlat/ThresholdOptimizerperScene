@@ -1,0 +1,575 @@
+{
+  "reports_dir": "checkpoints\\paper_kdet_baseline_target",
+  "scenes": {
+    "a06": {
+      "policies": {
+        "annealed": {
+          "holdout": {
+            "accuracy": 0.6600306278713629,
+            "expected_cost": 3636.6059169987857,
+            "route_percent": {
+              "K2": 0.8039816232771823,
+              "K3": 47.49234303215926,
+              "K4": 15.524502297090352,
+              "detector": 36.1791730474732
+            },
+            "thresholds": {
+              "K0": 0.9969136447322612,
+              "K1": 0.998279094696045,
+              "K2@initial[2]": 0.9315408723694937,
+              "K2@specialized[K0:suv][1]": 0.7153732813134486,
+              "K3@initial[1]": 0.8893409310554972,
+              "K3@specialized[K0:coupe][1]": 0.0,
+              "K3@specialized[K0:suv][2]": 0.5401463691069155,
+              "K4": 0.0,
+              "K6@specialized[K0:coupe][0]": 0.0,
+              "K6@specialized[K1:coupe][0]": 0.8110414013570668
+            }
+          },
+          "validation": {
+            "accuracy": 0.7681152483966689,
+            "expected_cost": 4915.660404085524,
+            "route_percent": {
+              "K2": 6.312817076672729,
+              "K3": 28.410069876519575,
+              "K4": 16.310902651478894,
+              "K6": 0.01914425193835551,
+              "detector": 48.947066143390444
+            },
+            "thresholds": {
+              "K0": 0.9969136447322612,
+              "K1": 0.998279094696045,
+              "K2@initial[2]": 0.9315408723694937,
+              "K2@specialized[K0:suv][1]": 0.7153732813134486,
+              "K3@initial[1]": 0.8893409310554972,
+              "K3@specialized[K0:coupe][1]": 0.0,
+              "K3@specialized[K0:suv][2]": 0.5401463691069155,
+              "K4": 0.0,
+              "K6@specialized[K0:coupe][0]": 0.0,
+              "K6@specialized[K1:coupe][0]": 0.8110414013570668
+            }
+          }
+        },
+        "baseline": {
+          "holdout": {
+            "accuracy": 0.6464395099540582,
+            "expected_cost": 3773.391242623302,
+            "route_percent": {
+              "K0": 0.01914241960183767,
+              "K1": 0.09571209800918837,
+              "K2": 2.8330781010719757,
+              "K3": 44.104134762634,
+              "K4": 15.141653905053598,
+              "K6": 0.2679938744257274,
+              "detector": 37.538284839203676
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[2]": 0.9,
+              "K2@specialized[K0:suv][1]": 0.9,
+              "K3@initial[1]": 0.9,
+              "K3@specialized[K0:coupe][1]": 0.9,
+              "K3@specialized[K0:suv][2]": 0.9,
+              "K4": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          },
+          "validation": {
+            "accuracy": 0.7665837082416005,
+            "expected_cost": 5072.113651228961,
+            "route_percent": {
+              "K0": 0.09093519670718866,
+              "K1": 0.33981047190581026,
+              "K2": 13.34354360103379,
+              "K3": 23.724514214607066,
+              "K4": 11.649277304489328,
+              "K6": 0.33023834593663254,
+              "detector": 50.521680865320185
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[2]": 0.9,
+              "K2@specialized[K0:suv][1]": 0.9,
+              "K3@initial[1]": 0.9,
+              "K3@specialized[K0:coupe][1]": 0.9,
+              "K3@specialized[K0:suv][2]": 0.9,
+              "K4": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          }
+        }
+      },
+      "target_accuracy": 0.7665837082416005,
+      "target_accuracy_source": "baseline_validation"
+    },
+    "h08": {
+      "policies": {
+        "annealed": {
+          "holdout": {
+            "accuracy": 0.9152144772117963,
+            "expected_cost": 2335.6750559353254,
+            "route_percent": {
+              "K1": 0.03351206434316354,
+              "K2": 0.05026809651474531,
+              "K3": 76.35723860589812,
+              "K4": 0.35187667560321717,
+              "K6": 0.03351206434316354,
+              "detector": 23.173592493297587
+            },
+            "thresholds": {
+              "K0": 1.0000000000000002,
+              "K1": 0.9697120359965733,
+              "K2@initial[2]": 0.9972176916745245,
+              "K2@specialized[K0:coupe][2]": 0.995337536140364,
+              "K2@specialized[K0:suv][2]": 0.6972254891784824,
+              "K3@initial[1]": 0.7474969455174038,
+              "K3@specialized[K0:coupe][1]": 1.0000000000000002,
+              "K3@specialized[K0:suv][1]": 1.0000000000000002,
+              "K4@specialized[K0:suv][0]": 0.9537570792801526,
+              "K4@specialized[K1:suv][0]": 0.7257859816356581,
+              "K6@specialized[K0:coupe][0]": 1.0000000000000002,
+              "K6@specialized[K1:coupe][0]": 0.9598111327813597
+            }
+          },
+          "validation": {
+            "accuracy": 0.9070994764397906,
+            "expected_cost": 2816.9890729863014,
+            "route_percent": {
+              "K1": 0.008376963350785341,
+              "K2": 0.07539267015706806,
+              "K3": 71.4261780104712,
+              "K4": 0.4774869109947644,
+              "K6": 0.033507853403141365,
+              "detector": 27.979057591623036
+            },
+            "thresholds": {
+              "K0": 1.0000000000000002,
+              "K1": 0.9697120359965733,
+              "K2@initial[2]": 0.9972176916745245,
+              "K2@specialized[K0:coupe][2]": 0.995337536140364,
+              "K2@specialized[K0:suv][2]": 0.6972254891784824,
+              "K3@initial[1]": 0.7474969455174038,
+              "K3@specialized[K0:coupe][1]": 1.0000000000000002,
+              "K3@specialized[K0:suv][1]": 1.0000000000000002,
+              "K4@specialized[K0:suv][0]": 0.9537570792801526,
+              "K4@specialized[K1:suv][0]": 0.7257859816356581,
+              "K6@specialized[K0:coupe][0]": 1.0000000000000002,
+              "K6@specialized[K1:coupe][0]": 0.9598111327813597
+            }
+          }
+        },
+        "baseline": {
+          "holdout": {
+            "accuracy": 0.9157171581769437,
+            "expected_cost": 2939.504323457822,
+            "route_percent": {
+              "K0": 1.6085790884718498,
+              "K1": 0.01675603217158177,
+              "K2": 4.272788203753351,
+              "K3": 31.300268096514746,
+              "K4": 19.453753351206434,
+              "K6": 14.10857908847185,
+              "detector": 29.239276139410187
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[2]": 0.9,
+              "K2@specialized[K0:coupe][2]": 0.9,
+              "K2@specialized[K0:suv][2]": 0.9,
+              "K3@initial[1]": 0.9,
+              "K3@specialized[K0:coupe][1]": 0.9,
+              "K3@specialized[K0:suv][1]": 0.9,
+              "K4@specialized[K0:suv][0]": 0.95,
+              "K4@specialized[K1:suv][0]": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          },
+          "validation": {
+            "accuracy": 0.9070994764397906,
+            "expected_cost": 3383.1691104226525,
+            "route_percent": {
+              "K0": 1.331937172774869,
+              "K1": 0.09633507853403141,
+              "K2": 4.464921465968587,
+              "K3": 29.047120418848166,
+              "K4": 19.179057591623035,
+              "K6": 12.213612565445025,
+              "detector": 33.66701570680628
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[2]": 0.9,
+              "K2@specialized[K0:coupe][2]": 0.9,
+              "K2@specialized[K0:suv][2]": 0.9,
+              "K3@initial[1]": 0.9,
+              "K3@specialized[K0:coupe][1]": 0.9,
+              "K3@specialized[K0:suv][1]": 0.9,
+              "K4@specialized[K0:suv][0]": 0.95,
+              "K4@specialized[K1:suv][0]": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          }
+        }
+      },
+      "target_accuracy": 0.9070994764397906,
+      "target_accuracy_source": "baseline_validation"
+    },
+    "h24": {
+      "policies": {
+        "annealed": {
+          "holdout": {
+            "accuracy": 0.9690322580645161,
+            "expected_cost": 840.2848760754816,
+            "route_percent": {
+              "K2": 1.032258064516129,
+              "K3": 75.35483870967742,
+              "K4": 9.612903225806452,
+              "K6": 5.741935483870968,
+              "detector": 8.258064516129032
+            },
+            "thresholds": {
+              "K0": 0.9996232305254255,
+              "K1": 0.999854564666748,
+              "K2@initial[2]": 0.8976777281079973,
+              "K2@specialized[K0:coupe][2]": 0.9884414332253593,
+              "K2@specialized[K0:suv][2]": 0.9297523072787693,
+              "K3@initial[1]": 0.7913912534713745,
+              "K3@specialized[K0:coupe][1]": 0.5286086031368801,
+              "K3@specialized[K0:suv][1]": 0.5286086031368801,
+              "K4": 0.9588181291307721,
+              "K6@specialized[K0:coupe][0]": 0.9990090131759644,
+              "K6@specialized[K1:coupe][0]": 0.9999547004699707
+            }
+          },
+          "validation": {
+            "accuracy": 0.9654615881213686,
+            "expected_cost": 874.760409180105,
+            "route_percent": {
+              "K2": 0.9199483537766301,
+              "K3": 75.22595222724338,
+              "K4": 9.764364105874758,
+              "K6": 5.487411233053583,
+              "detector": 8.602324080051647
+            },
+            "thresholds": {
+              "K0": 0.9996232305254255,
+              "K1": 0.999854564666748,
+              "K2@initial[2]": 0.8976777281079973,
+              "K2@specialized[K0:coupe][2]": 0.9884414332253593,
+              "K2@specialized[K0:suv][2]": 0.9297523072787693,
+              "K3@initial[1]": 0.7913912534713745,
+              "K3@specialized[K0:coupe][1]": 0.5286086031368801,
+              "K3@specialized[K0:suv][1]": 0.5286086031368801,
+              "K4": 0.9588181291307721,
+              "K6@specialized[K0:coupe][0]": 0.9990090131759644,
+              "K6@specialized[K1:coupe][0]": 0.9999547004699707
+            }
+          }
+        },
+        "baseline": {
+          "holdout": {
+            "accuracy": 0.9690322580645161,
+            "expected_cost": 1268.7927718555352,
+            "route_percent": {
+              "K0": 0.5161290322580645,
+              "K2": 1.2903225806451613,
+              "K3": 29.806451612903224,
+              "K4": 34.064516129032256,
+              "K6": 21.741935483870968,
+              "detector": 12.580645161290322
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[2]": 0.9,
+              "K2@specialized[K0:coupe][2]": 0.9,
+              "K2@specialized[K0:suv][2]": 0.9,
+              "K3@initial[1]": 0.9,
+              "K3@specialized[K0:coupe][1]": 0.9,
+              "K3@specialized[K0:suv][1]": 0.9,
+              "K4": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          },
+          "validation": {
+            "accuracy": 0.9654615881213686,
+            "expected_cost": 1277.9577352016718,
+            "route_percent": {
+              "K0": 0.500322788896062,
+              "K2": 1.5816655907036798,
+              "K3": 31.601032924467397,
+              "K4": 33.505487411233055,
+              "K6": 20.142027114267268,
+              "detector": 12.669464170432537
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[2]": 0.9,
+              "K2@specialized[K0:coupe][2]": 0.9,
+              "K2@specialized[K0:suv][2]": 0.9,
+              "K3@initial[1]": 0.9,
+              "K3@specialized[K0:coupe][1]": 0.9,
+              "K3@specialized[K0:suv][1]": 0.9,
+              "K4": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          }
+        }
+      },
+      "target_accuracy": 0.9654615881213686,
+      "target_accuracy_source": "baseline_validation"
+    },
+    "i29": {
+      "policies": {
+        "annealed": {
+          "holdout": {
+            "accuracy": 0.7343720491029273,
+            "expected_cost": 5622.798401811538,
+            "route_percent": {
+              "K0": 8.772426817752597,
+              "K1": 0.4438149197355996,
+              "K2": 4.910292728989613,
+              "K3": 24.523135033050046,
+              "K4": 0.3777148253068933,
+              "K6": 4.976392823418319,
+              "detector": 55.99622285174693
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.9420359171166711,
+              "K2@initial[1]": 0.9950627295338378,
+              "K2@specialized[K0:coupe][1]": 0.8557547343020536,
+              "K2@specialized[K0:suv][2]": 0.3579635565378228,
+              "K3@initial[2]": 0.8875080298404304,
+              "K3@specialized[K0:coupe][2]": 0.37882513537698864,
+              "K3@specialized[K0:suv][1]": 0.6747536440284885,
+              "K4@specialized[K0:suv][0]": 0.9997308388048288,
+              "K4@specialized[K1:suv][0]": 0.6155330149494872,
+              "K6@specialized[K0:coupe][0]": 0.8549750301302695,
+              "K6@specialized[K1:coupe][0]": 0.9365458257344305
+            }
+          },
+          "validation": {
+            "accuracy": 0.7274615802270957,
+            "expected_cost": 4922.29745474478,
+            "route_percent": {
+              "K0": 4.919619461296947,
+              "K1": 0.6043294539788957,
+              "K2": 5.927622105238309,
+              "K3": 30.28493189490333,
+              "K4": 0.6822312976558627,
+              "K6": 8.583366776044002,
+              "detector": 48.99789901088265
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.9420359171166711,
+              "K2@initial[1]": 0.9950627295338378,
+              "K2@specialized[K0:coupe][1]": 0.8557547343020536,
+              "K2@specialized[K0:suv][2]": 0.3579635565378228,
+              "K3@initial[2]": 0.8875080298404304,
+              "K3@specialized[K0:coupe][2]": 0.37882513537698864,
+              "K3@specialized[K0:suv][1]": 0.6747536440284885,
+              "K4@specialized[K0:suv][0]": 0.9997308388048288,
+              "K4@specialized[K1:suv][0]": 0.6155330149494872,
+              "K6@specialized[K0:coupe][0]": 0.8549750301302695,
+              "K6@specialized[K1:coupe][0]": 0.9365458257344305
+            }
+          }
+        },
+        "baseline": {
+          "holdout": {
+            "accuracy": 0.7398489140698773,
+            "expected_cost": 5971.264103134383,
+            "route_percent": {
+              "K0": 8.772426817752597,
+              "K1": 0.09442870632672333,
+              "K2": 9.036827195467422,
+              "K3": 11.406987724268177,
+              "K4": 6.732766761095373,
+              "K6": 4.457034938621341,
+              "detector": 59.49952785646837
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[1]": 0.9,
+              "K2@specialized[K0:coupe][1]": 0.9,
+              "K2@specialized[K0:suv][2]": 0.9,
+              "K3@initial[2]": 0.9,
+              "K3@specialized[K0:coupe][2]": 0.9,
+              "K3@specialized[K0:suv][1]": 0.9,
+              "K4@specialized[K0:suv][0]": 0.95,
+              "K4@specialized[K1:suv][0]": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          },
+          "validation": {
+            "accuracy": 0.7274615802270957,
+            "expected_cost": 5288.102326980758,
+            "route_percent": {
+              "K0": 4.919619461296947,
+              "K1": 0.26675479804537194,
+              "K2": 10.599372063926726,
+              "K3": 14.806071622482945,
+              "K4": 9.168810934586057,
+              "K6": 7.561200160525011,
+              "detector": 52.67817095913694
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[1]": 0.9,
+              "K2@specialized[K0:coupe][1]": 0.9,
+              "K2@specialized[K0:suv][2]": 0.9,
+              "K3@initial[2]": 0.9,
+              "K3@specialized[K0:coupe][2]": 0.9,
+              "K3@specialized[K0:suv][1]": 0.9,
+              "K4@specialized[K0:suv][0]": 0.95,
+              "K4@specialized[K1:suv][0]": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          }
+        }
+      },
+      "target_accuracy": 0.7274615802270957,
+      "target_accuracy_source": "baseline_validation"
+    },
+    "s31": {
+      "policies": {
+        "annealed": {
+          "holdout": {
+            "accuracy": 0.7755952380952381,
+            "expected_cost": 4009.843181892718,
+            "route_percent": {
+              "K0": 1.9444444444444444,
+              "K1": 0.15873015873015872,
+              "K2": 2.2817460317460316,
+              "K3": 49.38492063492063,
+              "K4": 0.9126984126984127,
+              "K6": 5.436507936507937,
+              "detector": 39.88095238095238
+            },
+            "thresholds": {
+              "K0": 0.9862541787478388,
+              "K1": 0.8772718261699287,
+              "K2@initial[2]": 0.9505509721989533,
+              "K2@specialized[K0:coupe][1]": 1.0000000000000002,
+              "K2@specialized[K0:suv][1]": 0.998507887733226,
+              "K3@initial[1]": 0.8412486521565185,
+              "K3@specialized[K0:coupe][2]": 0.0,
+              "K3@specialized[K0:suv][2]": 0.0,
+              "K4": 0.9991670506341117,
+              "K5@specialized[K0:coupe][3]": 0.9240873966898236,
+              "K5@specialized[K1:coupe][1]": 0.9656963628165576,
+              "K6@specialized[K0:coupe][0]": 0.9900974229890473,
+              "K6@specialized[K1:coupe][0]": 0.0
+            }
+          },
+          "validation": {
+            "accuracy": 0.7844032146046235,
+            "expected_cost": 4009.758556151324,
+            "route_percent": {
+              "K0": 2.192677845024308,
+              "K1": 0.2976485762476436,
+              "K2": 2.748288520686576,
+              "K3": 48.90366107748785,
+              "K4": 0.6250620101200516,
+              "K6": 5.352713562853458,
+              "detector": 39.879948407580116
+            },
+            "thresholds": {
+              "K0": 0.9862541787478388,
+              "K1": 0.8772718261699287,
+              "K2@initial[2]": 0.9505509721989533,
+              "K2@specialized[K0:coupe][1]": 1.0000000000000002,
+              "K2@specialized[K0:suv][1]": 0.998507887733226,
+              "K3@initial[1]": 0.8412486521565185,
+              "K3@specialized[K0:coupe][2]": 0.0,
+              "K3@specialized[K0:suv][2]": 0.0,
+              "K4": 0.9991670506341117,
+              "K5@specialized[K0:coupe][3]": 0.9240873966898236,
+              "K5@specialized[K1:coupe][1]": 0.9656963628165576,
+              "K6@specialized[K0:coupe][0]": 0.9900974229890473,
+              "K6@specialized[K1:coupe][0]": 0.0
+            }
+          }
+        },
+        "baseline": {
+          "holdout": {
+            "accuracy": 0.7867063492063492,
+            "expected_cost": 4505.314911567509,
+            "route_percent": {
+              "K0": 4.067460317460317,
+              "K2": 8.095238095238095,
+              "K3": 24.107142857142858,
+              "K4": 11.25,
+              "K5": 0.07936507936507936,
+              "K6": 7.5396825396825395,
+              "detector": 44.861111111111114
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[2]": 0.9,
+              "K2@specialized[K0:coupe][1]": 0.9,
+              "K2@specialized[K0:suv][1]": 0.9,
+              "K3@initial[1]": 0.9,
+              "K3@specialized[K0:coupe][2]": 0.9,
+              "K3@specialized[K0:suv][2]": 0.9,
+              "K4": 0.95,
+              "K5@specialized[K0:coupe][3]": 0.95,
+              "K5@specialized[K1:coupe][1]": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          },
+          "validation": {
+            "accuracy": 0.7843536065085822,
+            "expected_cost": 4466.115099386403,
+            "route_percent": {
+              "K0": 4.846710983232463,
+              "K1": 0.009921619208254788,
+              "K2": 8.760789760888978,
+              "K3": 23.955749578331183,
+              "K4": 10.020835400337335,
+              "K5": 0.03968647683301915,
+              "K6": 7.897608889770811,
+              "detector": 44.46869729139796
+            },
+            "thresholds": {
+              "K0": 0.95,
+              "K1": 0.95,
+              "K2@initial[2]": 0.9,
+              "K2@specialized[K0:coupe][1]": 0.9,
+              "K2@specialized[K0:suv][1]": 0.9,
+              "K3@initial[1]": 0.9,
+              "K3@specialized[K0:coupe][2]": 0.9,
+              "K3@specialized[K0:suv][2]": 0.9,
+              "K4": 0.95,
+              "K5@specialized[K0:coupe][3]": 0.95,
+              "K5@specialized[K1:coupe][1]": 0.95,
+              "K6@specialized[K0:coupe][0]": 0.95,
+              "K6@specialized[K1:coupe][0]": 0.95
+            }
+          }
+        }
+      },
+      "target_accuracy": 0.7843536065085822,
+      "target_accuracy_source": "baseline_validation"
+    }
+  }
+}
