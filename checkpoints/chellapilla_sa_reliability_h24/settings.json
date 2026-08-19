@@ -1,0 +1,28 @@
+{
+  "dataset": "m3n_vc/h24",
+  "detector_cost_ms": 10000.0,
+  "detector_mode": "paper",
+  "holdout_usage": "not_evaluated",
+  "layout_count": 5,
+  "layout_sampling": "uniform_over_legal_layouts_conditioned_on_minimum",
+  "layout_seed": 20260818,
+  "legal_layout_space_size": 11589085,
+  "minimum_distinct_non_detector_classifiers": 5,
+  "optimizer": {
+    "citation": "Chellapilla, Shilman, and Simard (DAS 2006)",
+    "continuous_thresholds": true,
+    "iterations": 1000,
+    "method": "chellapilla_continuous_gaussian_sa",
+    "post_sa_polisher": false,
+    "random_global_proposal": false,
+    "url": "https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/chellapilla_das06.pdf"
+  },
+  "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+  "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+  "partition": "validation",
+  "split_seed": 0,
+  "split_strategy": "blocked_per_run",
+  "target_accuracy": 0.9662,
+  "trial_count_per_layout": 1000,
+  "trial_seed_rule": "layout_index * 1000000 + trial_index"
+}

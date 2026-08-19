@@ -1044,6 +1044,140 @@ def coordinate_descent_thresholds(
     )
 
 
+def optimize_fixed_layout_thresholds_chellapilla_sa(
+    evaluator: FixedLayoutThresholdEvaluator,
+    target_accuracy: float = DEFAULT_TARGET_ACCURACY,
+    *,
+    n_iterations: int = 2_000,
+    random_seed: int = 0,
+    show_progress: bool = True,
+) -> dict:
+    """Continuous Gaussian SA based on Chellapilla, Shilman, and Simard.
+
+    The DAS 2006 algorithm starts with all rejection thresholds at one, moves
+    every threshold by a zero-mean Gaussian step, clips proposals to the valid
+    limits, rejects accuracy-constraint violations, and cools from ``N`` to
+    one threshold-index step.  In continuous confidence coordinates this is a
+    Gaussian standard deviation cooling geometrically from ``1`` to ``1/N``.
+
+    The paper normalizes classifier costs so the fastest stage has cost one.
+    We apply the same normalization for Metropolis acceptance.  It does not
+    specify the interpolation used for continuous cooling; geometric cooling
+    is used here so both endpoints are preserved without depending on units.
+    No grid, independent random proposal, or post-SA polish is used.
+    """
+    if not 0.0 <= target_accuracy <= 1.0:
+        raise ValueError("target_accuracy must be between 0 and 1.")
+    if n_iterations < 1:
+        raise ValueError("n_iterations must be at least 1.")
+    slot_ids = evaluator.tunable_ids
+    if not slot_ids:
+        metrics = evaluator.evaluate({})
+        return _result(
+            metrics,
+            target_accuracy,
+            evaluations=1,
+            elapsed_seconds=0.0,
+            method="chellapilla_continuous_gaussian_sa",
+            annealing_iterations=int(n_iterations),
+            annealing_evaluations=1,
+            annealing_accepted_moves=0,
+            infeasible_proposals_rejected=0,
+            initial_temperature=1.0,
+            final_temperature=1.0,
+            cost_normalization=1.0,
+        )
+
+    rng = np.random.default_rng(random_seed)
+    sample_count = max(1, int(evaluator.sample_count))
+    initial_temperature = 1.0
+    final_temperature = 1.0 / sample_count
+    positive_costs = [
+        evaluator._cost(candidate_id)
+        for candidate_id in evaluator.tunable_model_ids
+        if evaluator._cost(candidate_id) > 0.0
+    ]
+    cost_normalization = min(positive_costs) if positive_costs else 1.0
+
+    current = {slot_id: 1.0 for slot_id in slot_ids}
+    current_metrics = evaluator.evaluate(current, include_route_counts=False)
+    evaluations = 1
+    if float(current_metrics["accuracy"]) < target_accuracy:
+        raise ValueError(
+            "The all-one Chellapilla initialization is infeasible under the "
+            "evaluator's confidence acceptance semantics."
+        )
+    best_metrics = current_metrics
+    accepted_moves = 0
+    infeasible_rejections = 0
+    started = perf_counter()
+
+    with trange(
+        n_iterations,
+        desc="Chellapilla continuous SA",
+        disable=not show_progress,
+    ) as t_iter:
+        for iteration in t_iter:
+            progress = iteration / max(n_iterations - 1, 1)
+            temperature = initial_temperature * (
+                final_temperature / initial_temperature
+            ) ** progress
+            proposal_values = np.clip(
+                np.fromiter((current[slot_id] for slot_id in slot_ids), dtype=float)
+                + rng.normal(0.0, temperature, size=len(slot_ids)),
+                0.0,
+                1.0,
+            )
+            proposal = {
+                slot_id: float(value)
+                for slot_id, value in zip(slot_ids, proposal_values, strict=True)
+            }
+            proposal_metrics = evaluator.evaluate(
+                proposal, include_route_counts=False
+            )
+            evaluations += 1
+            if float(proposal_metrics["accuracy"]) < target_accuracy:
+                infeasible_rejections += 1
+                continue
+
+            cost_delta = (
+                float(proposal_metrics["expected_cost"])
+                - float(current_metrics["expected_cost"])
+            ) / cost_normalization
+            if cost_delta <= 0.0 or rng.random() < math.exp(-cost_delta / temperature):
+                current = proposal
+                current_metrics = proposal_metrics
+                accepted_moves += 1
+
+            if _policy_key(proposal_metrics, target_accuracy) < _policy_key(
+                best_metrics, target_accuracy
+            ):
+                best_metrics = proposal_metrics
+                t_iter.set_postfix(
+                    cost=float(proposal_metrics["expected_cost"]), status="Active"
+                )
+
+    elapsed = perf_counter() - started
+    final_metrics = evaluator.evaluate(best_metrics["thresholds"])
+    return _result(
+        final_metrics,
+        target_accuracy,
+        evaluations=evaluations,
+        elapsed_seconds=elapsed,
+        method="chellapilla_continuous_gaussian_sa",
+        annealing_iterations=int(n_iterations),
+        annealing_evaluations=int(evaluations),
+        annealing_elapsed_seconds=float(elapsed),
+        annealing_accepted_moves=int(accepted_moves),
+        infeasible_proposals_rejected=int(infeasible_rejections),
+        initial_temperature=float(initial_temperature),
+        final_temperature=float(final_temperature),
+        cost_normalization=float(cost_normalization),
+        proposal="all_thresholds_continuous_gaussian",
+        cooling="geometric",
+    )
+
+
 def optimize_fixed_layout_thresholds_simulated_annealing(
     evaluator: FixedLayoutThresholdEvaluator,
     target_accuracy: float = DEFAULT_TARGET_ACCURACY,
@@ -1053,6 +1187,7 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     n_iterations: int = 2_000,
     random_seed: int = 0,
     coordinate_descent_passes: int = 25,
+    random_proposal_rate: float = 0.20,
     accuracy_penalty: float | None = None,
     show_progress: bool = True,
 ) -> dict:
@@ -1069,6 +1204,8 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
         raise ValueError("n_iterations must be at least 1.")
     if coordinate_descent_passes < 0:
         raise ValueError("coordinate_descent_passes cannot be negative.")
+    if not 0.0 <= random_proposal_rate <= 1.0:
+        raise ValueError("random_proposal_rate must be between 0 and 1.")
     threshold_grids = _validate_grids(evaluator, grids, quantile_points)
     slot_ids = evaluator.tunable_ids
     grid_indices = {
@@ -1125,7 +1262,7 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
             current_index = current_indices[slot_id]
             proposal_indices = dict(current_indices)
 
-            if len(grid) > 1 and rng.random() < 0.8:
+            if len(grid) > 1 and rng.random() < 1.0 - random_proposal_rate:
                 max_step = max(1, int(round((1.0 - progress) * (len(grid) - 1))))
                 step = int(rng.integers(-max_step, max_step + 1))
                 if step == 0:
@@ -1172,6 +1309,7 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
                 "annealing_evaluations": int(evaluations),
                 "annealing_elapsed_seconds": float(annealing_elapsed),
                 "annealing_accepted_moves": int(accepted_moves),
+                "random_proposal_rate": float(random_proposal_rate),
                 "coordinate_descent_evaluations": 0,
                 "coordinate_descent_elapsed_seconds": 0.0,
                 "coordinate_descent_passes": 0,
@@ -1198,6 +1336,7 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
             "annealing_evaluations": int(evaluations),
             "annealing_elapsed_seconds": float(annealing_elapsed),
             "annealing_accepted_moves": int(accepted_moves),
+            "random_proposal_rate": float(random_proposal_rate),
             "coordinate_descent_evaluations": int(polished["evaluations"]),
             "coordinate_descent_elapsed_seconds": float(polished["elapsed_seconds"]),
             "coordinate_descent_passes": int(polished["passes"]),

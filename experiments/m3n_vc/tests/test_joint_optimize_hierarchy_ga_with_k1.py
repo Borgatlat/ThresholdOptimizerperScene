@@ -5,6 +5,12 @@ import unittest
 import numpy as np
 import pandas as pd
 
+from experiments.m3n_vc.benchmark_chellapilla_sa import (
+    _branch_options,
+    _classifier_ids,
+    _initial_sequences,
+    sample_layouts,
+)
 from experiments.m3n_vc.joint_optimize_hierarchy_ga_with_k1 import (
     build_k1_layout_space,
     legal_layout_count,
@@ -75,6 +81,26 @@ class K1EnabledGenomeTests(unittest.TestCase):
             child = crossover_genomes(first, second, self.space, rng)
             self.assertEqual(child, repair_genome(child, self.space))
             self.assertTrue(set(child.initial) <= set(self.space.initial_ids))
+
+    def test_uniform_sampler_weights_cover_the_complete_layout_space(self) -> None:
+        weighted_count = sum(
+            np.prod(
+                [
+                    len(chains)
+                    for _, _, chains in _branch_options(self.space, initial)
+                ],
+                dtype=np.int64,
+            )
+            for initial in _initial_sequences(self.space)
+        )
+        self.assertEqual(int(weighted_count), legal_layout_count(self.space))
+
+    def test_conditioned_random_layouts_are_unique_and_large_enough(self) -> None:
+        layouts = sample_layouts(self.space, 10, seed=20260818, minimum_classifiers=5)
+
+        self.assertEqual(len(layouts), 10)
+        self.assertEqual(len(set(layouts)), 10)
+        self.assertTrue(all(len(_classifier_ids(layout)) >= 5 for layout in layouts))
 
 
 if __name__ == "__main__":

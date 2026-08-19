@@ -1,0 +1,539 @@
+{
+  "dataset": "m3n_vc/h24",
+  "elapsed_seconds": 1.628727000002982,
+  "layouts": [
+    {
+      "cost_pearson_correlation": 0.9999896649174058,
+      "holdout_accuracy": {
+        "maximum": 0.9658064516129032,
+        "mean": 0.9645058064516129,
+        "minimum": 0.9587096774193549
+      },
+      "holdout_cost_ms": {
+        "fraction_at_most_800_ms": 0.872,
+        "fraction_over_1000_ms": 0.128,
+        "fraction_over_2000_ms": 0.124,
+        "maximum": 6310.703161623936,
+        "mean": 1371.6755921464671,
+        "median": 681.467666349657,
+        "minimum": 674.6231014239535,
+        "quantiles": {
+          "p01": 681.04316202027,
+          "p05": 681.4428584612536,
+          "p10": 681.4471884573826,
+          "p25": 681.4653027696537,
+          "p50": 681.467666349657,
+          "p75": 681.467666349657,
+          "p90": 6220.335384382667,
+          "p95": 6220.335384382667,
+          "p99": 6233.2454909065345
+        },
+        "standard_deviation": 1827.859686968647
+      },
+      "holdout_feasible_trials": 0,
+      "layout": {
+        "initial": [
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K3",
+            "K5",
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "detector"
+          ],
+          "K1:coupe": [
+            "K5",
+            "K2",
+            "K3",
+            "detector"
+          ],
+          "K1:suv": [
+            "K2",
+            "K4",
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "1a4636d90f9dfcdb",
+      "layout_index": 0,
+      "paired_holdout_minus_validation_cost_ms": {
+        "maximum": -60.734492643389785,
+        "mean": -83.09235577399177,
+        "median": -76.28471502750267,
+        "minimum": -199.57052542765314
+      },
+      "trials": 1000,
+      "validation_accuracy": {
+        "maximum": 0.9662685603615235,
+        "mean": 0.9662685603615235,
+        "minimum": 0.9662685603615235
+      },
+      "validation_cost_ms": {
+        "fraction_at_most_800_ms": 0.872,
+        "fraction_over_1000_ms": 0.128,
+        "fraction_over_2000_ms": 0.124,
+        "maximum": 6376.279656240052,
+        "mean": 1454.767947920459,
+        "median": 757.7523813771596,
+        "minimum": 754.1788948029484,
+        "quantiles": {
+          "p01": 756.0924252711071,
+          "p05": 756.1270924034815,
+          "p10": 757.707291198635,
+          "p25": 757.7472585990729,
+          "p50": 757.7523813771596,
+          "p75": 757.7537577862904,
+          "p90": 6352.040314247664,
+          "p95": 6352.040314247664,
+          "p99": 6371.423848847879
+        },
+        "standard_deviation": 1845.2033722760611
+      }
+    },
+    {
+      "cost_pearson_correlation": 0.9974939220794646,
+      "holdout_accuracy": {
+        "maximum": 0.964516129032258,
+        "mean": 0.9640767741935483,
+        "minimum": 0.9580645161290322
+      },
+      "holdout_cost_ms": {
+        "fraction_at_most_800_ms": 0.922,
+        "fraction_over_1000_ms": 0.078,
+        "fraction_over_2000_ms": 0.078,
+        "maximum": 4979.09138009247,
+        "mean": 842.1756237578674,
+        "median": 681.4467751006232,
+        "minimum": 681.370961349653,
+        "quantiles": {
+          "p01": 681.417361130526,
+          "p05": 681.4173670425453,
+          "p10": 681.418581081901,
+          "p25": 681.4222231999682,
+          "p50": 681.4467751006232,
+          "p75": 681.4467751006232,
+          "p90": 681.4601622528877,
+          "p95": 2193.905450592021,
+          "p99": 4561.220001129538
+        },
+        "standard_deviation": 618.2630888022638
+      },
+      "holdout_feasible_trials": 0,
+      "layout": {
+        "initial": [
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K2",
+            "K5",
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K5",
+            "K6",
+            "K2",
+            "detector"
+          ],
+          "K1:suv": [
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "36bb1b883566558a",
+      "layout_index": 1,
+      "paired_holdout_minus_validation_cost_ms": {
+        "maximum": -51.467700791990865,
+        "mean": -92.27273277786796,
+        "median": -76.28651118889695,
+        "minimum": -384.00841130026447
+      },
+      "trials": 1000,
+      "validation_accuracy": {
+        "maximum": 0.9662685603615235,
+        "mean": 0.9662685603615235,
+        "minimum": 0.9662685603615235
+      },
+      "validation_cost_ms": {
+        "fraction_at_most_800_ms": 0.922,
+        "fraction_over_1000_ms": 0.078,
+        "fraction_over_2000_ms": 0.078,
+        "maximum": 5058.25699825974,
+        "mean": 934.4483565357352,
+        "median": 757.7332862895202,
+        "minimum": 757.6482352496439,
+        "quantiles": {
+          "p01": 757.685742144565,
+          "p05": 757.6871204441861,
+          "p10": 757.6893939805096,
+          "p25": 757.6945496121314,
+          "p50": 757.7332862895202,
+          "p75": 757.7354223437902,
+          "p90": 757.9059000536781,
+          "p95": 2532.6810850680963,
+          "p99": 4668.900782557079
+        },
+        "standard_deviation": 659.1250976031772
+      }
+    },
+    {
+      "cost_pearson_correlation": 0.9988137376458197,
+      "holdout_accuracy": {
+        "maximum": 0.9651612903225807,
+        "mean": 0.9640058064516128,
+        "minimum": 0.9580645161290322
+      },
+      "holdout_cost_ms": {
+        "fraction_at_most_800_ms": 0.887,
+        "fraction_over_1000_ms": 0.113,
+        "fraction_over_2000_ms": 0.001,
+        "maximum": 3282.463223700408,
+        "mean": 750.0347388879213,
+        "median": 681.4486188741739,
+        "minimum": 668.4974361927887,
+        "quantiles": {
+          "p01": 679.0216917966334,
+          "p05": 681.4236507399675,
+          "p10": 681.4332277025554,
+          "p25": 681.4428897044905,
+          "p50": 681.4486188741739,
+          "p75": 681.4524666670785,
+          "p90": 1227.9989325316667,
+          "p95": 1273.1707404145063,
+          "p99": 1331.194062765858
+        },
+        "standard_deviation": 203.20801568095007
+      },
+      "holdout_feasible_trials": 0,
+      "layout": {
+        "initial": [
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "K4",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K2",
+            "K5",
+            "K3",
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "K2",
+            "K4",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "652d18d5fd1f2540",
+      "layout_index": 2,
+      "paired_holdout_minus_validation_cost_ms": {
+        "maximum": -63.53599582881486,
+        "mean": -87.74462100484985,
+        "median": -76.28651237919632,
+        "minimum": -212.32344899750137
+      },
+      "trials": 1000,
+      "validation_accuracy": {
+        "maximum": 0.9662685603615235,
+        "mean": 0.9662685603615235,
+        "minimum": 0.9662685603615235
+      },
+      "validation_cost_ms": {
+        "fraction_at_most_800_ms": 0.887,
+        "fraction_over_1000_ms": 0.113,
+        "fraction_over_2000_ms": 0.001,
+        "maximum": 3486.5268625291637,
+        "mean": 837.7793598927711,
+        "median": 757.7351312533702,
+        "minimum": 748.9073371837142,
+        "quantiles": {
+          "p01": 754.4137469759338,
+          "p05": 756.0955686963881,
+          "p10": 756.1031604883513,
+          "p25": 757.7213746179871,
+          "p50": 757.7351312533702,
+          "p75": 757.740315392332,
+          "p90": 1419.3304419765188,
+          "p95": 1443.5545917629954,
+          "p99": 1511.2942159040504
+        },
+        "standard_deviation": 234.50180376925928
+      }
+    },
+    {
+      "cost_pearson_correlation": 0.9997148815210212,
+      "holdout_accuracy": {
+        "maximum": 0.9696774193548388,
+        "mean": 0.9637870967741935,
+        "minimum": 0.9567741935483871
+      },
+      "holdout_cost_ms": {
+        "fraction_at_most_800_ms": 0.866,
+        "fraction_over_1000_ms": 0.132,
+        "fraction_over_2000_ms": 0.109,
+        "maximum": 2955.114110857351,
+        "mean": 880.3950583012088,
+        "median": 673.6394126450549,
+        "minimum": 673.627869266341,
+        "quantiles": {
+          "p01": 673.627869266341,
+          "p05": 673.627869266341,
+          "p10": 673.627869266341,
+          "p25": 673.6302973450526,
+          "p50": 673.6394126450549,
+          "p75": 680.0794821695667,
+          "p90": 2406.4544446039085,
+          "p95": 2438.7386104012826,
+          "p99": 2535.6220142033626
+        },
+        "standard_deviation": 558.5170478644686
+      },
+      "holdout_feasible_trials": 2,
+      "layout": {
+        "initial": [
+          "K1",
+          "K3",
+          "K0",
+          "K2",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K5",
+            "K2",
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K2",
+            "K6",
+            "K5",
+            "detector"
+          ],
+          "K1:suv": [
+            "K3",
+            "K4",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "461094a3f8a79942",
+      "layout_index": 3,
+      "paired_holdout_minus_validation_cost_ms": {
+        "maximum": -52.20255028753377,
+        "mean": -111.32331813399422,
+        "median": -79.56917282124687,
+        "minimum": -410.10617527443173
+      },
+      "trials": 1000,
+      "validation_accuracy": {
+        "maximum": 0.9664299548095545,
+        "mean": 0.9662687217559716,
+        "minimum": 0.9662685603615235
+      },
+      "validation_cost_ms": {
+        "fraction_at_most_800_ms": 0.864,
+        "fraction_over_1000_ms": 0.134,
+        "fraction_over_2000_ms": 0.109,
+        "maximum": 3218.633781205844,
+        "mean": 991.718376435203,
+        "median": 753.2167415788778,
+        "minimum": 751.5656295920188,
+        "quantiles": {
+          "p01": 751.5656295920188,
+          "p05": 753.1809380913003,
+          "p10": 753.1853556753807,
+          "p25": 753.2076228970633,
+          "p50": 753.2167415788778,
+          "p75": 756.4355118576831,
+          "p90": 2771.346081947221,
+          "p95": 2816.546718318986,
+          "p99": 2863.4359675720643
+        },
+        "standard_deviation": 644.3827237675783
+      }
+    },
+    {
+      "cost_pearson_correlation": 0.9956960519688992,
+      "holdout_accuracy": {
+        "maximum": 0.9658064516129032,
+        "mean": 0.9641154838709678,
+        "minimum": 0.9587096774193549
+      },
+      "holdout_cost_ms": {
+        "fraction_at_most_800_ms": 0.798,
+        "fraction_over_1000_ms": 0.202,
+        "fraction_over_2000_ms": 0.199,
+        "maximum": 3741.8766115203957,
+        "mean": 1130.7865486978462,
+        "median": 685.1239082394883,
+        "minimum": 665.3442044382754,
+        "quantiles": {
+          "p01": 678.2173221377116,
+          "p05": 678.7689485725328,
+          "p10": 680.8681980448868,
+          "p25": 684.6893671324053,
+          "p50": 685.1239082394883,
+          "p75": 704.0240008028119,
+          "p90": 3354.7768689010436,
+          "p95": 3412.4063141267225,
+          "p99": 3554.565301106675
+        },
+        "standard_deviation": 922.054945340597
+      },
+      "holdout_feasible_trials": 0,
+      "layout": {
+        "initial": [
+          "K1",
+          "K2",
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "K4",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K3",
+            "K2",
+            "K5",
+            "detector"
+          ],
+          "K1:suv": [
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "757026c0348a6829",
+      "layout_index": 4,
+      "paired_holdout_minus_validation_cost_ms": {
+        "maximum": 118.42881131910599,
+        "mean": -94.03956343559973,
+        "median": -84.61268587817085,
+        "minimum": -401.7124780506524
+      },
+      "trials": 1000,
+      "validation_accuracy": {
+        "maximum": 0.9662685603615235,
+        "mean": 0.9662685603615235,
+        "minimum": 0.9662685603615235
+      },
+      "validation_cost_ms": {
+        "fraction_at_most_800_ms": 0.798,
+        "fraction_over_1000_ms": 0.202,
+        "fraction_over_2000_ms": 0.201,
+        "maximum": 3623.4478002012897,
+        "mean": 1224.826112133446,
+        "median": 770.9191566842944,
+        "minimum": 757.2085023342229,
+        "quantiles": {
+          "p01": 758.842429614301,
+          "p05": 763.6660668760404,
+          "p10": 766.1055359497117,
+          "p25": 768.4396555061179,
+          "p50": 770.9191566842944,
+          "p75": 772.5380756581045,
+          "p90": 3353.868290666455,
+          "p95": 3400.685268808155,
+          "p99": 3523.1326234260446
+        },
+        "standard_deviation": 926.3824052442608
+      }
+    }
+  ],
+  "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+  "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+  "partition": "holdout",
+  "policy_selection_partition": "validation",
+  "source_validation_packets": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\chellapilla_sa_reliability_h24\\trial_packets.jsonl",
+  "source_validation_packets_sha256": "0d74b754645f69727633270f6c4fc279a55b20f717a69e7ed6ca60bfd64f9e5b",
+  "split": {
+    "holdout_fraction": 0.2,
+    "holdout_samples": 1550,
+    "per_group": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "per_run": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "random_seed": 0,
+    "split_group_column": "run_id",
+    "strategy": "blocked_per_run",
+    "validation_samples": 6196
+  },
+  "target_accuracy": 0.9662,
+  "trials": 5000
+}
