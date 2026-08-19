@@ -245,6 +245,7 @@ def _compact_optimization(metrics: Mapping[str, object]) -> dict[str, object]:
         "annealing_evaluations",
         "annealing_elapsed_seconds",
         "annealing_accepted_moves",
+        "random_proposal_rate",
         "coordinate_descent_evaluations",
         "coordinate_descent_elapsed_seconds",
         "coordinate_descent_passes",

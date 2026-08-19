@@ -6,6 +6,7 @@ import pandas as pd
 from hierarchy_optimizer import Cascade
 from threshold_optimizer import (
     FixedLayoutThresholdEvaluator,
+    optimize_fixed_layout_thresholds_chellapilla_sa,
     optimize_fixed_layout_thresholds_exhaustive,
     optimize_fixed_layout_thresholds_simulated_annealing,
 )
@@ -141,6 +142,7 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
             n_iterations=1,
             random_seed=0,
             coordinate_descent_passes=0,
+            random_proposal_rate=0.0,
             show_progress=False,
         )
 
@@ -148,6 +150,7 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
         self.assertEqual(result["coordinate_descent_passes"], 0)
         self.assertEqual(result["coordinate_descent_evaluations"], 0)
         self.assertEqual(result["evaluations"], result["annealing_evaluations"])
+        self.assertEqual(result["random_proposal_rate"], 0.0)
 
     def test_annealer_rejects_negative_coordinate_descent_passes(self) -> None:
         with self.assertRaisesRegex(ValueError, "cannot be negative"):
@@ -156,6 +159,37 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
                 coordinate_descent_passes=-1,
                 show_progress=False,
             )
+
+    def test_annealer_rejects_invalid_random_proposal_rate(self) -> None:
+        with self.assertRaisesRegex(ValueError, "between 0 and 1"):
+            optimize_fixed_layout_thresholds_simulated_annealing(
+                repeated_model_evaluator(),
+                random_proposal_rate=1.1,
+                show_progress=False,
+            )
+
+    def test_chellapilla_sa_is_continuous_deterministic_and_unpolished(self) -> None:
+        first = optimize_fixed_layout_thresholds_chellapilla_sa(
+            repeated_model_evaluator(),
+            target_accuracy=1.0,
+            n_iterations=25,
+            random_seed=7,
+            show_progress=False,
+        )
+        second = optimize_fixed_layout_thresholds_chellapilla_sa(
+            repeated_model_evaluator(),
+            target_accuracy=1.0,
+            n_iterations=25,
+            random_seed=7,
+            show_progress=False,
+        )
+
+        self.assertEqual(first["method"], "chellapilla_continuous_gaussian_sa")
+        self.assertEqual(first["thresholds"], second["thresholds"])
+        self.assertEqual(first["expected_cost"], second["expected_cost"])
+        self.assertNotIn("coordinate_descent_evaluations", first)
+        self.assertEqual(first["proposal"], "all_thresholds_continuous_gaussian")
+        self.assertTrue(all(0.0 <= value <= 1.0 for value in first["thresholds"].values()))
 
 
 if __name__ == "__main__":
