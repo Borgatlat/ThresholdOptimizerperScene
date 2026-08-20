@@ -6,8 +6,14 @@ import pandas as pd
 from hierarchy_optimizer import Cascade
 from threshold_optimizer import (
     FixedLayoutThresholdEvaluator,
+<<<<<<< Updated upstream
     optimize_fixed_layout_thresholds_chellapilla_sa,
+=======
+    enumerate_threshold_slots,
+>>>>>>> Stashed changes
     optimize_fixed_layout_thresholds_exhaustive,
+    optimize_fixed_layout_thresholds_chellapilla_sa,
+    optimize_fixed_layout_thresholds_legacy_grid_sa,
     optimize_fixed_layout_thresholds_simulated_annealing,
 )
 
@@ -79,6 +85,24 @@ def repeated_model_evaluator() -> FixedLayoutThresholdEvaluator:
 
 
 class PerOccurrenceThresholdTests(unittest.TestCase):
+    def test_threshold_coordinates_ignore_specialized_dict_insertion_order(self) -> None:
+        slots = enumerate_threshold_slots(
+            ["K0", "detector"],
+            {
+                ("K0", "suv"): ["K4", "detector"],
+                ("K0", "coupe"): ["K6", "detector"],
+            },
+        )
+
+        self.assertEqual(
+            [slot.location for slot in slots],
+            [
+                "initial[0]",
+                "specialized[K0:coupe][0]",
+                "specialized[K0:suv][0]",
+            ],
+        )
+
     def test_repeated_model_gets_distinct_location_keys(self) -> None:
         evaluator = repeated_model_evaluator()
 
@@ -117,7 +141,7 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
 
     def test_annealer_and_polish_optimize_occurrences_independently(self) -> None:
         evaluator = repeated_model_evaluator()
-        result = optimize_fixed_layout_thresholds_simulated_annealing(
+        result = optimize_fixed_layout_thresholds_legacy_grid_sa(
             evaluator,
             target_accuracy=1.0,
             grids={"K0": [0.5], "K2": [0.65, 0.85]},
@@ -135,7 +159,7 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
 
     def test_annealer_can_skip_coordinate_descent(self) -> None:
         evaluator = repeated_model_evaluator()
-        result = optimize_fixed_layout_thresholds_simulated_annealing(
+        result = optimize_fixed_layout_thresholds_legacy_grid_sa(
             evaluator,
             target_accuracy=1.0,
             grids={"K0": [0.5], "K2": [0.65, 0.85]},
@@ -154,12 +178,13 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
 
     def test_annealer_rejects_negative_coordinate_descent_passes(self) -> None:
         with self.assertRaisesRegex(ValueError, "cannot be negative"):
-            optimize_fixed_layout_thresholds_simulated_annealing(
+            optimize_fixed_layout_thresholds_legacy_grid_sa(
                 repeated_model_evaluator(),
                 coordinate_descent_passes=-1,
                 show_progress=False,
             )
 
+<<<<<<< Updated upstream
     def test_annealer_rejects_invalid_random_proposal_rate(self) -> None:
         with self.assertRaisesRegex(ValueError, "between 0 and 1"):
             optimize_fixed_layout_thresholds_simulated_annealing(
@@ -190,6 +215,89 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
         self.assertNotIn("coordinate_descent_evaluations", first)
         self.assertEqual(first["proposal"], "all_thresholds_continuous_gaussian")
         self.assertTrue(all(0.0 <= value <= 1.0 for value in first["thresholds"].values()))
+=======
+    def test_canonical_annealer_selects_best_paper_restart(self) -> None:
+        evaluator = repeated_model_evaluator()
+        independent = [
+            optimize_fixed_layout_thresholds_chellapilla_sa(
+                evaluator,
+                target_accuracy=1.0,
+                n_iterations=20,
+                random_seed=seed,
+                show_progress=False,
+            )
+            for seed in range(3)
+        ]
+        result = optimize_fixed_layout_thresholds_simulated_annealing(
+            evaluator,
+            target_accuracy=1.0,
+            n_iterations=20,
+            random_seed=0,
+            restarts=3,
+            show_progress=False,
+        )
+
+        self.assertEqual(
+            result["expected_cost"],
+            min(item["expected_cost"] for item in independent),
+        )
+        self.assertEqual(result["restart_count"], 3)
+        self.assertEqual(result["iterations_per_restart"], 20)
+        self.assertEqual(
+            result["method"], "best_of_3_chellapilla_continuous_gaussian_sa"
+        )
+
+    def test_canonical_annealer_requires_a_restart(self) -> None:
+        with self.assertRaisesRegex(ValueError, "restarts must be at least 1"):
+            optimize_fixed_layout_thresholds_simulated_annealing(
+                repeated_model_evaluator(), restarts=0, show_progress=False
+            )
+
+    def test_paper_pruning_removes_reject_all_stages_and_their_cost(self) -> None:
+        evaluator = repeated_model_evaluator()
+        thresholds = {slot_id: 1.0 for slot_id in evaluator.tunable_ids}
+
+        charged = evaluator.evaluate(thresholds, strict_thresholds=True)
+        pruned = evaluator.evaluate(
+            thresholds,
+            prune_reject_all_stages=True,
+            strict_thresholds=True,
+        )
+
+        self.assertEqual(charged["expected_cost"], 13.0)
+        self.assertEqual(pruned["expected_cost"], 10.0)
+        self.assertEqual(pruned["active_slots"], [])
+        self.assertEqual(pruned["pruned_slots"], list(evaluator.tunable_ids))
+
+    def test_validation_active_slots_are_frozen_for_holdout_replay(self) -> None:
+        evaluator = repeated_model_evaluator()
+        validation = evaluator.evaluate(
+            {
+                "K0": 0.5,
+                "K2@initial[1]": 1.0,
+                "K2@specialized[K0:suv][0]": 1.0,
+            },
+            prune_reject_all_stages=True,
+            strict_thresholds=True,
+        )
+        replay = evaluator.evaluate(
+            {
+                "K0": 0.5,
+                "K2@initial[1]": 0.0,
+                "K2@specialized[K0:suv][0]": 0.0,
+            },
+            strict_thresholds=True,
+            active_slots=validation["active_slots"],
+        )
+
+        self.assertEqual(validation["active_slots"], ["K0"])
+        self.assertEqual(replay["active_slots"], ["K0"])
+        self.assertEqual(replay["expected_cost"], 11.0)
+
+    def test_frozen_active_slots_reject_unknown_occurrences(self) -> None:
+        with self.assertRaisesRegex(ValueError, "unknown fixed-layout occurrences"):
+            repeated_model_evaluator().evaluate(active_slots=["not-a-slot"])
+>>>>>>> Stashed changes
 
 
 if __name__ == "__main__":

@@ -9,8 +9,8 @@ router K1:
 * every initial/branch cascade terminates at the paper Kdet.
 
 This produces 5,545 layouts. The detector-only layout has no thresholds and is
-scored directly; the other 5,544 layouts receive an independent 8,000-step
-simulated-annealing run followed by the existing coordinate-descent polish.
+scored directly; the other 5,544 layouts receive the best of ten independent
+1,000-step continuous Gaussian SA runs based on Chellapilla et al. (DAS 2006).
 
 The defaults intentionally reproduce the settings behind
 ``fig1_layouts_accuracy_cost.png``:
@@ -18,8 +18,7 @@ The defaults intentionally reproduce the settings behind
 * h24 empirical outcomes;
 * paper Kdet;
 * blocked-per-run 80/20 validation/holdout split;
-* 50 threshold quantiles;
-* 8,000 annealing iterations and seed 0; and
+* ten continuous SA restarts of 1,000 iterations and seed 0; and
 * the fixed K3 -> Kdet validation accuracy target (0.9833763718528082).
 
 Examples
@@ -66,7 +65,7 @@ from threshold_optimizer import (
 
 DEFAULT_OUTCOMES = Path("checkpoints/empirical_outcomes.pkl")
 DEFAULT_OUTPUT_DIR = Path("checkpoints/brute_force_k1_free_h24")
-DEFAULT_ITERATIONS = 8_000
+DEFAULT_ITERATIONS = 1_000
 DEFAULT_HOLDOUT_FRACTION = 0.20
 DEFAULT_SPLIT_STRATEGY = "blocked_per_run"
 DEFAULT_SEED = 0
@@ -80,7 +79,7 @@ FIG1_K3_HOLDOUT_COST_MS = 1561.0626697763914
 
 # Measured on the development machine for the seven-slot
 # k0_k2_k3_hierarchy layout, which is close to the 7.18-slot average here.
-REFERENCE_SECONDS_PER_LAYOUT = 4.15
+REFERENCE_SECONDS_PER_LAYOUT = 3.70
 EXPECTED_LAYOUT_COUNT = 5_545
 
 
@@ -191,7 +190,8 @@ def _without_candidates(payload: dict, excluded: Iterable[str]) -> dict:
     """Return an empirical payload with excluded candidates removed."""
 
     excluded_set = set(excluded)
-    return {
+    filtered = dict(payload)
+    filtered.update({
         "labels": payload["labels"].copy(),
         "candidates": payload["candidates"].loc[
             ~payload["candidates"]["id"].isin(excluded_set)
@@ -200,7 +200,8 @@ def _without_candidates(payload: dict, excluded: Iterable[str]) -> dict:
         "outcomes": payload["outcomes"].loc[
             ~payload["outcomes"]["candidate_id"].isin(excluded_set)
         ].copy(),
-    }
+    })
+    return filtered
 
 
 def _direct_detector_metrics(
@@ -249,6 +250,15 @@ def _compact_optimization(metrics: Mapping[str, object]) -> dict[str, object]:
         "coordinate_descent_evaluations",
         "coordinate_descent_elapsed_seconds",
         "coordinate_descent_passes",
+        "restart_count",
+        "iterations_per_restart",
+        "total_requested_iterations",
+        "selected_restart_index",
+        "selected_restart_seed",
+        "restart_seeds",
+        "restart_costs_ms",
+        "restart_accuracies",
+        "infeasible_proposals_rejected",
     )
     return {key: metrics[key] for key in keys if key in metrics}
 

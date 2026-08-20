@@ -65,7 +65,9 @@ class OuterScheduleOracleTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "oracle.jsonl"
             path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
-            with self.assertRaisesRegex(ValueError, "requires 8000"):
+            with self.assertRaisesRegex(
+                ValueError, rf"requires {DEFAULT_ITERATIONS}"
+            ):
                 load_validation_oracle(path)
 
     def test_exact_sign_test_ignores_ties_outside_its_inputs(self) -> None:

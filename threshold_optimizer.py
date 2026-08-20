@@ -13,13 +13,15 @@ Two optimizers are provided:
 * ``optimize_fixed_layout_thresholds_exhaustive`` enumerates a Cartesian
   product of threshold grids.  It is an exact baseline for that *discrete*
   grid, guarded against accidentally attempting millions/billions of policies.
-* ``optimize_fixed_layout_thresholds_simulated_annealing`` explores the same
-  grid stochastically and then runs coordinate descent as a local polish.
+* ``optimize_fixed_layout_thresholds_simulated_annealing`` is the canonical
+  best-of-ten continuous Gaussian SA from Chellapilla et al. (DAS 2006), with
+  1,000 iterations per independent restart.
+* ``optimize_fixed_layout_thresholds_legacy_grid_sa`` preserves the former
+  quantile-grid SA plus coordinate-descent implementation for reproducibility.
 
-The two methods can therefore be compared fairly with
-``benchmark_threshold_optimizers``.  Setting ``quantile_points=None`` uses
-every distinct observed confidence, which is exact on the empirical data but
-usually too large for an exhaustive Cartesian search.
+Setting ``quantile_points=None`` uses every distinct observed confidence for
+the exhaustive and legacy-grid methods, which is exact on the empirical data
+but usually too large for an exhaustive Cartesian search.
 """
 
 from __future__ import annotations
@@ -32,8 +34,13 @@ from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
 from time import perf_counter
+<<<<<<< Updated upstream
 from typing import Mapping, Sequence
 from tqdm import *
+=======
+from typing import Collection, Mapping, Sequence
+
+>>>>>>> Stashed changes
 import numpy as np
 
 from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
@@ -79,7 +86,10 @@ def enumerate_threshold_slots(
     for index, candidate_id in enumerate(initial):
         if candidate_id != detector_id:
             occurrences.append((candidate_id, f"initial[{index}]"))
-    for (router_id, group), chain in specialized.items():
+    # Dict insertion order is not a property of a cascade topology. Keep the
+    # optimizer coordinate order canonical so one seed produces the same
+    # proposals for equivalent layouts constructed by DP and enumeration.
+    for (router_id, group), chain in sorted(specialized.items()):
         for index, candidate_id in enumerate(chain):
             if candidate_id != detector_id:
                 location = f"specialized[{router_id}:{group}][{index}]"
@@ -285,6 +295,9 @@ class FixedLayoutThresholdEvaluator:
         *,
         include_route_counts: bool = True,
         include_class_metrics: bool | None = None,
+        prune_reject_all_stages: bool = False,
+        strict_thresholds: bool = False,
+        active_slots: Collection[str] | None = None,
     ) -> dict:
         """Replay the fixed hierarchy for every logged sample.
 
@@ -293,10 +306,23 @@ class FixedLayoutThresholdEvaluator:
         large threshold grid stays practical.
         """
         threshold_map = self._normalise_thresholds(thresholds)
+        frozen_active_slots = None if active_slots is None else frozenset(active_slots)
+        if frozen_active_slots is not None:
+            unknown_slots = frozen_active_slots.difference(self.tunable_ids)
+            if unknown_slots:
+                raise ValueError(
+                    "active_slots contains unknown fixed-layout occurrences: "
+                    f"{sorted(unknown_slots)}"
+                )
         accepts = {
-            slot_id: self.confidence[slot_id] >= threshold
+            slot_id: (
+                self.confidence[slot_id] > threshold
+                if strict_thresholds
+                else self.confidence[slot_id] >= threshold
+            )
             for slot_id, threshold in threshold_map.items()
         }
+        executed_slots: set[str] = set()
         final_prediction = np.full(self.sample_count, -1, dtype=int)
         final_cost = np.zeros(self.sample_count, dtype=float)
         ending = np.full(self.sample_count, -1, dtype=np.int8)
@@ -310,9 +336,17 @@ class FixedLayoutThresholdEvaluator:
                 pending[:] = False
                 break
 
-            final_cost[pending] += self._cost(candidate_id)
             slot_id = self._slot_by_location[f"initial[{index}]"]
             accepted = pending & accepts[slot_id]
+            if not self._execute_stage(
+                slot_id,
+                accepted,
+                executed_slots,
+                frozen_active_slots,
+                prune_reject_all_stages,
+            ):
+                continue
+            final_cost[pending] += self._cost(candidate_id)
             if self._is_identifier(candidate_id):
                 self._route_identifier(
                     candidate_id,
@@ -321,6 +355,9 @@ class FixedLayoutThresholdEvaluator:
                     final_prediction,
                     final_cost,
                     ending,
+                    executed_slots,
+                    frozen_active_slots,
+                    prune_reject_all_stages,
                 )
             else:
                 self._finish_candidate(
@@ -348,6 +385,13 @@ class FixedLayoutThresholdEvaluator:
             "total": int(self.sample_count),
             "thresholds": threshold_map,
         }
+        if prune_reject_all_stages or frozen_active_slots is not None:
+            metrics["active_slots"] = [
+                slot_id for slot_id in self.tunable_ids if slot_id in executed_slots
+            ]
+            metrics["pruned_slots"] = [
+                slot_id for slot_id in self.tunable_ids if slot_id not in executed_slots
+            ]
         if include_route_counts:
             route_codes, route_counts = np.unique(ending, return_counts=True)
             metrics["route_counts"] = {
@@ -391,6 +435,9 @@ class FixedLayoutThresholdEvaluator:
         final_prediction: np.ndarray,
         final_cost: np.ndarray,
         ending: np.ndarray,
+        executed_slots: set[str],
+        frozen_active_slots: frozenset[str] | None,
+        prune_reject_all_stages: bool,
     ) -> None:
         predictions = self.prediction[router_id]
         handled = np.zeros(self.sample_count, dtype=bool)
@@ -412,6 +459,9 @@ class FixedLayoutThresholdEvaluator:
                     final_prediction,
                     final_cost,
                     ending,
+                    executed_slots,
+                    frozen_active_slots,
+                    prune_reject_all_stages,
                 )
             elif group in self._global_name_to_idx:
                 final_prediction[branch_mask] = self._global_name_to_idx[group]
@@ -433,6 +483,9 @@ class FixedLayoutThresholdEvaluator:
         final_prediction: np.ndarray,
         final_cost: np.ndarray,
         ending: np.ndarray,
+        executed_slots: set[str],
+        frozen_active_slots: frozenset[str] | None,
+        prune_reject_all_stages: bool,
     ) -> None:
         pending = initial_mask.copy()
         for index, candidate_id in enumerate(chain):
@@ -442,10 +495,18 @@ class FixedLayoutThresholdEvaluator:
                 self._finish_detector(pending, final_prediction, final_cost, ending)
                 return
 
-            final_cost[pending] += self._cost(candidate_id)
             location = f"specialized[{router_id}:{group}][{index}]"
             slot_id = self._slot_by_location[location]
             accepted = pending & accepts[slot_id]
+            if not self._execute_stage(
+                slot_id,
+                accepted,
+                executed_slots,
+                frozen_active_slots,
+                prune_reject_all_stages,
+            ):
+                continue
+            final_cost[pending] += self._cost(candidate_id)
             self._finish_candidate(accepted, candidate_id, final_prediction, ending)
             pending &= ~accepted
 
@@ -461,6 +522,23 @@ class FixedLayoutThresholdEvaluator:
     ) -> None:
         final_prediction[mask] = self.prediction[candidate_id][mask]
         ending[mask] = self._ending_codes[candidate_id]
+
+    @staticmethod
+    def _execute_stage(
+        slot_id: str,
+        accepted: np.ndarray,
+        executed_slots: set[str],
+        frozen_active_slots: frozenset[str] | None,
+        prune_reject_all_stages: bool,
+    ) -> bool:
+        """Return whether a stage exists in the deployed cascade policy."""
+        if frozen_active_slots is not None:
+            execute = slot_id in frozen_active_slots
+        else:
+            execute = not prune_reject_all_stages or bool(accepted.any())
+        if execute:
+            executed_slots.add(slot_id)
+        return execute
 
     def _finish_detector(
         self,
@@ -717,7 +795,15 @@ def _holdout_summary(
     holdout_evaluator: FixedLayoutThresholdEvaluator,
     target_accuracy: float,
 ) -> dict:
-    holdout_metrics = holdout_evaluator.evaluate(validation_metrics["thresholds"])
+    replay_options = {}
+    if "active_slots" in validation_metrics:
+        replay_options = {
+            "strict_thresholds": True,
+            "active_slots": validation_metrics["active_slots"],
+        }
+    holdout_metrics = holdout_evaluator.evaluate(
+        validation_metrics["thresholds"], **replay_options
+    )
     return {
         "validation": dict(validation_metrics),
         "holdout": holdout_metrics,
@@ -1048,6 +1134,7 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
     evaluator: FixedLayoutThresholdEvaluator,
     target_accuracy: float = DEFAULT_TARGET_ACCURACY,
     *,
+<<<<<<< Updated upstream
     n_iterations: int = 2_000,
     random_seed: int = 0,
     show_progress: bool = True,
@@ -1065,6 +1152,21 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
     specify the interpolation used for continuous cooling; geometric cooling
     is used here so both endpoints are preserved without depending on units.
     No grid, independent random proposal, or post-SA polish is used.
+=======
+    n_iterations: int = 1_000,
+    random_seed: int = 0,
+    show_progress: bool = True,
+) -> dict:
+    """Run one continuous Gaussian SA trajectory from DAS 2006.
+
+    Chellapilla, Shilman, and Simard initialize every rejection threshold at
+    one, perturb all thresholds together with zero-mean Gaussian noise, reject
+    accuracy-infeasible proposals, and cool the Gaussian scale from one to one
+    empirical threshold step.  In continuous confidence coordinates the final
+    scale is represented by ``1 / sample_count``.  Their deployment rule also
+    deletes a stage that accepts no validation samples, so these evaluations
+    use strict ``confidence > threshold`` acceptance and zero-cost pruning.
+>>>>>>> Stashed changes
     """
     if not 0.0 <= target_accuracy <= 1.0:
         raise ValueError("target_accuracy must be between 0 and 1.")
@@ -1072,7 +1174,15 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
         raise ValueError("n_iterations must be at least 1.")
     slot_ids = evaluator.tunable_ids
     if not slot_ids:
+<<<<<<< Updated upstream
         metrics = evaluator.evaluate({})
+=======
+        metrics = evaluator.evaluate(
+            {},
+            prune_reject_all_stages=True,
+            strict_thresholds=True,
+        )
+>>>>>>> Stashed changes
         return _result(
             metrics,
             target_accuracy,
@@ -1098,6 +1208,7 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
         if evaluator._cost(candidate_id) > 0.0
     ]
     cost_normalization = min(positive_costs) if positive_costs else 1.0
+<<<<<<< Updated upstream
 
     current = {slot_id: 1.0 for slot_id in slot_ids}
     current_metrics = evaluator.evaluate(current, include_route_counts=False)
@@ -1108,6 +1219,19 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
             "evaluator's confidence acceptance semantics."
         )
     best_metrics = current_metrics
+=======
+    current = {slot_id: 1.0 for slot_id in slot_ids}
+    current_metrics = evaluator.evaluate(
+        current,
+        include_route_counts=False,
+        prune_reject_all_stages=True,
+        strict_thresholds=True,
+    )
+    if float(current_metrics["accuracy"]) < target_accuracy:
+        raise ValueError("The all-one Chellapilla initialization is infeasible.")
+    best_metrics = current_metrics
+    evaluations = 1
+>>>>>>> Stashed changes
     accepted_moves = 0
     infeasible_rejections = 0
     started = perf_counter()
@@ -1116,8 +1240,13 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
         n_iterations,
         desc="Chellapilla continuous SA",
         disable=not show_progress,
+<<<<<<< Updated upstream
     ) as t_iter:
         for iteration in t_iter:
+=======
+    ) as iterations:
+        for iteration in iterations:
+>>>>>>> Stashed changes
             progress = iteration / max(n_iterations - 1, 1)
             temperature = initial_temperature * (
                 final_temperature / initial_temperature
@@ -1133,7 +1262,14 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
                 for slot_id, value in zip(slot_ids, proposal_values, strict=True)
             }
             proposal_metrics = evaluator.evaluate(
+<<<<<<< Updated upstream
                 proposal, include_route_counts=False
+=======
+                proposal,
+                include_route_counts=False,
+                prune_reject_all_stages=True,
+                strict_thresholds=True,
+>>>>>>> Stashed changes
             )
             evaluations += 1
             if float(proposal_metrics["accuracy"]) < target_accuracy:
@@ -1144,7 +1280,13 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
                 float(proposal_metrics["expected_cost"])
                 - float(current_metrics["expected_cost"])
             ) / cost_normalization
+<<<<<<< Updated upstream
             if cost_delta <= 0.0 or rng.random() < math.exp(-cost_delta / temperature):
+=======
+            if cost_delta <= 0.0 or rng.random() < math.exp(
+                -cost_delta / temperature
+            ):
+>>>>>>> Stashed changes
                 current = proposal
                 current_metrics = proposal_metrics
                 accepted_moves += 1
@@ -1153,12 +1295,22 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
                 best_metrics, target_accuracy
             ):
                 best_metrics = proposal_metrics
+<<<<<<< Updated upstream
                 t_iter.set_postfix(
                     cost=float(proposal_metrics["expected_cost"]), status="Active"
                 )
 
     elapsed = perf_counter() - started
     final_metrics = evaluator.evaluate(best_metrics["thresholds"])
+=======
+
+    elapsed = perf_counter() - started
+    final_metrics = evaluator.evaluate(
+        best_metrics["thresholds"],
+        prune_reject_all_stages=True,
+        strict_thresholds=True,
+    )
+>>>>>>> Stashed changes
     return _result(
         final_metrics,
         target_accuracy,
@@ -1178,7 +1330,11 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
     )
 
 
+<<<<<<< Updated upstream
 def optimize_fixed_layout_thresholds_simulated_annealing(
+=======
+def optimize_fixed_layout_thresholds_legacy_grid_sa(
+>>>>>>> Stashed changes
     evaluator: FixedLayoutThresholdEvaluator,
     target_accuracy: float = DEFAULT_TARGET_ACCURACY,
     *,
@@ -1347,6 +1503,88 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     return winner
 
 
+def optimize_fixed_layout_thresholds_simulated_annealing(
+    evaluator: FixedLayoutThresholdEvaluator,
+    target_accuracy: float = DEFAULT_TARGET_ACCURACY,
+    *,
+    grids: Mapping[str, Sequence[float]] | None = None,
+    quantile_points: int | None = DEFAULT_QUANTILE_POINTS,
+    n_iterations: int = 1_000,
+    random_seed: int = 0,
+    coordinate_descent_passes: int = 0,
+    accuracy_penalty: float | None = None,
+    show_progress: bool = True,
+    restarts: int = 10,
+) -> dict:
+    """Return the best of independent continuous DAS 2006 SA restarts.
+
+    This is the repository's canonical threshold annealer.  ``grids``,
+    ``quantile_points``, ``coordinate_descent_passes``, and
+    ``accuracy_penalty`` remain accepted so older experiment entry points do
+    not break, but the continuous paper method does not use them.
+    """
+    del grids, quantile_points, coordinate_descent_passes, accuracy_penalty
+    if restarts < 1:
+        raise ValueError("restarts must be at least 1.")
+    if n_iterations < 1:
+        raise ValueError("n_iterations must be at least 1.")
+
+    started = perf_counter()
+    results: list[dict] = []
+    best_index = 0
+    iterator = trange(
+        restarts,
+        desc="Chellapilla SA restarts",
+        disable=not show_progress,
+    )
+    for restart_index in iterator:
+        result = optimize_fixed_layout_thresholds_chellapilla_sa(
+            evaluator,
+            target_accuracy,
+            n_iterations=n_iterations,
+            random_seed=random_seed + restart_index,
+            show_progress=False,
+        )
+        results.append(result)
+        if _policy_key(result, target_accuracy) < _policy_key(
+            results[best_index], target_accuracy
+        ):
+            best_index = restart_index
+
+    winner = dict(results[best_index])
+    winner.update(
+        {
+            "method": f"best_of_{restarts}_chellapilla_continuous_gaussian_sa",
+            "restart_count": int(restarts),
+            "iterations_per_restart": int(n_iterations),
+            "total_requested_iterations": int(restarts * n_iterations),
+            "selected_restart_index": int(best_index),
+            "selected_restart_seed": int(random_seed + best_index),
+            "restart_seeds": [int(random_seed + index) for index in range(restarts)],
+            "restart_costs_ms": [
+                float(result["expected_cost"]) for result in results
+            ],
+            "restart_accuracies": [float(result["accuracy"]) for result in results],
+            "evaluations": int(sum(int(result["evaluations"]) for result in results)),
+            "elapsed_seconds": float(perf_counter() - started),
+            "annealing_iterations": int(restarts * n_iterations),
+            "annealing_evaluations": int(
+                sum(int(result["annealing_evaluations"]) for result in results)
+            ),
+            "annealing_elapsed_seconds": float(
+                sum(float(result["annealing_elapsed_seconds"]) for result in results)
+            ),
+            "annealing_accepted_moves": int(
+                sum(int(result["annealing_accepted_moves"]) for result in results)
+            ),
+            "infeasible_proposals_rejected": int(
+                sum(int(result["infeasible_proposals_rejected"]) for result in results)
+            ),
+        }
+    )
+    return winner
+
+
 def benchmark_threshold_optimizers(
     evaluator: FixedLayoutThresholdEvaluator,
     target_accuracy: float = DEFAULT_TARGET_ACCURACY,
@@ -1356,7 +1594,7 @@ def benchmark_threshold_optimizers(
     annealing_iterations: int = 2_000,
     random_seed: int = 0,
 ) -> dict:
-    """Run exact grid search and annealing/polish on exactly the same grid."""
+    """Compare exact grid search with the canonical restarted continuous SA."""
     grids = build_threshold_grids(evaluator, quantile_points)
     exhaustive = optimize_fixed_layout_thresholds_exhaustive(
         evaluator,
