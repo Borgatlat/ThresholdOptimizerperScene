@@ -40,8 +40,12 @@
         },
         "route_counts": {
           "K0": 8,
-          "K2": 20,
-          "K3": 462,
+          "K2@initial[2]": 12,
+          "K2@specialized[K0:coupe][2]": 7,
+          "K2@specialized[K0:suv][2]": 1,
+          "K3@initial[1]": 324,
+          "K3@specialized[K0:coupe][1]": 56,
+          "K3@specialized[K0:suv][1]": 82,
           "K4": 528,
           "K6": 335,
           "detector": 197
@@ -121,8 +125,12 @@
         },
         "route_counts": {
           "K0": 31,
-          "K2": 98,
-          "K3": 1958,
+          "K2@initial[2]": 58,
+          "K2@specialized[K0:coupe][2]": 35,
+          "K2@specialized[K0:suv][2]": 5,
+          "K3@initial[1]": 1328,
+          "K3@specialized[K0:coupe][1]": 260,
+          "K3@specialized[K0:suv][1]": 370,
           "K4": 2076,
           "K6": 1243,
           "detector": 790
@@ -185,8 +193,11 @@
           }
         },
         "route_counts": {
-          "K2": 106,
-          "K3": 1344,
+          "K2@initial[2]": 3,
+          "K2@specialized[K0:coupe][0]": 103,
+          "K3@initial[1]": 1024,
+          "K3@specialized[K0:coupe][1]": 82,
+          "K3@specialized[K0:suv][0]": 238,
           "detector": 100
         },
         "target_accuracy": 0.9657843770174306,
@@ -308,8 +319,11 @@
         ],
         "route_counts": {
           "K0": 1,
-          "K2": 383,
-          "K3": 5372,
+          "K2@initial[2]": 13,
+          "K2@specialized[K0:coupe][0]": 370,
+          "K3@initial[1]": 4087,
+          "K3@specialized[K0:coupe][1]": 318,
+          "K3@specialized[K0:suv][0]": 967,
           "detector": 440
         },
         "selected_restart_index": 8,
@@ -370,8 +384,8 @@
           }
         },
         "route_counts": {
-          "K2": 1,
-          "K3": 1444,
+          "K2@initial[2]": 1,
+          "K3@initial[1]": 1444,
           "K6": 6,
           "detector": 99
         },
@@ -492,8 +506,8 @@
           9
         ],
         "route_counts": {
-          "K2": 3,
-          "K3": 5722,
+          "K2@initial[2]": 3,
+          "K3@initial[1]": 5722,
           "K4": 1,
           "K6": 26,
           "detector": 444
@@ -530,6 +544,7 @@
     "removed_candidates": [
       "K1"
     ],
+    "route_count_semantics": "threshold_occurrence_or_detector",
     "schema_version": "k1-free-optimizer-benchmark/v1",
     "selected_layout_count": 5545,
     "split_seed": 0,

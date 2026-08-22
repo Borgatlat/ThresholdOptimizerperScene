@@ -266,6 +266,7 @@ def run_benchmark(
     checkpoint_every: int = 25,
     overwrite: bool = False,
     max_layouts: int | None = None,
+    target_accuracy: float | None = None,
 ) -> dict[str, object]:
     if min(iterations, restarts, checkpoint_every) < 1:
         raise ValueError("iterations, restarts, and checkpoint_every must be positive.")
@@ -273,6 +274,8 @@ def run_benchmark(
         workers = min(16, max(1, (os.cpu_count() or 2) - 1))
     if workers < 1:
         raise ValueError("workers must be positive.")
+    if target_accuracy is not None and not 0.0 <= target_accuracy <= 1.0:
+        raise ValueError("target_accuracy must be between 0 and 1 inclusive.")
 
     layouts = list(enumerate_k1_free_layouts())
     if len(layouts) != EXPECTED_LAYOUT_COUNT:
@@ -309,7 +312,13 @@ def run_benchmark(
         prune_reject_all_stages=True,
         strict_thresholds=True,
     )
-    target_accuracy = float(dp_validation["accuracy"])
+    dp_fixed_validation_accuracy = float(dp_validation["accuracy"])
+    if target_accuracy is None:
+        target_accuracy = dp_fixed_validation_accuracy
+        target_accuracy_source = "k1_free_dp_fixed_threshold_validation_accuracy"
+    else:
+        target_accuracy = float(target_accuracy)
+        target_accuracy_source = "explicit_cli_or_api_override"
     dp_validation = _with_constraint(dp_validation, target_accuracy, "dp_fixed_thresholds")
     dp_holdout = _with_constraint(
         dp_holdout_evaluator.evaluate(
@@ -357,7 +366,8 @@ def run_benchmark(
         "split_seed": 0,
         "holdout_fraction": DEFAULT_HOLDOUT_FRACTION,
         "target_accuracy": target_accuracy,
-        "target_accuracy_source": "k1_free_dp_fixed_threshold_validation_accuracy",
+        "target_accuracy_source": target_accuracy_source,
+        "dp_fixed_validation_accuracy": dp_fixed_validation_accuracy,
         "dp_layout_index_in_exhaustive_space": dp_indexed_layout.index,
         "threshold_optimizer": {
             "method": f"best_of_{restarts}_chellapilla_continuous_gaussian_sa",
@@ -515,6 +525,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--workers", type=int)
     parser.add_argument("--checkpoint-every", type=int, default=25)
     parser.add_argument("--max-layouts", type=int)
+    parser.add_argument(
+        "--target-accuracy",
+        type=float,
+        help="Required validation accuracy in [0, 1]. Defaults to the fixed-threshold DP accuracy.",
+    )
     parser.add_argument("--overwrite", action="store_true")
     return parser
 
@@ -531,6 +546,7 @@ def main() -> None:
         checkpoint_every=args.checkpoint_every,
         overwrite=args.overwrite,
         max_layouts=args.max_layouts,
+        target_accuracy=args.target_accuracy,
     )
     print(json.dumps(summary, indent=2, sort_keys=True, default=float))
 

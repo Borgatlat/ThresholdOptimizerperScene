@@ -34,14 +34,10 @@ from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
 from time import perf_counter
-<<<<<<< Updated upstream
-from typing import Mapping, Sequence
-from tqdm import *
-=======
 from typing import Collection, Mapping, Sequence
 
->>>>>>> Stashed changes
 import numpy as np
+from tqdm import trange
 
 from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
 from hierarchy_optimizer import (
@@ -210,12 +206,15 @@ class FixedLayoutThresholdEvaluator:
         self._global_name_to_idx = {
             name: idx for idx, name in enumerate(self.global_class_names)
         }
-        ending_ids = [*self.tunable_model_ids, self.detector_id]
+        # Route endings use the same occurrence-qualified ids as thresholds,
+        # so a repeated model remains distinguishable across initial and
+        # specialized branches in result packets and figures.
+        ending_ids = [*self.tunable_ids, self.detector_id]
         if optimizer.detector_mode == "trained":
             ending_ids[-1] = optimizer.detector_outcome_id
-        self._ending_ids = tuple(dict.fromkeys(ending_ids))
+        self._ending_ids = tuple(ending_ids)
         self._ending_codes = {
-            candidate_id: index for index, candidate_id in enumerate(self._ending_ids)
+            route_id: index for index, route_id in enumerate(self._ending_ids)
         }
 
     def _load_true_labels(self) -> tuple[np.ndarray, np.ndarray]:
@@ -325,7 +324,7 @@ class FixedLayoutThresholdEvaluator:
         executed_slots: set[str] = set()
         final_prediction = np.full(self.sample_count, -1, dtype=int)
         final_cost = np.zeros(self.sample_count, dtype=float)
-        ending = np.full(self.sample_count, -1, dtype=np.int8)
+        ending = np.full(self.sample_count, -1, dtype=np.int32)
 
         pending = np.ones(self.sample_count, dtype=bool)
         for index, candidate_id in enumerate(self.cascade.initial):
@@ -350,6 +349,7 @@ class FixedLayoutThresholdEvaluator:
             if self._is_identifier(candidate_id):
                 self._route_identifier(
                     candidate_id,
+                    slot_id,
                     accepted,
                     accepts,
                     final_prediction,
@@ -363,6 +363,7 @@ class FixedLayoutThresholdEvaluator:
                 self._finish_candidate(
                     accepted,
                     candidate_id,
+                    slot_id,
                     final_prediction,
                     ending,
                 )
@@ -430,6 +431,7 @@ class FixedLayoutThresholdEvaluator:
     def _route_identifier(
         self,
         router_id: str,
+        router_slot_id: str,
         accepted: np.ndarray,
         accepts: Mapping[str, np.ndarray],
         final_prediction: np.ndarray,
@@ -465,7 +467,7 @@ class FixedLayoutThresholdEvaluator:
                 )
             elif group in self._global_name_to_idx:
                 final_prediction[branch_mask] = self._global_name_to_idx[group]
-                ending[branch_mask] = self._ending_codes[router_id]
+                ending[branch_mask] = self._ending_codes[router_slot_id]
             else:
                 self._finish_detector(branch_mask, final_prediction, final_cost, ending)
 
@@ -507,7 +509,13 @@ class FixedLayoutThresholdEvaluator:
             ):
                 continue
             final_cost[pending] += self._cost(candidate_id)
-            self._finish_candidate(accepted, candidate_id, final_prediction, ending)
+            self._finish_candidate(
+                accepted,
+                candidate_id,
+                slot_id,
+                final_prediction,
+                ending,
+            )
             pending &= ~accepted
 
         if pending.any():
@@ -517,11 +525,12 @@ class FixedLayoutThresholdEvaluator:
         self,
         mask: np.ndarray,
         candidate_id: str,
+        route_id: str,
         final_prediction: np.ndarray,
         ending: np.ndarray,
     ) -> None:
         final_prediction[mask] = self.prediction[candidate_id][mask]
-        ending[mask] = self._ending_codes[candidate_id]
+        ending[mask] = self._ending_codes[route_id]
 
     @staticmethod
     def _execute_stage(
@@ -1134,25 +1143,6 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
     evaluator: FixedLayoutThresholdEvaluator,
     target_accuracy: float = DEFAULT_TARGET_ACCURACY,
     *,
-<<<<<<< Updated upstream
-    n_iterations: int = 2_000,
-    random_seed: int = 0,
-    show_progress: bool = True,
-) -> dict:
-    """Continuous Gaussian SA based on Chellapilla, Shilman, and Simard.
-
-    The DAS 2006 algorithm starts with all rejection thresholds at one, moves
-    every threshold by a zero-mean Gaussian step, clips proposals to the valid
-    limits, rejects accuracy-constraint violations, and cools from ``N`` to
-    one threshold-index step.  In continuous confidence coordinates this is a
-    Gaussian standard deviation cooling geometrically from ``1`` to ``1/N``.
-
-    The paper normalizes classifier costs so the fastest stage has cost one.
-    We apply the same normalization for Metropolis acceptance.  It does not
-    specify the interpolation used for continuous cooling; geometric cooling
-    is used here so both endpoints are preserved without depending on units.
-    No grid, independent random proposal, or post-SA polish is used.
-=======
     n_iterations: int = 1_000,
     random_seed: int = 0,
     show_progress: bool = True,
@@ -1166,7 +1156,6 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
     scale is represented by ``1 / sample_count``.  Their deployment rule also
     deletes a stage that accepts no validation samples, so these evaluations
     use strict ``confidence > threshold`` acceptance and zero-cost pruning.
->>>>>>> Stashed changes
     """
     if not 0.0 <= target_accuracy <= 1.0:
         raise ValueError("target_accuracy must be between 0 and 1.")
@@ -1174,15 +1163,11 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
         raise ValueError("n_iterations must be at least 1.")
     slot_ids = evaluator.tunable_ids
     if not slot_ids:
-<<<<<<< Updated upstream
-        metrics = evaluator.evaluate({})
-=======
         metrics = evaluator.evaluate(
             {},
             prune_reject_all_stages=True,
             strict_thresholds=True,
         )
->>>>>>> Stashed changes
         return _result(
             metrics,
             target_accuracy,
@@ -1208,18 +1193,6 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
         if evaluator._cost(candidate_id) > 0.0
     ]
     cost_normalization = min(positive_costs) if positive_costs else 1.0
-<<<<<<< Updated upstream
-
-    current = {slot_id: 1.0 for slot_id in slot_ids}
-    current_metrics = evaluator.evaluate(current, include_route_counts=False)
-    evaluations = 1
-    if float(current_metrics["accuracy"]) < target_accuracy:
-        raise ValueError(
-            "The all-one Chellapilla initialization is infeasible under the "
-            "evaluator's confidence acceptance semantics."
-        )
-    best_metrics = current_metrics
-=======
     current = {slot_id: 1.0 for slot_id in slot_ids}
     current_metrics = evaluator.evaluate(
         current,
@@ -1231,7 +1204,6 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
         raise ValueError("The all-one Chellapilla initialization is infeasible.")
     best_metrics = current_metrics
     evaluations = 1
->>>>>>> Stashed changes
     accepted_moves = 0
     infeasible_rejections = 0
     started = perf_counter()
@@ -1240,13 +1212,8 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
         n_iterations,
         desc="Chellapilla continuous SA",
         disable=not show_progress,
-<<<<<<< Updated upstream
-    ) as t_iter:
-        for iteration in t_iter:
-=======
     ) as iterations:
         for iteration in iterations:
->>>>>>> Stashed changes
             progress = iteration / max(n_iterations - 1, 1)
             temperature = initial_temperature * (
                 final_temperature / initial_temperature
@@ -1262,14 +1229,10 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
                 for slot_id, value in zip(slot_ids, proposal_values, strict=True)
             }
             proposal_metrics = evaluator.evaluate(
-<<<<<<< Updated upstream
-                proposal, include_route_counts=False
-=======
                 proposal,
                 include_route_counts=False,
                 prune_reject_all_stages=True,
                 strict_thresholds=True,
->>>>>>> Stashed changes
             )
             evaluations += 1
             if float(proposal_metrics["accuracy"]) < target_accuracy:
@@ -1280,13 +1243,9 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
                 float(proposal_metrics["expected_cost"])
                 - float(current_metrics["expected_cost"])
             ) / cost_normalization
-<<<<<<< Updated upstream
-            if cost_delta <= 0.0 or rng.random() < math.exp(-cost_delta / temperature):
-=======
             if cost_delta <= 0.0 or rng.random() < math.exp(
                 -cost_delta / temperature
             ):
->>>>>>> Stashed changes
                 current = proposal
                 current_metrics = proposal_metrics
                 accepted_moves += 1
@@ -1295,14 +1254,6 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
                 best_metrics, target_accuracy
             ):
                 best_metrics = proposal_metrics
-<<<<<<< Updated upstream
-                t_iter.set_postfix(
-                    cost=float(proposal_metrics["expected_cost"]), status="Active"
-                )
-
-    elapsed = perf_counter() - started
-    final_metrics = evaluator.evaluate(best_metrics["thresholds"])
-=======
 
     elapsed = perf_counter() - started
     final_metrics = evaluator.evaluate(
@@ -1310,7 +1261,6 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
         prune_reject_all_stages=True,
         strict_thresholds=True,
     )
->>>>>>> Stashed changes
     return _result(
         final_metrics,
         target_accuracy,
@@ -1330,11 +1280,7 @@ def optimize_fixed_layout_thresholds_chellapilla_sa(
     )
 
 
-<<<<<<< Updated upstream
-def optimize_fixed_layout_thresholds_simulated_annealing(
-=======
 def optimize_fixed_layout_thresholds_legacy_grid_sa(
->>>>>>> Stashed changes
     evaluator: FixedLayoutThresholdEvaluator,
     target_accuracy: float = DEFAULT_TARGET_ACCURACY,
     *,

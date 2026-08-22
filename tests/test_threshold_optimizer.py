@@ -6,11 +6,7 @@ import pandas as pd
 from hierarchy_optimizer import Cascade
 from threshold_optimizer import (
     FixedLayoutThresholdEvaluator,
-<<<<<<< Updated upstream
-    optimize_fixed_layout_thresholds_chellapilla_sa,
-=======
     enumerate_threshold_slots,
->>>>>>> Stashed changes
     optimize_fixed_layout_thresholds_exhaustive,
     optimize_fixed_layout_thresholds_chellapilla_sa,
     optimize_fixed_layout_thresholds_legacy_grid_sa,
@@ -121,6 +117,25 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
         self.assertEqual(expanded["K2@initial[1]"], 0.75)
         self.assertEqual(expanded["K2@specialized[K0:suv][0]"], 0.75)
 
+    def test_route_counts_distinguish_repeated_model_occurrences(self) -> None:
+        metrics = repeated_model_evaluator().evaluate(
+            {
+                "K0": 0.5,
+                "K2@initial[1]": 0.65,
+                "K2@specialized[K0:suv][0]": 0.85,
+            }
+        )
+
+        self.assertEqual(
+            metrics["route_counts"],
+            {
+                "K2@initial[1]": 1,
+                "K2@specialized[K0:suv][0]": 1,
+                "detector": 2,
+            },
+        )
+        self.assertEqual(sum(metrics["route_counts"].values()), metrics["total"])
+
     def test_exhaustive_search_optimizes_occurrences_independently(self) -> None:
         evaluator = repeated_model_evaluator()
         result = optimize_fixed_layout_thresholds_exhaustive(
@@ -184,10 +199,9 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
                 show_progress=False,
             )
 
-<<<<<<< Updated upstream
     def test_annealer_rejects_invalid_random_proposal_rate(self) -> None:
         with self.assertRaisesRegex(ValueError, "between 0 and 1"):
-            optimize_fixed_layout_thresholds_simulated_annealing(
+            optimize_fixed_layout_thresholds_legacy_grid_sa(
                 repeated_model_evaluator(),
                 random_proposal_rate=1.1,
                 show_progress=False,
@@ -215,7 +229,7 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
         self.assertNotIn("coordinate_descent_evaluations", first)
         self.assertEqual(first["proposal"], "all_thresholds_continuous_gaussian")
         self.assertTrue(all(0.0 <= value <= 1.0 for value in first["thresholds"].values()))
-=======
+
     def test_canonical_annealer_selects_best_paper_restart(self) -> None:
         evaluator = repeated_model_evaluator()
         independent = [
@@ -297,7 +311,6 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
     def test_frozen_active_slots_reject_unknown_occurrences(self) -> None:
         with self.assertRaisesRegex(ValueError, "unknown fixed-layout occurrences"):
             repeated_model_evaluator().evaluate(active_slots=["not-a-slot"])
->>>>>>> Stashed changes
 
 
 if __name__ == "__main__":
