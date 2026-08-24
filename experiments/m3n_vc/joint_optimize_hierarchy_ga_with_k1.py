@@ -2,8 +2,10 @@
 
 Unlike the historical K1-free experiment, the complete legal layout space
 contains millions of topologies and is therefore represented dynamically
-rather than materialized as a catalogue.  Every visited topology still gets
-the same 8,000-step, 50-quantile inner threshold optimization.
+rather than materialized as a catalogue. Every visited topology receives the
+canonical best-of-ten, 1,000-iteration continuous Chellapilla SA. The target
+accuracy defaults to the fixed-threshold DP baseline with all candidates,
+including K1, available.
 """
 
 from __future__ import annotations
@@ -51,13 +53,14 @@ from layout_search import (
 )
 from threshold_optimizer import (
     DEFAULT_QUANTILE_POINTS,
+    DEFAULT_SA_RESTARTS,
     FixedLayoutThresholdEvaluator,
     split_empirical_outcomes,
 )
 
 
-DEFAULT_TARGET_ACCURACY = 0.9662
-DEFAULT_OUTPUT_DIR = Path("checkpoints/joint_ga_with_k1_h24_target_096")
+DEFAULT_TARGET_ACCURACY: float | None = None
+DEFAULT_OUTPUT_DIR = Path("checkpoints/joint_ga_with_k1_h24_dp_target_paper_sa")
 DEFAULT_POPULATION_SIZE = 32
 DEFAULT_GENERATIONS = 24
 DEFAULT_EVALUATION_BUDGET = 512
@@ -151,6 +154,7 @@ class CachedGenomeFitness:
         target_accuracy: float,
         quantile_points: int,
         iterations: int,
+        restarts: int,
         inner_seed: int,
         settings: Mapping[str, object],
         results_path: Path,
@@ -172,6 +176,7 @@ class CachedGenomeFitness:
             iterations=iterations,
             inner_seed=inner_seed,
             settings=self.settings,
+            restarts=restarts,
         )
         self.cache_hits = 0
         self.new_evaluations = 0
@@ -219,8 +224,12 @@ def _holdout_metrics(
         thresholds = validation.get("thresholds")
         if not isinstance(thresholds, Mapping):
             raise ValueError("The winning validation policy has no thresholds.")
+        replay_options: dict[str, object] = {"strict_thresholds": True}
+        if "active_slots" in validation:
+            replay_options["active_slots"] = validation["active_slots"]
         metrics = FixedLayoutThresholdEvaluator(optimizer, cascade).evaluate(
-            thresholds
+            thresholds,
+            **replay_options,
         )
     metrics = dict(metrics)
     metrics["feasible"] = bool(float(metrics["accuracy"]) >= target_accuracy)
@@ -231,8 +240,9 @@ def run_k1_search(
     *,
     outcomes: Path = DEFAULT_OUTCOMES,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
-    target_accuracy: float = DEFAULT_TARGET_ACCURACY,
+    target_accuracy: float | None = DEFAULT_TARGET_ACCURACY,
     iterations: int = DEFAULT_ITERATIONS,
+    restarts: int = DEFAULT_SA_RESTARTS,
     quantile_points: int = DEFAULT_QUANTILE_POINTS,
     inner_seed: int = DEFAULT_SEED,
     split_seed: int = DEFAULT_SEED,
@@ -260,8 +270,63 @@ def run_k1_search(
         random_seed=outer_seed,
         allow_cached_reentry=False,
     )
+    if iterations < 1 or restarts < 1:
+        raise ValueError("iterations and restarts must both be positive.")
     if not population_size <= evaluation_budget <= layout_count:
         raise ValueError("evaluation_budget must be between population and space size.")
+
+    validation_payload, holdout_payload, split = split_empirical_outcomes(
+        payload,
+        holdout_fraction=holdout_fraction,
+        split_strategy=split_strategy,
+        random_seed=split_seed,
+    )
+    validation_optimizer = HierarchyOptimizer(
+        validation_payload,
+        detector_mode="paper",
+        detector_cost_ms=PAPER_DETECTOR_COST_MS,
+    )
+    holdout_optimizer = HierarchyOptimizer(
+        holdout_payload,
+        detector_mode="paper",
+        detector_cost_ms=PAPER_DETECTOR_COST_MS,
+    )
+    dp_cascade = validation_optimizer.synthesize()
+    dp_validation = dict(
+        FixedLayoutThresholdEvaluator(validation_optimizer, dp_cascade).evaluate(
+            prune_reject_all_stages=True,
+            strict_thresholds=True,
+        )
+    )
+    dp_fixed_validation_accuracy = float(dp_validation["accuracy"])
+    if target_accuracy is None:
+        target_accuracy = dp_fixed_validation_accuracy
+        target_accuracy_source = "full_candidate_dp_fixed_threshold_validation_accuracy"
+    else:
+        target_accuracy = float(target_accuracy)
+        target_accuracy_source = "explicit_cli_or_api_override"
+    if not 0.0 <= target_accuracy <= 1.0:
+        raise ValueError("target_accuracy must be between 0 and 1 inclusive.")
+    dp_validation.update(
+        {
+            "feasible": bool(dp_fixed_validation_accuracy >= target_accuracy),
+            "target_accuracy": target_accuracy,
+            "method": "full_candidate_dp_fixed_thresholds",
+        }
+    )
+    dp_holdout = dict(
+        FixedLayoutThresholdEvaluator(holdout_optimizer, dp_cascade).evaluate(
+            strict_thresholds=True,
+            active_slots=dp_validation["active_slots"],
+        )
+    )
+    dp_holdout.update(
+        {
+            "feasible": bool(float(dp_holdout["accuracy"]) >= target_accuracy),
+            "target_accuracy": target_accuracy,
+            "method": "validation_pruned_policy_holdout_replay",
+        }
+    )
 
     settings: dict[str, object] = {
         "algorithm": "dynamic_constrained_memetic_genetic_algorithm",
@@ -274,9 +339,19 @@ def run_k1_search(
         "detector_mode": "paper",
         "detector_cost_ms": float(PAPER_DETECTOR_COST_MS),
         "target_accuracy": float(target_accuracy),
-        "target_accuracy_source": "explicit_0962",
-        "iterations": int(iterations),
-        "quantile_points": int(quantile_points),
+        "target_accuracy_source": target_accuracy_source,
+        "dp_fixed_validation_accuracy": dp_fixed_validation_accuracy,
+        "threshold_optimizer": {
+            "method": f"best_of_{restarts}_chellapilla_continuous_gaussian_sa",
+            "iterations_per_restart": int(iterations),
+            "restarts": int(restarts),
+            "restart_seeds": [inner_seed + index for index in range(restarts)],
+            "continuous_thresholds": True,
+            "quantile_points_used": False,
+            "prune_stages_accepting_zero_validation_samples": True,
+            "freeze_validation_active_slots_on_holdout": True,
+        },
+        "quantile_points_compatibility_argument": int(quantile_points),
         "inner_seed": int(inner_seed),
         "split_seed": int(split_seed),
         "outer_seed": int(outer_seed),
@@ -297,28 +372,13 @@ def run_k1_search(
             return summary
         raise ValueError("Existing summary belongs to another experiment.")
 
-    validation_payload, holdout_payload, split = split_empirical_outcomes(
-        payload,
-        holdout_fraction=holdout_fraction,
-        split_strategy=split_strategy,
-        random_seed=split_seed,
-    )
-    validation_optimizer = HierarchyOptimizer(
-        validation_payload,
-        detector_mode="paper",
-        detector_cost_ms=PAPER_DETECTOR_COST_MS,
-    )
-    holdout_optimizer = HierarchyOptimizer(
-        holdout_payload,
-        detector_mode="paper",
-        detector_cost_ms=PAPER_DETECTOR_COST_MS,
-    )
     fitness = CachedGenomeFitness(
         validation_optimizer,
         space,
         target_accuracy=target_accuracy,
         quantile_points=quantile_points,
         iterations=iterations,
+        restarts=restarts,
         inner_seed=inner_seed,
         settings=settings,
         results_path=results_path,
@@ -367,6 +427,11 @@ def run_k1_search(
         "new_evaluations_this_invocation": fitness.new_evaluations,
         "elapsed_seconds_this_invocation": elapsed,
         "split": split,
+        "dp_fixed_threshold_baseline": {
+            "layout": _cascade_payload(dp_cascade),
+            "validation": _compact_optimization(dp_validation),
+            "holdout": _compact_optimization(dp_holdout),
+        },
         "holdout_usage": "winner_only_after_validation_search",
         "winner": winner,
     }
@@ -380,6 +445,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--target-accuracy", type=float, default=DEFAULT_TARGET_ACCURACY)
     parser.add_argument("--iterations", type=int, default=DEFAULT_ITERATIONS)
+    parser.add_argument("--restarts", type=int, default=DEFAULT_SA_RESTARTS)
     parser.add_argument("--quantile-points", type=int, default=DEFAULT_QUANTILE_POINTS)
     parser.add_argument("--inner-seed", type=int, default=DEFAULT_SEED)
     parser.add_argument("--split-seed", type=int, default=DEFAULT_SEED)
@@ -405,7 +471,9 @@ def main() -> None:
                     "fraction_evaluated": args.evaluation_budget
                     / legal_layout_count(space),
                     "iterations_per_layout": args.iterations,
-                    "quantile_points": args.quantile_points,
+                    "restarts_per_layout": args.restarts,
+                    "total_iterations_per_layout": args.iterations * args.restarts,
+                    "threshold_optimizer": "chellapilla_continuous_gaussian_sa",
                 },
                 indent=2,
             )
@@ -416,6 +484,7 @@ def main() -> None:
         output_dir=args.output_dir,
         target_accuracy=args.target_accuracy,
         iterations=args.iterations,
+        restarts=args.restarts,
         quantile_points=args.quantile_points,
         inner_seed=args.inner_seed,
         split_seed=args.split_seed,

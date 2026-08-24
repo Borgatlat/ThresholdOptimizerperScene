@@ -84,6 +84,7 @@ from empirical_outcomes import load_empirical_outcomes
 from hierarchy_optimizer import Cascade, HierarchyOptimizer, PAPER_DETECTOR_COST_MS
 from threshold_optimizer import (
     DEFAULT_QUANTILE_POINTS,
+    DEFAULT_SA_RESTARTS,
     FixedLayoutThresholdEvaluator,
     optimize_fixed_layout_thresholds_simulated_annealing,
     split_empirical_outcomes,
@@ -669,12 +670,14 @@ class InnerAnnealingFitness:
         iterations: int,
         inner_seed: int,
         settings: Mapping[str, object],
+        restarts: int = DEFAULT_SA_RESTARTS,
     ) -> None:
         self.optimizer = optimizer
         self.target_accuracy = float(target_accuracy)
         self.quantile_points = int(quantile_points)
         self.iterations = int(iterations)
         self.inner_seed = int(inner_seed)
+        self.restarts = int(restarts)
         self.settings = dict(settings)
 
     def __call__(self, indexed: IndexedLayout) -> dict[str, object]:
@@ -692,6 +695,7 @@ class InnerAnnealingFitness:
                 n_iterations=self.iterations,
                 random_seed=self.inner_seed,
                 show_progress=False,
+                restarts=self.restarts,
             )
         metrics = dict(metrics)
         metrics["feasible"] = bool(

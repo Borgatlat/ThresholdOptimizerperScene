@@ -233,6 +233,8 @@ def _compact_optimization(metrics: Mapping[str, object]) -> dict[str, object]:
         "correct",
         "total",
         "thresholds",
+        "active_slots",
+        "pruned_slots",
         "route_counts",
         "macro_accuracy",
         "worst_class_accuracy",

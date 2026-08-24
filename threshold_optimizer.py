@@ -50,6 +50,7 @@ from hierarchy_optimizer import (
 
 DEFAULT_TARGET_ACCURACY = 0.95
 DEFAULT_QUANTILE_POINTS = 50
+DEFAULT_SA_RESTARTS = 10
 DEFAULT_MAX_EXHAUSTIVE_COMBINATIONS = 500_000
 # A deployment policy must be selected against the fallback that will really
 # run. The paper's perfect, 10-second surrogate remains available explicitly.
@@ -1460,7 +1461,7 @@ def optimize_fixed_layout_thresholds_simulated_annealing(
     coordinate_descent_passes: int = 0,
     accuracy_penalty: float | None = None,
     show_progress: bool = True,
-    restarts: int = 10,
+    restarts: int = DEFAULT_SA_RESTARTS,
 ) -> dict:
     """Return the best of independent continuous DAS 2006 SA restarts.
 

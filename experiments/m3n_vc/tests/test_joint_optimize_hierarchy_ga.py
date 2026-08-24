@@ -275,6 +275,7 @@ class JointHierarchyFitnessTests(unittest.TestCase):
             n_iterations=8_000,
             random_seed=0,
             show_progress=False,
+            restarts=10,
         )
         self.assertEqual(result["validation"]["thresholds"], {"K3": 0.8})
 

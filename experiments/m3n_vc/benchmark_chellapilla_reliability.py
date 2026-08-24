@@ -54,7 +54,7 @@ from threshold_optimizer import (
 
 
 DEFAULT_OUTPUT_DIR = Path("checkpoints/chellapilla_sa_reliability_h24")
-DEFAULT_FIGURES_DIR = Path("figures/chellapilla_sa_reliability_h24")
+DEFAULT_FIGURES_DIR = Path("checkpoints/figures/chellapilla_sa_reliability_h24")
 DEFAULT_LAYOUT_COUNT = 5
 DEFAULT_TRIAL_COUNT = 1_000
 DEFAULT_ITERATIONS = 1_000
@@ -447,13 +447,12 @@ def plot_histograms(
             axis.axvline(float(np.min(costs)), color="#2b8cbe", linewidth=1.5, label="Best")
             axis.axvline(float(np.median(costs)), color="#238b45", linewidth=1.5, label="Median")
             axis.axvline(float(np.mean(costs)), color="#cb181d", linewidth=1.5, label="Mean")
-            axis.set_yscale("log")
             axis.set_xlabel(
                 "Best feasible validation cost found (ms)"
                 if partition == "validation"
                 else "Holdout expected cost of validation-selected policy (ms)"
             )
-            axis.set_ylabel("Trials (log scale)")
+            axis.set_ylabel("Trials")
             axis.grid(axis="y", alpha=0.22)
             axis.set_title(f"Layout {layout_index + 1} (n={len(costs):,})")
             if detailed:
@@ -496,8 +495,9 @@ def plot_histograms(
             f"Chellapilla SA reliability — Layout {layout_index + 1}\n"
             f"{fill(_layout_caption(layout), 88)}"
         )
+        partition_suffix = "" if partition == "validation" else f"_{partition}"
         individual_path = figures_dir / (
-            f"layout_{layout_index + 1:02d}_{partition}_cost_histogram.png"
+            f"layout_{layout_index + 1:02d}{partition_suffix}_cost_histogram.png"
         )
         individual.savefig(individual_path, dpi=200)
         plt.close(individual)
