@@ -1,0 +1,115 @@
+{
+  "classifiers": {
+    "K0": {
+      "accepted_samples": 7024,
+      "confidence_threshold": 0.95,
+      "correct_accepted_samples": 6925,
+      "execution_time_ms": 1.966572997334879,
+      "modality": "Both",
+      "parameters": 141379,
+      "precision": 0.9859054669703873,
+      "scope_samples": 9546,
+      "success_rate": 0.7358055730148754
+    },
+    "K1": {
+      "accepted_samples": 4249,
+      "confidence_threshold": 0.95,
+      "correct_accepted_samples": 4248,
+      "execution_time_ms": 8.791406999807805,
+      "modality": "Both",
+      "parameters": 354827,
+      "precision": 0.9997646505060014,
+      "scope_samples": 9546,
+      "success_rate": 0.4451078985962707
+    },
+    "K2": {
+      "accepted_samples": 5954,
+      "confidence_threshold": 0.9,
+      "correct_accepted_samples": 5826,
+      "execution_time_ms": 6.711494000046514,
+      "modality": "Both",
+      "parameters": 141637,
+      "precision": 0.9785018474974807,
+      "scope_samples": 9546,
+      "success_rate": 0.6237167399958098
+    },
+    "K3": {
+      "accepted_samples": 8216,
+      "confidence_threshold": 0.9,
+      "correct_accepted_samples": 8090,
+      "execution_time_ms": 12.67557300219778,
+      "modality": "Both",
+      "parameters": 1218173,
+      "precision": 0.9846640701071081,
+      "scope_samples": 9546,
+      "success_rate": 0.8606746281164885
+    },
+    "K4": {
+      "accepted_samples": 3131,
+      "confidence_threshold": 0.95,
+      "correct_accepted_samples": 3111,
+      "execution_time_ms": 2.264197000185959,
+      "modality": "Acoustic",
+      "parameters": 37858,
+      "precision": 0.9936122644522517,
+      "scope_samples": 4062,
+      "success_rate": 0.7708025603151157
+    },
+    "K5": {
+      "accepted_samples": 497,
+      "confidence_threshold": 0.95,
+      "correct_accepted_samples": 497,
+      "execution_time_ms": 2.300529997155536,
+      "modality": "Acoustic",
+      "parameters": 37858,
+      "precision": 1.0,
+      "scope_samples": 3684,
+      "success_rate": 0.13490770901194354
+    },
+    "K6": {
+      "accepted_samples": 2518,
+      "confidence_threshold": 0.95,
+      "correct_accepted_samples": 2419,
+      "execution_time_ms": 1.8817610014230013,
+      "modality": "Both",
+      "parameters": 141250,
+      "precision": 0.9606830818109611,
+      "scope_samples": 3684,
+      "success_rate": 0.6834961997828447
+    },
+    "Kdet": {
+      "accepted_samples": 9546,
+      "confidence_threshold": null,
+      "correct_accepted_samples": 9546,
+      "execution_time_ms": 10000.0,
+      "modality": "\u2014",
+      "parameters": null,
+      "precision": 1.0,
+      "scope_samples": 9546,
+      "success_rate": 1.0
+    }
+  },
+  "dataset": "m3n_vc/h24",
+  "definitions": {
+    "precision": "P(correct | accepted)",
+    "success_rate": "P(accepted)"
+  },
+  "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes_h24_with_run9.pkl",
+  "outcomes_sha256": "bba4c751e7bd6836dc49870dbb8f678b77c2984e9d884ab474356adfb6880429",
+  "registry": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\classifier_registry.json",
+  "registry_sha256": "6f03e2624a1fafe4a299e87fb8a03d07dd916361b2e114e1eb675b1267c57c81",
+  "runs": [
+    "run1",
+    "run3",
+    "run5",
+    "run7",
+    "run9"
+  ],
+  "sample_count": 9546,
+  "schema_version": "m3n-vc-model-statistics/v1",
+  "thresholds_by_level": {
+    "global": 0.9,
+    "intermediate": 0.95,
+    "specialized": 0.95
+  }
+}

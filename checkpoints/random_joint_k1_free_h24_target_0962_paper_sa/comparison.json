@@ -1,0 +1,282 @@
+{
+  "experiment_contract": {
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "layout_space_size": 5545,
+    "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+    "removed_candidates": [
+      "K1"
+    ],
+    "split": {
+      "holdout_fraction": 0.2,
+      "holdout_samples": 1550,
+      "per_run": {
+        "run1": {
+          "holdout": 431,
+          "validation": 1723
+        },
+        "run3": {
+          "holdout": 382,
+          "validation": 1526
+        },
+        "run5": {
+          "holdout": 367,
+          "validation": 1469
+        },
+        "run7": {
+          "holdout": 370,
+          "validation": 1478
+        }
+      },
+      "seed": 0,
+      "strategy": "blocked_per_run",
+      "validation_samples": 6196
+    },
+    "target_accuracy": 0.9662,
+    "threshold_optimizer": {
+      "freeze_validation_active_slots_on_holdout": true,
+      "iterations_per_restart": 1000,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "prune_stages_accepting_zero_validation_samples": true,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "restarts": 10
+    }
+  },
+  "inputs": {
+    "exhaustive_layout_results": {
+      "path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\k1_free_full_benchmark_h24_target_0962_paper_sa\\layout_results.jsonl",
+      "sha256": "0c6d8e51cb940c959d3f7dacfd2c20f0ea21a3bec99b29533d6c5c82e654dbc8"
+    },
+    "exhaustive_search": {
+      "path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\k1_free_full_benchmark_h24_target_0962_paper_sa\\summary.json",
+      "sha256": "ae57eeabe508b8a406f2550820ae1567f4128e669a2614402f67e042743a3306"
+    },
+    "genetic_algorithm": {
+      "path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\joint_ga_k1_free_h24_target_0962_paper_sa\\summary.json",
+      "sha256": "c4a9c2f0e344d4ad64797d06b8596325e123519e1aaa2584bdbf2247532b86e1"
+    },
+    "random_sampling": {
+      "path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\random_joint_k1_free_h24_target_0962_paper_sa\\summary.json",
+      "sha256": "4e1af8f9efd3d1ad81fb3f73cebd65a6e7b6370adb85c61a5067e55c8f6509ff"
+    }
+  },
+  "methods": {
+    "exhaustive_search": {
+      "elapsed_seconds": 1993.5309702000013,
+      "elapsed_source_field": "completion_seconds",
+      "evaluated_layouts": 5545,
+      "holdout": {
+        "accuracy": 0.9632258064516129,
+        "expected_cost_ms": 659.8119345976036,
+        "meets_target_accuracy": false,
+        "route_counts": {
+          "K3@initial[1]": 1094,
+          "K3@specialized[K0:coupe][0]": 164,
+          "K3@specialized[K0:suv][0]": 191,
+          "K6": 1,
+          "detector": 100
+        }
+      },
+      "layout": {
+        "initial": [
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K3",
+            "K6",
+            "K5",
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "eb5f9997eb1a7c2c",
+      "layout_index": 2695,
+      "thresholds": {
+        "K0": 0.9994571310625464,
+        "K3@initial[1]": 0.6872828733465445,
+        "K3@specialized[K0:coupe][0]": 0.8190044534028564,
+        "K3@specialized[K0:suv][0]": 0.5919561551566037,
+        "K5": 0.9957012968062633,
+        "K6": 0.9816555836498063
+      },
+      "validation": {
+        "accuracy": 0.9662685603615235,
+        "expected_cost_ms": 740.9332585452195,
+        "meets_target_accuracy": true,
+        "route_counts": {
+          "K3@initial[1]": 4373,
+          "K3@specialized[K0:coupe][0]": 597,
+          "K3@specialized[K0:suv][0]": 769,
+          "K6": 7,
+          "detector": 450
+        }
+      }
+    },
+    "genetic_algorithm": {
+      "elapsed_seconds": 1626.6618770999994,
+      "elapsed_source_field": "elapsed_seconds_this_invocation",
+      "evaluated_layouts": 512,
+      "holdout": {
+        "accuracy": 0.9632258064516129,
+        "expected_cost_ms": 659.8119345976036,
+        "meets_target_accuracy": false,
+        "route_counts": {
+          "K3@initial[1]": 1094,
+          "K3@specialized[K0:coupe][0]": 164,
+          "K3@specialized[K0:suv][0]": 191,
+          "K6": 1,
+          "detector": 100
+        }
+      },
+      "layout": {
+        "initial": [
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K3",
+            "K6",
+            "K5",
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "eb5f9997eb1a7c2c",
+      "layout_index": 2695,
+      "thresholds": {
+        "K0": 0.9994571310625464,
+        "K3@initial[1]": 0.6872828733465445,
+        "K3@specialized[K0:coupe][0]": 0.8190044534028564,
+        "K3@specialized[K0:suv][0]": 0.5919561551566037,
+        "K5": 0.9957012968062633,
+        "K6": 0.9816555836498063
+      },
+      "validation": {
+        "accuracy": 0.9662685603615235,
+        "expected_cost_ms": 740.9332585452195,
+        "meets_target_accuracy": true,
+        "route_counts": {
+          "K3@initial[1]": 4373,
+          "K3@specialized[K0:coupe][0]": 597,
+          "K3@specialized[K0:suv][0]": 769,
+          "K6": 7,
+          "detector": 450
+        }
+      }
+    },
+    "random_sampling": {
+      "elapsed_seconds": 1627.8388766999997,
+      "elapsed_source_field": "search_elapsed_seconds",
+      "evaluated_layouts": 268,
+      "holdout": {
+        "accuracy": 0.964516129032258,
+        "expected_cost_ms": 664.7301358331686,
+        "meets_target_accuracy": false,
+        "route_counts": {
+          "K2@initial[2]": 1,
+          "K3": 1448,
+          "detector": 101
+        }
+      },
+      "layout": {
+        "initial": [
+          "K3",
+          "K0",
+          "K2",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K2",
+            "detector"
+          ],
+          "K0:suv": [
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "68edc7a9141bc3ad",
+      "layout_index": 3390,
+      "thresholds": {
+        "K0": 1.0,
+        "K2@initial[2]": 0.9888603224169353,
+        "K2@specialized[K0:coupe][0]": 0.9536356838479383,
+        "K3": 0.7045473213014299
+      },
+      "validation": {
+        "accuracy": 0.9662685603615235,
+        "expected_cost_ms": 744.2852776132405,
+        "meets_target_accuracy": true,
+        "route_counts": {
+          "K2@initial[2]": 2,
+          "K3": 5741,
+          "detector": 453
+        }
+      }
+    }
+  },
+  "pairwise_validation_cost_ms": {
+    "ga_minus_exhaustive": 0.0,
+    "random_minus_exhaustive": 3.352019068021036,
+    "random_minus_ga": 3.352019068021036
+  },
+  "sampling_analysis": {
+    "actual_equal_time_prefix": {
+      "best_layout_id": "68edc7a9141bc3ad",
+      "best_layout_index": 3390,
+      "best_validation_accuracy": 0.9662685603615235,
+      "best_validation_cost_ms": 744.2852776132405,
+      "evaluated_layouts": 268
+    },
+    "actual_prefix_reproduces_random_winner": true,
+    "equal_ga_evaluation_prefix": {
+      "best_layout_id": "eb5f9997eb1a7c2c",
+      "best_layout_index": 2695,
+      "best_validation_accuracy": 0.9662685603615235,
+      "best_validation_cost_ms": 740.9332585452195,
+      "evaluated_layouts": 512
+    },
+    "exhaustive_layout_counts_relative_to_random": {
+      "at_or_better": 1136,
+      "strictly_better": 13
+    },
+    "global_optimum": {
+      "first_sample_rank_one_based": 294,
+      "first_sample_rank_zero_based": 293,
+      "nominal_layout_count": 1,
+      "validation_cost_ms": 740.9332585452195
+    },
+    "layout_order_sha256": "abe4af45563c792f6bf2bbcaf17bf590749a0579c5efa0350b1ec36e661d09d8",
+    "sampling_seed": 0
+  },
+  "schema_version": "k1-free-random-ga-exhaustive-comparison/v1",
+  "validation_regret_to_exhaustive_ms": {
+    "exhaustive_search": 0.0,
+    "genetic_algorithm": 0.0,
+    "random_sampling": 3.352019068021036
+  }
+}

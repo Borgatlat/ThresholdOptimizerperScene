@@ -1,0 +1,287 @@
+{
+  "assumptions_and_limitations": [
+    "The GA is seeded with mandatory K3->detector while uniform random sampling is unseeded. Results therefore compare the implemented search procedures, including that a-priori GA advantage.",
+    "Trials vary outer layout-search seeds only; split and threshold-SA seeds are fixed.",
+    "The exact sign test has limited power with ten trials.",
+    "Reported per-method wall times may be affected by concurrent independent trials.",
+    "The primary historical time convention favors random because the GA budget includes holdout replay and raw random includes its final deadline-crossing layout; censored and equal-512 sensitivities are reported.",
+    "Holdout results are descriptive and never select a winner."
+  ],
+  "complete": true,
+  "completed_trials": 10,
+  "contract": {
+    "dataset": "m3n_vc/h24",
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "equal_evaluation_secondary": {
+      "random_layout_prefix": 512,
+      "scope": "validation_only_posthoc_exhaustive_oracle_replay"
+    },
+    "fixed_seed_fields": {
+      "inner_seed": 0,
+      "split_seed": 0
+    },
+    "genetic_algorithm": {
+      "algorithm": "constrained_memetic_genetic_algorithm",
+      "component_resample_rate": 0.3,
+      "crossover_rate": 0.8,
+      "elite_count": 4,
+      "evaluation_budget": 512,
+      "generations": 24,
+      "internal_workers": 1,
+      "mandatory_initial_member": {
+        "initial": [
+          "K3",
+          "detector"
+        ],
+        "specialized": {}
+      },
+      "max_restarts": 3,
+      "mutation_rate": 0.8,
+      "outer_schedule": "fixed",
+      "population_size": 32,
+      "random_immigrant_rate": 0.2,
+      "stagnation_generations": 6,
+      "tournament_size": 2
+    },
+    "layout_catalogue_sha256": "9907857a0bd3d1f008e63dddd138744f2d6c2fa7d5392b9a79aae90632ff0140",
+    "layout_space_size": 5545,
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+    "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+    "primary_comparison": {
+      "cost_delta": "random_minus_ga_ms_positive_favors_ga",
+      "scope": "validation_only",
+      "selection_rule": "feasibility_aware_topology_selection"
+    },
+    "random_sampling": {
+      "algorithm": "uniform_random_layout_sampling_without_replacement",
+      "atomic_layout_overshoot_allowed": true,
+      "mandatory_initial_member": null,
+      "time_budget": "paired_ga_reported_elapsed_seconds_this_invocation"
+    },
+    "removed_candidates": [
+      "K1"
+    ],
+    "schema_version": "paired-ga-vs-random-k1-free/v1",
+    "search_asymmetry": "The GA is seeded with mandatory K3->detector while uniform random sampling is unseeded. Results therefore compare the implemented search procedures, including that a-priori GA advantage.",
+    "split": {
+      "holdout_fraction": 0.2,
+      "seed": 0,
+      "strategy": "blocked_per_run"
+    },
+    "target_accuracy": 0.9662,
+    "threshold_optimizer": {
+      "fitness_implementation_sha256": "6bf59e5e7de47be6ca5ba0839d60b8aac7862cf9c0573560188337c4ced733bf",
+      "freeze_validation_active_slots_on_holdout": true,
+      "inner_seed_varies_across_trials": false,
+      "iterations_per_restart": 1000,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "prune_stages_accepting_zero_validation_samples": true,
+      "quantile_points_recorded_but_unused": 50,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "restarts": 10
+    },
+    "trial_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "varied_seed_fields": {
+      "genetic_algorithm": "outer_seed",
+      "random_sampling": "sampling_seed"
+    }
+  },
+  "deadline_censored_random_validation_secondary": {
+    "available_trials": 10,
+    "exact_two_sided_sign_test": {
+      "p_value": 0.5078125,
+      "ties_excluded": 1
+    },
+    "feasible_random_minus_ga_cost_ms": {
+      "maximum": 1.4835610846008649,
+      "mean": -0.0055600291652353915,
+      "median": 0.022271368948167947,
+      "minimum": -1.8684579834201713,
+      "population_stddev": 1.0901527521447218
+    },
+    "method": "exclude_random_layouts_completed_after_paired_GA_budget",
+    "overtime_layouts_excluded": {
+      "maximum": 1.0,
+      "mean": 1.0,
+      "median": 1.0,
+      "minimum": 1.0,
+      "population_stddev": 0.0
+    },
+    "paired_outcomes": {
+      "ga_better": 6,
+      "random_better": 3,
+      "tie": 1
+    },
+    "remaining_timing_asymmetry": "Censoring removes deadline-crossing layouts, but random still receives GA winner-holdout time as validation-search budget."
+  },
+  "equal_512_validation_oracle_secondary": {
+    "exact_two_sided_sign_test": {
+      "p_value": 1.0,
+      "ties_excluded": 1
+    },
+    "feasible_random_minus_ga_cost_ms": {
+      "maximum": 1.4835610846008649,
+      "mean": -0.04888285521676607,
+      "median": 0.011135684474083973,
+      "minimum": -1.8684579834201713,
+      "population_stddev": 1.0967740691154475
+    },
+    "method": "posthoc_exhaustive_oracle_replay",
+    "paired_outcomes": {
+      "ga_better": 5,
+      "random_better": 4,
+      "tie": 1
+    }
+  },
+  "expected_trials": 10,
+  "holdout_descriptive": {
+    "not_used_for_selection": true,
+    "random_minus_ga_cost_ms": {
+      "maximum": 8.252918701380167,
+      "mean": -4.010247734591223,
+      "median": -5.7458371886648365,
+      "minimum": -11.49178137668082,
+      "population_stddev": 5.687797821283525
+    }
+  },
+  "oracle": {
+    "optimum_layout_id": "eb5f9997eb1a7c2c",
+    "results_path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\k1_free_full_benchmark_h24_target_0962_paper_sa\\layout_results.jsonl",
+    "results_sha256": "0c6d8e51cb940c959d3f7dacfd2c20f0ea21a3bec99b29533d6c5c82e654dbc8",
+    "summary_path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\k1_free_full_benchmark_h24_target_0962_paper_sa\\summary.json",
+    "summary_sha256": "ae57eeabe508b8a406f2550820ae1567f4128e669a2614402f67e042743a3306"
+  },
+  "orchestration": {
+    "ga_phase_pending_trials": 10,
+    "internal_layout_workers": 1,
+    "parallel_trials_requested": 10,
+    "phase_barrier": "all_pending_GA_then_all_pending_random",
+    "random_phase_pending_trials": 10,
+    "seed_zero_imported": false,
+    "threading_environment_expectation": "Set OMP_NUM_THREADS=MKL_NUM_THREADS=OPENBLAS_NUM_THREADS=NUMEXPR_NUM_THREADS=1 before Python starts.",
+    "timing_interpretation": "Wrapper wall and process CPU seconds are recorded per invocation. Primary random budgets use GA-reported elapsed wall seconds.",
+    "worker_progress_output": "suppressed"
+  },
+  "primary_validation_comparison": {
+    "bootstrap_95pct_mean_feasible_delta_ms": [
+      -0.7099352383250807,
+      0.6416258883382511
+    ],
+    "exact_two_sided_sign_test": {
+      "non_tied_trials": 9,
+      "p_value": 0.5078125,
+      "ties_excluded": 1
+    },
+    "feasible_random_minus_ga_cost_ms": {
+      "maximum": 1.4835610846008649,
+      "mean": -0.0055600291652353915,
+      "median": 0.022271368948167947,
+      "minimum": -1.8684579834201713,
+      "population_stddev": 1.0901527521447218
+    },
+    "ga_exhaustive_rank": {
+      "maximum": 5.0,
+      "mean": 4.6,
+      "median": 5.0,
+      "minimum": 1.0,
+      "population_stddev": 1.2
+    },
+    "metric": "feasibility-aware selection; feasible cost delta is random-GA",
+    "paired_outcomes": {
+      "ga_better": 6,
+      "random_better": 3,
+      "tie": 1
+    },
+    "positive_feasible_cost_delta_favors": "genetic_algorithm",
+    "random_exhaustive_rank": {
+      "maximum": 18.0,
+      "mean": 7.6,
+      "median": 8.0,
+      "minimum": 1.0,
+      "population_stddev": 5.535341001239219
+    },
+    "raw_random_minus_ga_cost_ms_descriptive": {
+      "maximum": 1.4835610846008649,
+      "mean": -0.0055600291652353915,
+      "median": 0.022271368948167947,
+      "minimum": -1.8684579834201713,
+      "population_stddev": 1.0901527521447218
+    }
+  },
+  "schema_version": "paired-ga-vs-random-k1-free/v1",
+  "trials": [
+    {
+      "summary": "trial_00/summary.json",
+      "summary_sha256": "4c476dc695fe39d01806207c4e84459ca6ea3938f11cc82216a763dd715d5b7e",
+      "trial_seed": 0
+    },
+    {
+      "summary": "trial_01/summary.json",
+      "summary_sha256": "a7ef5197c2b03fb0f55e92bb8914cb317bf55f85d5053eaa237e3576f758cb93",
+      "trial_seed": 1
+    },
+    {
+      "summary": "trial_02/summary.json",
+      "summary_sha256": "ce3bc8505c06938e61113022fb545b691ac69c759c27ae23af0c0e62fb852848",
+      "trial_seed": 2
+    },
+    {
+      "summary": "trial_03/summary.json",
+      "summary_sha256": "92ad5818e093f0cb97abfe431cb7f0d8da372dddef42744b001c55c785151bf0",
+      "trial_seed": 3
+    },
+    {
+      "summary": "trial_04/summary.json",
+      "summary_sha256": "731d62abdf1558a79e81a630be4712602547648cce654fbf7c89f51d4a89db57",
+      "trial_seed": 4
+    },
+    {
+      "summary": "trial_05/summary.json",
+      "summary_sha256": "2bf41dc2274670c08ec15e0ee95ee15ba5d6feecda1194e5ad643a24209f06ae",
+      "trial_seed": 5
+    },
+    {
+      "summary": "trial_06/summary.json",
+      "summary_sha256": "816efa11a1d24c274eae69879f4e5188c1e49d3f3e960d14d81d2c81d992ccea",
+      "trial_seed": 6
+    },
+    {
+      "summary": "trial_07/summary.json",
+      "summary_sha256": "d1b81144c5e04fd76a717d8fed0ed7fde56931fbd7ae696dc434e72c3dff9fab",
+      "trial_seed": 7
+    },
+    {
+      "summary": "trial_08/summary.json",
+      "summary_sha256": "67fb7d9edb555b7fdb333f66c861a648434ae8a5539da1c17a1f46e0eacaf967",
+      "trial_seed": 8
+    },
+    {
+      "summary": "trial_09/summary.json",
+      "summary_sha256": "9c04b5fcfb726f2ae5c9efb19b40151dfbefc749c643b19aed5a0cab1714a501",
+      "trial_seed": 9
+    }
+  ]
+}

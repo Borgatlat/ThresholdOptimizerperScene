@@ -1,0 +1,110 @@
+{
+  "dataset": "m3n_vc/h24",
+  "detector_cost_ms": 10000.0,
+  "detector_mode": "paper",
+  "fixed_seed_fields": {
+    "inner_seed": 0,
+    "split_seed": 0,
+    "threshold_restart_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "genetic_algorithm": {
+    "algorithm": "dynamic_constrained_memetic_genetic_algorithm",
+    "allow_cached_reentry": false,
+    "component_resample_rate": 0.3,
+    "crossover_rate": 0.8,
+    "elite_count": 4,
+    "evaluation_budget": 512,
+    "generations": 24,
+    "internal_layout_workers": 1,
+    "mandatory_initial_member": {
+      "initial": [
+        "K3",
+        "detector"
+      ],
+      "specialized": {}
+    },
+    "mutation_rate": 0.8,
+    "population_size": 32,
+    "random_immigrant_rate": 0.2,
+    "tournament_size": 2
+  },
+  "implementation_fingerprints": {
+    "genetic_algorithm": "517cc85b9eb1967ec50cd84cf872803c526fecf9530ee056fb988d86166035cb",
+    "random_sampling": "7d3640b62be6dd86daa2b570c665268e71da0e78fe970ac16933f1031e2de798"
+  },
+  "layout_grammar": "depth_one_K0_K1",
+  "layout_space_size": 11589085,
+  "oracle_limitation": "No exhaustive K1-enabled oracle exists for the 11,589,085-layout space; global ranks, exact-optimum recovery, and optimum regret are therefore unavailable.",
+  "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+  "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+  "primary_comparison": {
+    "cost_delta": "random_minus_ga_ms_positive_favors_ga",
+    "scope": "validation_only",
+    "selection_rule": "feasibility_aware_topology_selection"
+  },
+  "random_sampling": {
+    "algorithm": "uniform_random_implicit_layout_sampling_without_replacement",
+    "atomic_layout_overshoot_allowed": true,
+    "mandatory_initial_member": null,
+    "minimum_classifier_condition": null,
+    "sampler": "exact_uniform_over_all_legal_layouts",
+    "time_budget": "paired_ga_elapsed_seconds_this_invocation"
+  },
+  "removed_candidates": [],
+  "schema_version": "paired-ga-vs-random-with-k1/v1",
+  "search_asymmetry": "The GA is seeded with mandatory K3->detector while exact-uniform random sampling is unseeded. In addition, the GA representation's random initial members and immigrants sample component lengths uniformly, which overweights shorter layouts relative to exact-uniform sampling over the complete legal space. Results therefore compare the complete implemented search procedures, including both asymmetries.",
+  "split": {
+    "holdout_fraction": 0.2,
+    "seed": 0,
+    "strategy": "blocked_per_run"
+  },
+  "target_accuracy": 0.9,
+  "threshold_optimizer": {
+    "freeze_validation_active_slots_on_holdout": true,
+    "inner_seed_varies_across_trials": false,
+    "iterations_per_restart": 1000,
+    "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+    "prune_stages_accepting_zero_validation_samples": true,
+    "quantile_points_recorded_but_unused": 50,
+    "restart_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "restarts": 10
+  },
+  "trial_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "varied_seed_fields": {
+    "genetic_algorithm": "outer_seed",
+    "random_sampling": "sampling_seed"
+  }
+}

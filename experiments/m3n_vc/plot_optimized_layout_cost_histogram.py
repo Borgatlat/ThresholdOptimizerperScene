@@ -53,7 +53,6 @@ def plot_histogram(
 
     methods = summary["methods"]
     joint_cost = float(methods["exhaustive_joint"]["validation"]["expected_cost"])
-    sa_cost = float(methods["sa_on_dp_layout"]["validation"]["expected_cost"])
     target_accuracy = 100.0 * float(summary["target_accuracy"])
     zoom_costs = feasible_costs[feasible_costs <= zoom_max_ms]
 
@@ -69,11 +68,26 @@ def plot_histogram(
     axes[0].set_xlabel("Best validation cost per layout (ms, log scale)")
     axes[0].set_ylabel("Number of layouts")
 
-    zoom_bins = np.linspace(float(feasible_costs.min()) * 0.995, zoom_max_ms, 48)
-    axes[1].hist(zoom_costs, bins=zoom_bins, color="#72B7B2", edgecolor="white")
+    zoom_min_ms = float(np.floor(feasible_costs.min()))
+    zoom_span_ms = zoom_max_ms - zoom_min_ms
+    zoom_bin_width_ms = max(
+        0.25,
+        float(np.ceil((zoom_span_ms / 60.0) * 4.0) / 4.0),
+    )
+    zoom_bins = np.arange(
+        zoom_min_ms,
+        zoom_max_ms + zoom_bin_width_ms,
+        zoom_bin_width_ms,
+    )
+    axes[1].hist(zoom_costs, bins=zoom_bins, color="#72B7B2")
     axes[1].set_title(f"Low-cost region (≤ {zoom_max_ms:g} ms)")
     axes[1].set_xlabel("Best validation cost per layout (ms)")
     axes[1].set_ylabel("Number of layouts")
+    axes[1].set_xlim(zoom_min_ms, zoom_max_ms)
+    tick_step_ms = max(1.0, float(np.ceil((zoom_max_ms - zoom_min_ms) / 10.0)))
+    axes[1].set_xticks(
+        np.arange(zoom_min_ms, zoom_max_ms + 1e-9, tick_step_ms)
+    )
 
     for axis in axes:
         axis.axvline(
@@ -82,25 +96,17 @@ def plot_histogram(
             linewidth=1.8,
             label=f"Joint optimum: {joint_cost:.3f} ms",
         )
-        axis.axvline(
-            sa_cost,
-            color="#2CA02C",
-            linestyle="--",
-            linewidth=1.8,
-            label=f"SA on DP layout: {sa_cost:.3f} ms",
-        )
         axis.grid(axis="y", alpha=0.22)
         axis.legend(frameon=False, fontsize=9)
 
     feasible_count = int(feasible_costs.size)
-    total_count = len(records)
     axes[0].text(
         0.98,
         0.95,
         "\n".join(
             (
-                f"Feasible: {feasible_count:,}/{total_count:,}",
                 f"Median: {np.median(feasible_costs):.3f} ms",
+                f"Standard deviation: {np.std(feasible_costs):.3f} ms",
                 f"90th percentile: {np.quantile(feasible_costs, 0.9):.3f} ms",
             )
         ),
@@ -130,7 +136,7 @@ def plot_histogram(
         0.5,
         0.01,
         "Each value is one layout's best validation cost after best-of-10, "
-        "1,000-iteration Chellapilla SA. Holdout data are not used.",
+        "1,000-iteration Chellapilla SA. Testing data are not used.",
         ha="center",
         fontsize=9,
         color="#444444",

@@ -330,6 +330,7 @@ def run_k1_search(
 
     settings: dict[str, object] = {
         "algorithm": "dynamic_constrained_memetic_genetic_algorithm",
+        "dataset": "m3n_vc/h24",
         "layout_grammar": "depth_one_K0_K1",
         "layout_space_size": layout_count,
         "fitness_implementation_sha256": _implementation_sha256(),

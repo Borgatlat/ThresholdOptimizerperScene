@@ -1,0 +1,42 @@
+{
+  "base_seed": 0,
+  "dataset": "m3n_vc/h24",
+  "detector_cost_ms": 10000.0,
+  "detector_mode": "paper",
+  "dp_fixed_validation_accuracy": 0.9722367731796753,
+  "dp_layout_index_in_exhaustive_space": 5112,
+  "expected_layout_count": 5545,
+  "holdout_fraction": 0.2,
+  "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes_h24_with_run9.pkl",
+  "outcomes_sha256": "bba4c751e7bd6836dc49870dbb8f678b77c2984e9d884ab474356adfb6880429",
+  "removed_candidates": [
+    "K1"
+  ],
+  "schema_version": "k1-free-optimizer-benchmark/v2",
+  "selected_layout_count": 5545,
+  "split_seed": 0,
+  "split_strategy": "blocked_per_run",
+  "target_accuracy": 0.9722367731796753,
+  "target_accuracy_source": "k1_free_dp_fixed_threshold_validation_accuracy",
+  "threshold_optimizer": {
+    "freeze_validation_active_slots_on_holdout": true,
+    "iterations_per_restart": 1000,
+    "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+    "prune_stages_accepting_zero_validation_samples": true,
+    "restart_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "restarts": 10,
+    "seed_strategy": "same_restart_seeds_for_every_layout",
+    "strict_confidence_comparison": true
+  }
+}

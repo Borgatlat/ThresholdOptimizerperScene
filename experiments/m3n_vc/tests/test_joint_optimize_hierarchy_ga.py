@@ -11,6 +11,7 @@ import numpy as np
 from experiments.m3n_vc.joint_optimize_hierarchy_ga import (
     InnerAnnealingFitness,
     TopologyGenome,
+    _fitness_implementation_sha256,
     _load_jsonl,
     build_layout_catalogue,
     cascade_from_genome,
@@ -52,6 +53,11 @@ class JointHierarchyGenomeTests(unittest.TestCase):
                 self.catalogue.entry_for_genome(genome).layout_id,
                 expected_id,
             )
+
+    def test_fitness_fingerprint_resolves_generalized_root_modules(self) -> None:
+        fingerprint = _fitness_implementation_sha256()
+        self.assertEqual(len(fingerprint), 64)
+        int(fingerprint, 16)
 
     def test_repair_enforces_k1_free_router_grammar(self) -> None:
         repaired = repair_genome(

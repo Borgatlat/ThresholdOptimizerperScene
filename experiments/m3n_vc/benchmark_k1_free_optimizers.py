@@ -1,11 +1,13 @@
-"""Benchmark three K1-free h24 hierarchy-optimization strategies.
+"""Benchmark K1-free h24 hierarchy-optimization strategies.
 
 The comparison uses one fixed blocked validation/holdout split:
 
 1. dynamic-programming layout optimization at registry thresholds;
-2. best-of-ten 8,000-iteration Chellapilla SA on that DP layout; and
+2. best-of-ten Chellapilla SA on that DP layout, using the configured number
+   of iterations per restart; and
 3. exhaustive enumeration of all 5,545 legal layouts, with the same restarted
-    SA threshold optimizer applied independently to every layout.
+   SA threshold optimizer applied independently to every layout; and
+4. best-of-ten Chellapilla SA on the linear K3 -> K2 -> detector cascade.
 
 Every layout uses the identical ten random seeds. Reject-all stages are pruned
 on validation following the paper and that active-stage mask is frozen for the
@@ -42,7 +44,7 @@ from experiments.m3n_vc.joint_optimize_hierarchy_ga import (
     _file_sha256,
     _write_json_atomic,
 )
-from hierarchy_optimizer import HierarchyOptimizer, PAPER_DETECTOR_COST_MS
+from hierarchy_optimizer import Cascade, HierarchyOptimizer, PAPER_DETECTOR_COST_MS
 from threshold_optimizer import (
     FixedLayoutThresholdEvaluator,
     optimize_fixed_layout_thresholds_simulated_annealing,
@@ -209,26 +211,32 @@ def _optimize_layout(indexed: IndexedLayout) -> dict[str, object]:
 
 def _plot_comparison(summary: Mapping[str, object], output_dir: Path) -> tuple[Path, Path]:
     methods = summary["methods"]
-    keys = ("dp_fixed_thresholds", "sa_on_dp_layout", "exhaustive_joint")
-    labels = ("DP layout\nfixed thresholds", "SA thresholds\non DP layout", "Exhaustive layouts\n+ SA thresholds")
-    colors = ("#607D8B", "#2A9D8F", "#E76F51")
+    keys = (
+        "exhaustive_joint",
+        "sa_on_dp_layout",
+        "sa_on_k3_k2_linear",
+    )
+    labels = (
+        "Layout-Threshold\nExhaustive Search",
+        "Previous Paper\nOptimized Layout\n(thresholds optimized)",
+        "Linear cascade\nK3 → K2 → detector\n(thresholds optimized)",
+    )
     x = np.arange(len(keys))
     validation_costs = [float(methods[key]["validation"]["expected_cost"]) for key in keys]
     holdout_costs = [float(methods[key]["holdout"]["expected_cost"]) for key in keys]
     validation_accuracies = [100.0 * float(methods[key]["validation"]["accuracy"]) for key in keys]
     holdout_accuracies = [100.0 * float(methods[key]["holdout"]["accuracy"]) for key in keys]
-    completion_times = [float(methods[key]["completion_seconds"]) for key in keys]
 
-    figure, axes = plt.subplots(1, 3, figsize=(14.5, 4.8), layout="constrained")
+    figure, axes = plt.subplots(1, 2, figsize=(13.0, 5.2), layout="constrained")
     width = 0.36
     axes[0].bar(x - width / 2, validation_costs, width, label="Validation", color="#457B9D")
-    axes[0].bar(x + width / 2, holdout_costs, width, label="Holdout", color="#A8DADC")
+    axes[0].bar(x + width / 2, holdout_costs, width, label="Testing", color="#A8DADC")
     axes[0].set_ylabel("Expected cost (ms)")
     axes[0].set_title("Expected cascade cost")
     axes[0].legend(frameon=False)
 
     axes[1].bar(x - width / 2, validation_accuracies, width, label="Validation", color="#457B9D")
-    axes[1].bar(x + width / 2, holdout_accuracies, width, label="Holdout", color="#A8DADC")
+    axes[1].bar(x + width / 2, holdout_accuracies, width, label="Testing", color="#A8DADC")
     axes[1].axhline(100.0 * float(summary["target_accuracy"]), color="#333333", linestyle="--", linewidth=1.1, label="Target")
     lower = min(validation_accuracies + holdout_accuracies) - 0.15
     upper = max(validation_accuracies + holdout_accuracies) + 0.15
@@ -236,12 +244,6 @@ def _plot_comparison(summary: Mapping[str, object], output_dir: Path) -> tuple[P
     axes[1].set_ylabel("Accuracy (%)")
     axes[1].set_title("End-to-end accuracy")
     axes[1].legend(frameon=False)
-
-    bars = axes[2].bar(x, completion_times, color=colors)
-    axes[2].set_yscale("log")
-    axes[2].set_ylabel("Measured completion time (s, log scale)")
-    axes[2].set_title("Optimizer completion time")
-    axes[2].bar_label(bars, labels=[f"{value:.3g}s" for value in completion_times], padding=3, fontsize=8)
 
     for axis in axes:
         axis.set_xticks(x, labels)
@@ -354,6 +356,38 @@ def run_benchmark(
         "validation_pruned_policy_holdout_replay",
     )
 
+    linear_started = perf_counter()
+    linear_layout = Cascade(
+        expected_cost=0.0,
+        initial=["K3", "K2", validation_optimizer.detector_id],
+        specialized={},
+        detector=validation_optimizer.detector_id,
+    )
+    linear_validation_evaluator = FixedLayoutThresholdEvaluator(
+        validation_optimizer, linear_layout
+    )
+    linear_holdout_evaluator = FixedLayoutThresholdEvaluator(
+        holdout_optimizer, linear_layout
+    )
+    linear_validation = optimize_fixed_layout_thresholds_simulated_annealing(
+        linear_validation_evaluator,
+        target_accuracy,
+        n_iterations=iterations,
+        restarts=restarts,
+        random_seed=seed,
+        show_progress=False,
+    )
+    linear_completion = perf_counter() - linear_started
+    linear_holdout = _with_constraint(
+        linear_holdout_evaluator.evaluate(
+            linear_validation["thresholds"],
+            strict_thresholds=True,
+            active_slots=linear_validation["active_slots"],
+        ),
+        target_accuracy,
+        "validation_pruned_policy_holdout_replay",
+    )
+
     settings = {
         "schema_version": "k1-free-optimizer-benchmark/v2",
         "dataset": "m3n_vc/h24",
@@ -400,6 +434,11 @@ def run_benchmark(
 
     records = _read_jsonl(results_path)
     pending = [layout for layout in selected_layouts if layout.index not in records]
+    previous_summary = (
+        json.loads(summary_path.read_text(encoding="utf-8"))
+        if summary_path.exists()
+        else None
+    )
     brute_started = perf_counter()
     print(
         f"K1-free exhaustive search: {len(selected_layouts):,} layouts; "
@@ -438,6 +477,12 @@ def run_benchmark(
                         f"ETA={eta / 60:.1f} min"
                     )
     brute_completion = perf_counter() - brute_started
+    if not pending and previous_summary is not None:
+        previous_exhaustive = previous_summary.get("methods", {}).get(
+            "exhaustive_joint", {}
+        )
+        if int(previous_exhaustive.get("completed_layouts", -1)) == len(records):
+            brute_completion = float(previous_exhaustive["completion_seconds"])
 
     expected_restart_seeds = [seed + index for index in range(restarts)]
     for record in records.values():
@@ -494,6 +539,12 @@ def run_benchmark(
                 "layout": _cascade_payload(dp_layout),
                 "validation": _compact(sa_validation),
                 "holdout": _compact(sa_holdout),
+            },
+            "sa_on_k3_k2_linear": {
+                "completion_seconds": linear_completion,
+                "layout": _cascade_payload(linear_layout),
+                "validation": _compact(linear_validation),
+                "holdout": _compact(linear_holdout),
             },
             "exhaustive_joint": {
                 "completion_seconds": brute_completion,

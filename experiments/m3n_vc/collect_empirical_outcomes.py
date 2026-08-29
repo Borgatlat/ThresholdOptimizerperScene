@@ -124,30 +124,25 @@ def _load_scene_spectrogram_cache(processed_dir: Path, scene: str) -> tuple[np.n
     return mic, geo, metadata
 
 
-def _shared_eval_mask(metadata: pd.DataFrame, eval_runs: set[str] | None) -> np.ndarray:
+def _shared_eval_mask(
+    metadata: pd.DataFrame,
+    eval_runs: set[str] | str | None,
+) -> np.ndarray:
     """Rows used for the shared outcome log.
 
-    Default (eval_runs=None): union of every split currently used anywhere
-    in utils/splits.py (DEFAULT_VAL_RUNS | SUV_VAL_RUNS | COUPE_VAL_RUNS).
-    This default is H24-SPECIFIC -- those run-id sets were chosen for h24's
-    particular run numbering and held-out convention, and have no meaning
-    for a different scene's run ids. For any non-h24 scene, this function
-    is instead called with eval_runs="ALL" (see collect_empirical_outcomes),
-    which uses every row in that scene -- there is no train/val split
-    concept for a scene you're only ever evaluating zero-shot on, never
-    training on.
+    Default (eval_runs=None): h24's empirical optimization pool, runs
+    1, 3, 5, 7, and 9.  Run9 contributes the background examples missing
+    from the four vehicle runs.  For any non-h24 scene, this function is
+    instead called with eval_runs="ALL" (see collect_empirical_outcomes),
+    which uses every row in that scene.
     """
     if eval_runs == "ALL":
         return np.ones(len(metadata), dtype=bool)
 
     if eval_runs is None:
-        from experiments.m3n_vc.utils.splits import (
-            COUPE_VAL_RUNS,
-            DEFAULT_VAL_RUNS,
-            SUV_VAL_RUNS,
-        )
+        from experiments.m3n_vc.utils.splits import H24_EMPIRICAL_RUNS
 
-        eval_runs = DEFAULT_VAL_RUNS | SUV_VAL_RUNS | COUPE_VAL_RUNS
+        eval_runs = set(H24_EMPIRICAL_RUNS)
 
     run_ids = metadata["run_id"].astype(str)
     return run_ids.isin(eval_runs).to_numpy()
@@ -292,9 +287,8 @@ def collect_empirical_outcomes(
     eval_runs: defaults to "ALL" for any scene other than "h24" (no
         train/val split concept applies when you're only ever evaluating
         zero-shot, never training, on that scene's data). For "h24",
-        defaults to the existing DEFAULT_VAL_RUNS|SUV_VAL_RUNS|COUPE_VAL_RUNS
-        union, preserving old behavior. Pass an explicit set to override
-        either default.
+        defaults to runs 1, 3, 5, 7, and 9 so background is represented.
+        Pass an explicit set to override either default.
 
     output_path: defaults to checkpoints/empirical_outcomes_<scene>.pkl
         (or checkpoints/empirical_outcomes.pkl for scene="h24", to match
@@ -419,6 +413,25 @@ if __name__ == "__main__":
     parser.add_argument("--scene", default="h24",
                         help="Scene id: h24, h08, s31, a06, i29, or i22")
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument(
+        "--output-path",
+        default=None,
+        help="Output pickle path (defaults to the scene's canonical checkpoint path)",
+    )
+    parser.add_argument(
+        "--eval-runs",
+        nargs="+",
+        default=None,
+        help="Explicit run ids to collect, or ALL (h24 default: run1 run3 run5 run7 run9)",
+    )
     args = parser.parse_args()
 
-    collect_empirical_outcomes(scene=args.scene, batch_size=args.batch_size)
+    eval_runs = None
+    if args.eval_runs:
+        eval_runs = "ALL" if args.eval_runs == ["ALL"] else set(args.eval_runs)
+    collect_empirical_outcomes(
+        scene=args.scene,
+        output_path=args.output_path,
+        eval_runs=eval_runs,
+        batch_size=args.batch_size,
+    )

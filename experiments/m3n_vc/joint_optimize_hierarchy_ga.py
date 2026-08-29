@@ -3,11 +3,10 @@
 The outer optimizer is a constrained memetic genetic algorithm (GA).  A
 genome contains the initial cascade and the two K0 branches. The fitness of
 every previously unseen, non-detector-only genome is obtained by running the
-*same* threshold optimizer used by :mod:`brute_force_k1_free_layouts`: 8,000
-simulated-annealing iterations on 50-point confidence grids, followed by
-coordinate descent. The detector-only topology is scored directly, as in the
-brute force. Thus the approximation is only over which of the 5,545 layouts
-are visited; a visited layout is evaluated identically to the exhaustive run.
+canonical best-of-ten continuous Chellapilla SA. The detector-only topology
+is scored directly, as in the brute force. Thus the approximation is only
+over which of the 5,545 layouts are visited; a visited layout is evaluated
+identically to the exhaustive run.
 
 The defaults reproduce the brute-force experimental contract:
 
@@ -15,8 +14,7 @@ The defaults reproduce the brute-force experimental contract:
 * paper Kdet (perfect, 10,000 ms);
 * blocked-per-run 80/20 validation/holdout split;
 * the Fig. 1 K3 validation-accuracy target;
-* 50 confidence quantiles; and
-* an 8,000-step inner anneal with seed 0.
+* ten 1,000-iteration continuous-SA restarts with seeds 0 through 9.
 
 Only validation outcomes participate in the GA. The holdout is not consulted
 or evaluated, and the optional exhaustive reference is not read, until the
@@ -778,15 +776,16 @@ def _fitness_implementation_sha256() -> str:
     """Fingerprint source files that define cached layout fitness."""
 
     source_dir = Path(__file__).resolve().parent
+    repository_root = source_dir.parents[1]
     digest = hashlib.sha256()
-    for name in (
-        "brute_force_k1_free_layouts.py",
-        "hierarchy_optimizer.py",
-        "joint_optimize_hierarchy_ga.py",
-        "threshold_optimizer.py",
+    for path in (
+        source_dir / "brute_force_k1_free_layouts.py",
+        repository_root / "hierarchy_optimizer.py",
+        source_dir / "joint_optimize_hierarchy_ga.py",
+        repository_root / "threshold_optimizer.py",
     ):
-        path = source_dir / name
-        digest.update(name.encode("utf-8"))
+        relative_path = path.relative_to(repository_root).as_posix()
+        digest.update(relative_path.encode("utf-8"))
         digest.update(path.read_bytes())
     return digest.hexdigest()
 
@@ -924,7 +923,10 @@ def _final_holdout(
         evaluator = FixedLayoutThresholdEvaluator(holdout_optimizer, cascade)
         thresholds = validation["thresholds"]
         assert isinstance(thresholds, Mapping)
-        metrics = evaluator.evaluate(thresholds)
+        replay_options: dict[str, object] = {"strict_thresholds": True}
+        if "active_slots" in validation:
+            replay_options["active_slots"] = validation["active_slots"]
+        metrics = evaluator.evaluate(thresholds, **replay_options)
     metrics = dict(metrics)
     metrics["feasible"] = bool(float(metrics["accuracy"]) >= target_accuracy)
     return _compact_optimization(metrics)
@@ -1200,6 +1202,21 @@ def _search_settings(
         ),
         "iterations": int(iterations),
         "quantile_points": int(quantile_points),
+        "threshold_optimizer": {
+            "method": (
+                f"best_of_{DEFAULT_SA_RESTARTS}_"
+                "chellapilla_continuous_gaussian_sa"
+            ),
+            "iterations_per_restart": int(iterations),
+            "restarts": DEFAULT_SA_RESTARTS,
+            "restart_seeds": [
+                inner_seed + index for index in range(DEFAULT_SA_RESTARTS)
+            ],
+            "continuous_thresholds": True,
+            "quantile_points_used": False,
+            "prune_stages_accepting_zero_validation_samples": True,
+            "freeze_validation_active_slots_on_holdout": True,
+        },
         "inner_seed": int(inner_seed),
         "split_seed": int(split_seed),
         "outer_seed": int(outer_seed),
