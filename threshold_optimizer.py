@@ -388,11 +388,20 @@ class FixedLayoutThresholdEvaluator:
             "thresholds": threshold_map,
         }
         if prune_reject_all_stages or frozen_active_slots is not None:
+            reported_active_slots = (
+                executed_slots
+                if frozen_active_slots is None
+                else frozen_active_slots
+            )
             metrics["active_slots"] = [
-                slot_id for slot_id in self.tunable_ids if slot_id in executed_slots
+                slot_id
+                for slot_id in self.tunable_ids
+                if slot_id in reported_active_slots
             ]
             metrics["pruned_slots"] = [
-                slot_id for slot_id in self.tunable_ids if slot_id not in executed_slots
+                slot_id
+                for slot_id in self.tunable_ids
+                if slot_id not in reported_active_slots
             ]
         if include_route_counts:
             route_codes, route_counts = np.unique(ending, return_counts=True)

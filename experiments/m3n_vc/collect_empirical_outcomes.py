@@ -53,6 +53,10 @@ from torch.utils.data import DataLoader
 
 from cascade_profile import HierarchyProfile
 from empirical_outcomes import save_empirical_outcomes
+from experiments.m3n_vc.checkpoint_paths import (
+    file_fingerprint,
+    resolve_registry_checkpoint,
+)
 from experiments.m3n_vc.loader import load_cascade_models
 from experiments.m3n_vc.training.trainer import KiDataset
 from experiments.m3n_vc.utils.labels import (
@@ -332,13 +336,23 @@ def collect_empirical_outcomes(
 
     metadata_rows: list[dict] = []
     outcome_frames: list[pd.DataFrame] = []
+    model_checkpoints: dict[str, dict[str, str | int]] = {}
     sample_ids = list(range(len(eval_metadata)))
 
     for ki_name, model in models.items():
         spec = KI_REGISTRY[ki_name]
         rec = registry.get(ki_name)
-        class_names = rec.class_names if rec is not None else spec.class_names
+        if rec is None:
+            raise ValueError(f"No registry record for {ki_name}.")
+        class_names = rec.class_names
         threshold = threshold_hi_for_ki(ki_name)
+        checkpoint_path = resolve_registry_checkpoint(
+            rec.checkpoint,
+            ki_name,
+            checkpoint_dir,
+            registry_path=registry_path,
+        )
+        model_checkpoints[ki_name] = file_fingerprint(checkpoint_path)
 
         print(f"Running {ki_name} over {len(sample_ids)} shared rows...")
         accepted, prediction, confidence = _run_one_classifier(
@@ -451,6 +465,7 @@ def collect_empirical_outcomes(
             "registry": str(registry_path.resolve()),
             "registry_sha256": hashlib.sha256(registry_path.read_bytes()).hexdigest(),
             "checkpoint_dir": str(checkpoint_dir.resolve()),
+            "model_checkpoints": model_checkpoints,
             "paper_detector": bool(paper_detector),
             "detector_behavior": (
                 "perfect_oracle_non_sleeping"

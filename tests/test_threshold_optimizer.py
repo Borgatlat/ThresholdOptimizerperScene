@@ -312,6 +312,18 @@ class PerOccurrenceThresholdTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unknown fixed-layout occurrences"):
             repeated_model_evaluator().evaluate(active_slots=["not-a-slot"])
 
+    def test_frozen_but_unreached_slot_remains_in_deployed_policy(self) -> None:
+        evaluator = repeated_model_evaluator()
+        specialized_slot = "K2@specialized[K0:suv][0]"
+
+        replay = evaluator.evaluate(
+            strict_thresholds=True,
+            active_slots=[specialized_slot],
+        )
+
+        self.assertEqual(replay["active_slots"], [specialized_slot])
+        self.assertNotIn(specialized_slot, replay["pruned_slots"])
+
 
 if __name__ == "__main__":
     unittest.main()

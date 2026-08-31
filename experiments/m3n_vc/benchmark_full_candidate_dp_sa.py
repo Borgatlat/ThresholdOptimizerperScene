@@ -55,6 +55,7 @@ def run_benchmark(
     restarts: int = DEFAULT_SA_RESTARTS,
     seed: int = DEFAULT_SEED,
     target_accuracy: float | None = None,
+    include_linear: bool = True,
 ) -> dict[str, object]:
     if iterations < 1 or restarts < 1:
         raise ValueError("iterations and restarts must both be positive.")
@@ -127,37 +128,55 @@ def run_benchmark(
         "validation_pruned_policy_holdout_replay",
     )
 
-    linear_cascade = Cascade(
-        expected_cost=0.0,
-        initial=["K3", "K2", validation_optimizer.detector_id],
-        specialized={},
-        detector=validation_optimizer.detector_id,
-    )
-    linear_validation_evaluator = FixedLayoutThresholdEvaluator(
-        validation_optimizer, linear_cascade
-    )
-    linear_holdout_evaluator = FixedLayoutThresholdEvaluator(
-        holdout_optimizer, linear_cascade
-    )
-    linear_started = perf_counter()
-    linear_validation = optimize_fixed_layout_thresholds_simulated_annealing(
-        linear_validation_evaluator,
-        target_accuracy,
-        n_iterations=iterations,
-        random_seed=seed,
-        show_progress=False,
-        restarts=restarts,
-    )
-    linear_completion_seconds = perf_counter() - linear_started
-    linear_holdout = _constrained(
-        linear_holdout_evaluator.evaluate(
-            linear_validation["thresholds"],
-            strict_thresholds=True,
-            active_slots=linear_validation["active_slots"],
-        ),
-        target_accuracy,
-        "validation_pruned_policy_holdout_replay",
-    )
+    methods: dict[str, object] = {
+        "dp_fixed_thresholds": {
+            "validation": _compact_optimization(fixed_validation),
+            "holdout": _compact_optimization(fixed_holdout),
+        },
+        "sa_on_dp_layout": {
+            "completion_seconds": completion_seconds,
+            "validation": _compact_optimization(sa_validation),
+            "holdout": _compact_optimization(sa_holdout),
+        },
+    }
+    if include_linear:
+        linear_cascade = Cascade(
+            expected_cost=0.0,
+            initial=["K3", "K2", validation_optimizer.detector_id],
+            specialized={},
+            detector=validation_optimizer.detector_id,
+        )
+        linear_validation_evaluator = FixedLayoutThresholdEvaluator(
+            validation_optimizer, linear_cascade
+        )
+        linear_holdout_evaluator = FixedLayoutThresholdEvaluator(
+            holdout_optimizer, linear_cascade
+        )
+        linear_started = perf_counter()
+        linear_validation = optimize_fixed_layout_thresholds_simulated_annealing(
+            linear_validation_evaluator,
+            target_accuracy,
+            n_iterations=iterations,
+            random_seed=seed,
+            show_progress=False,
+            restarts=restarts,
+        )
+        linear_completion_seconds = perf_counter() - linear_started
+        linear_holdout = _constrained(
+            linear_holdout_evaluator.evaluate(
+                linear_validation["thresholds"],
+                strict_thresholds=True,
+                active_slots=linear_validation["active_slots"],
+            ),
+            target_accuracy,
+            "validation_pruned_policy_holdout_replay",
+        )
+        methods["sa_on_k3_k2_linear"] = {
+            "completion_seconds": linear_completion_seconds,
+            "layout": _cascade_payload(linear_cascade),
+            "validation": _compact_optimization(linear_validation),
+            "holdout": _compact_optimization(linear_holdout),
+        }
 
     summary: dict[str, object] = {
         "settings": {
@@ -173,6 +192,7 @@ def run_benchmark(
             "target_accuracy": target_accuracy,
             "target_accuracy_source": target_accuracy_source,
             "dp_fixed_validation_accuracy": dp_fixed_validation_accuracy,
+            "include_linear_comparison": bool(include_linear),
             "threshold_optimizer": {
                 "method": f"best_of_{restarts}_chellapilla_continuous_gaussian_sa",
                 "iterations_per_restart": iterations,
@@ -186,23 +206,7 @@ def run_benchmark(
         "split": split,
         "layout": _cascade_payload(cascade),
         "target_accuracy": target_accuracy,
-        "methods": {
-            "dp_fixed_thresholds": {
-                "validation": _compact_optimization(fixed_validation),
-                "holdout": _compact_optimization(fixed_holdout),
-            },
-            "sa_on_dp_layout": {
-                "completion_seconds": completion_seconds,
-                "validation": _compact_optimization(sa_validation),
-                "holdout": _compact_optimization(sa_holdout),
-            },
-            "sa_on_k3_k2_linear": {
-                "completion_seconds": linear_completion_seconds,
-                "layout": _cascade_payload(linear_cascade),
-                "validation": _compact_optimization(linear_validation),
-                "holdout": _compact_optimization(linear_holdout),
-            },
-        },
+        "methods": methods,
     }
     _write_json_atomic(output, summary)
     return summary
@@ -216,6 +220,11 @@ def main() -> None:
     parser.add_argument("--restarts", type=int, default=DEFAULT_SA_RESTARTS)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     parser.add_argument("--target-accuracy", type=float)
+    parser.add_argument(
+        "--skip-linear",
+        action="store_true",
+        help="Skip the unrelated K3 -> K2 -> detector comparison.",
+    )
     args = parser.parse_args()
     summary = run_benchmark(
         outcomes=args.outcomes,
@@ -224,6 +233,7 @@ def main() -> None:
         restarts=args.restarts,
         seed=args.seed,
         target_accuracy=args.target_accuracy,
+        include_linear=not args.skip_linear,
     )
     print(summary["methods"]["sa_on_dp_layout"])
 

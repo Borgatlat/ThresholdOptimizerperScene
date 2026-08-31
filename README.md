@@ -241,9 +241,10 @@ the values are saved in `checkpoints/paper_kdet_baseline_target/plot_data.json`.
 
 ## Jetson Nano Live Runtime Benchmark
 
-Run these commands in order on the Jetson. Both prefer CUDA and print an
-explicit CPU fallback if the installed Python 3.11 PyTorch build cannot access
-CUDA.
+Run these commands in order on the Jetson. Model profiling, empirical
+collection, and live inference prefer CUDA and print an explicit CPU fallback
+if the installed Python 3.11 PyTorch build cannot access CUDA; optimization of
+the cached outcome tables is CPU work.
 
 ```bash
 # 1. Profile real K0-K6 forwards at batch size 1. This creates a new registry;
@@ -256,6 +257,10 @@ python -m experiments.m3n_vc.collect_empirical_outcomes \
   --registry checkpoints/classifier_registry_jetson_nano.json \
   --paper-detector \
   --output-path checkpoints/empirical_outcomes_h24_jetson_nano.pkl
+
+# 3. On the Jetson, optimize and live-test the five agreed policies. This
+#    deliberately uses one GA worker and runs every testing sample once.
+python -m experiments.m3n_vc.run_jetson_cascade_experiments
 ```
 
 The profiler writes `checkpoints/classifier_registry_jetson_nano.json` and
@@ -268,9 +273,23 @@ standard deviation, p95, and maximum after warmup, with synchronization before
 and after every CUDA call. Model loading, input loading, and host-to-device
 transfer are excluded.
 
-Copy the profiled registry, profile report, and Jetson empirical-outcome packet
-back to this PC. Recreate the paper classifier table and run the reliability
-benchmark locally:
+The third command uses all candidates, including K1. It synthesizes the fresh
+Jetson-cost DP layout, runs best-of-10 x 1,000-step threshold optimization at
+exact validation targets 0.97 and 0.95, and runs separate K1-inclusive genetic
+joint searches at those targets. It then performs batch-size-1 live inference
+for the fixed-threshold DP policy and the four optimized policies over the
+complete final 20% of run1/3/5/7/9. The non-sleeping oracle detector adds
+10,000 ms. Results and a consolidated packet are written under
+`checkpoints/jetson_nano_h24_cascade_experiments/`. If interrupted, run the
+same command again. The GA reuses its append-only layout cache, while the two
+small DP jobs and live passes rerun; `pipeline_state.json` identifies the
+interrupted stage and reports stage times for the current invocation. The
+pipeline also verifies registry and K0-K6 checkpoint hashes against both the
+latency profile and empirical collection before optimization begins.
+
+Afterward, copy the profiler outputs, empirical-outcome packet, and experiment
+folder back to this PC for plotting. The paper classifier table and optional
+independent SA reliability benchmark can be generated with:
 
 ```bash
 python -m experiments.m3n_vc.plot_model_statistics_table \
@@ -284,13 +303,6 @@ python -m experiments.m3n_vc.benchmark_jetson_best10_sa \
   --outcomes checkpoints/empirical_outcomes_h24_jetson_nano.pkl \
   --target-accuracy 0.95 \
   --workers 24
-
-# Re-run the K1-inclusive GA using Jetson costs rather than workstation costs.
-python -m experiments.m3n_vc.joint_optimize_hierarchy_ga_with_k1 \
-  --outcomes checkpoints/empirical_outcomes_h24_jetson_nano.pkl \
-  --output-dir checkpoints/k1_including_h24_jetson_cost_target_095/ga \
-  --target-accuracy 0.95 \
-  --workers 24
 ```
 
 The SA benchmark selects thresholds only on the first 80% of each of
@@ -298,11 +310,10 @@ run1/3/5/7/run9, then replays each selected policy on the final 20%. Its
 summary contains per-layout and pooled validation/testing mean, median,
 highest, minimum, and standard-deviation cost and accuracy.
 
-The cascade runner reads the K1-including 0.95 GA summary and its frozen
-position-specific thresholds, then writes
-`checkpoints/jetson_nano_live_cascade_h24.json`. K0-K6 execute normally. The
+The cascade runner reads a selected GA, fixed-DP, or threshold-on-DP policy
+and its frozen position-specific thresholds. K0-K6 execute normally. The
 paper's detector returns the ground truth immediately and adds 10,000 ms to
-the calculated cost without sleeping. The report contains live accuracy,
+the calculated cost without sleeping. Each report contains live accuracy,
 per-class accuracy, measured latency, detector-adjusted and registry-based
 costs, terminal routes, path counts, and per-slot/per-model invocation timing.
 Use `--max-samples N` for a smoke test; the default `0` runs the entire testing

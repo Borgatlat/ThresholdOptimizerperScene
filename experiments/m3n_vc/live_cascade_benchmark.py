@@ -193,52 +193,103 @@ def load_policy_thresholds(
     return {str(candidate_id): float(value) for candidate_id, value in thresholds.items()}
 
 
-def load_winner_policy(
-    summary: Mapping[str, object],
-    partition: str,
-) -> tuple["FrozenLayout", dict[str, float], tuple[str, ...], Mapping[str, object]]:
-    """Read a joint-optimizer winner while retaining position-specific slots."""
-    winner = summary.get("winner")
-    if not isinstance(winner, Mapping):
-        raise ValueError("Summary has no winner object.")
-    raw_layout = winner.get("layout")
+def _parse_saved_layout(raw_layout: object) -> "FrozenLayout":
     if not isinstance(raw_layout, Mapping):
-        raise ValueError("Summary winner has no layout object.")
+        raise ValueError("Saved policy has no layout object.")
     initial = raw_layout.get("initial")
     specialized = raw_layout.get("specialized")
     if not isinstance(initial, list) or not isinstance(specialized, Mapping):
-        raise ValueError("Winner layout is missing initial or specialized chains.")
+        raise ValueError("Saved layout is missing initial or specialized chains.")
 
     parsed_specialized: dict[tuple[str, str], tuple[str, ...]] = {}
     for key, chain in specialized.items():
         if not isinstance(key, str) or ":" not in key or not isinstance(chain, list):
-            raise ValueError(f"Malformed winner specialized layout: {key!r}")
+            raise ValueError(f"Malformed saved specialized layout: {key!r}")
         router_id, group = key.split(":", 1)
         parsed_specialized[(router_id, group)] = tuple(str(value) for value in chain)
 
+    return FrozenLayout(
+        initial=tuple(str(value) for value in initial),
+        specialized=parsed_specialized,
+    )
+
+
+def load_saved_policy(
+    summary: Mapping[str, object],
+    saved_policy: str,
+    partition: str,
+) -> tuple[
+    "FrozenLayout",
+    dict[str, float],
+    tuple[str, ...] | None,
+    Mapping[str, object],
+]:
+    """Load a GA winner or one method from a DP/threshold benchmark summary."""
+    if saved_policy == "winner":
+        container = summary.get("winner")
+        if not isinstance(container, Mapping):
+            raise ValueError("Summary has no winner object.")
+        raw_layout = container.get("layout")
+    else:
+        methods = summary.get("methods")
+        if not isinstance(methods, Mapping):
+            raise ValueError("Summary has no methods object.")
+        container = methods.get(saved_policy)
+        if not isinstance(container, Mapping):
+            raise ValueError(f"Summary has no {saved_policy!r} method.")
+        raw_layout = container.get("layout", summary.get("layout"))
+
+    layout = _parse_saved_layout(raw_layout)
+
     saved_partition = "holdout" if partition in {"all", "holdout"} else partition
-    policy = winner.get(saved_partition)
+    policy = container.get(saved_partition)
     if not isinstance(policy, Mapping):
-        raise ValueError(f"Winner has no {saved_partition!r} policy packet.")
-    raw_thresholds = policy.get("thresholds")
+        raise ValueError(
+            f"Saved policy {saved_policy!r} has no {saved_partition!r} packet."
+        )
+    # Holdout is evaluation-only. Thresholds and validation-time pruning must
+    # not change just because a slot happened to be unreachable on the test
+    # samples, so deploy the validation-selected configuration verbatim.
+    configuration = (
+        container.get("validation")
+        if saved_partition == "holdout"
+        else policy
+    )
+    if not isinstance(configuration, Mapping):
+        raise ValueError(
+            f"Saved policy {saved_policy!r} has no validation configuration."
+        )
+    raw_thresholds = configuration.get("thresholds")
     if not isinstance(raw_thresholds, Mapping):
-        raise ValueError(f"Winner {saved_partition!r} packet has no thresholds.")
-    raw_active = policy.get("active_slots")
+        raise ValueError(
+            f"Saved policy {saved_policy!r} {saved_partition!r} packet has no thresholds."
+        )
+    raw_active = configuration.get("active_slots")
     if raw_active is None:
-        active_slots: tuple[str, ...] = ()
+        active_slots: tuple[str, ...] | None = None
     elif isinstance(raw_active, list):
         active_slots = tuple(str(value) for value in raw_active)
     else:
-        raise ValueError("Winner active_slots must be a list when present.")
+        raise ValueError("Saved active_slots must be a list when present.")
     return (
-        FrozenLayout(
-            initial=tuple(str(value) for value in initial),
-            specialized=parsed_specialized,
-        ),
+        layout,
         {str(key): float(value) for key, value in raw_thresholds.items()},
         active_slots,
         policy,
     )
+
+
+def load_winner_policy(
+    summary: Mapping[str, object],
+    partition: str,
+) -> tuple[
+    "FrozenLayout",
+    dict[str, float],
+    tuple[str, ...] | None,
+    Mapping[str, object],
+]:
+    """Compatibility wrapper for loading a joint-optimizer winner."""
+    return load_saved_policy(summary, "winner", partition)
 
 
 def load_frozen_layout(metrics: Mapping[str, object]) -> FrozenLayout:
@@ -755,6 +806,9 @@ def benchmark_live_cascade(
     adjusted = [
         run.measured_model_ms + run.synthetic_detector_ms for run in runs
     ]
+    end_to_end_adjusted = [
+        run.measured_wall_ms + run.synthetic_detector_ms for run in runs
+    ]
     terminal_counts = Counter(run.terminal_route for run in runs)
     route_path_counts = Counter(" -> ".join(run.route_path) for run in runs)
 
@@ -764,7 +818,16 @@ def benchmark_live_cascade(
         "measured_model_latency": _latency_summary(measured_model),
         "costs": {
             "detector_cost_ms": cascade.detector_cost_ms,
+            # Retain the historical key while making its model-only scope
+            # explicit with an alias. The end-to-end value additionally
+            # includes measured Python routing/dispatch overhead.
             "measured_detector_adjusted_expected_cost_ms": float(np.mean(adjusted)),
+            "measured_model_detector_adjusted_expected_cost_ms": float(
+                np.mean(adjusted)
+            ),
+            "measured_end_to_end_detector_adjusted_expected_cost_ms": float(
+                np.mean(end_to_end_adjusted)
+            ),
             "profiled_registry_expected_cost_ms": profile_total_ms / len(runs),
             "measured_real_model_total_ms": float(np.sum(measured_model)),
             "synthetic_detector_total_ms": float(
@@ -801,6 +864,9 @@ def benchmark_live_cascade(
                 "detector_adjusted_cost_ms": (
                     run.measured_model_ms + run.synthetic_detector_ms
                 ),
+                "end_to_end_detector_adjusted_cost_ms": (
+                    run.measured_wall_ms + run.synthetic_detector_ms
+                ),
             }
             for index, run in enumerate(runs)
         ],
@@ -816,11 +882,20 @@ def _device_description(device: torch.device) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Run the saved joint-optimizer winner with live K0-K6 inference and "
-            "a non-sleeping synthetic detector."
+            "Run a saved GA or DP cascade policy with live K0-K6 inference "
+            "and a non-sleeping synthetic detector."
         )
     )
     parser.add_argument("--summary", type=Path, default=DEFAULT_METRICS_PATH)
+    parser.add_argument(
+        "--saved-policy",
+        choices=("winner", "dp_fixed_thresholds", "sa_on_dp_layout"),
+        default="winner",
+        help=(
+            "Policy packet to execute: a joint-GA winner or one method from "
+            "benchmark_full_candidate_dp_sa.py."
+        ),
+    )
     parser.add_argument("--outcomes", type=Path, default=DEFAULT_OUTPUT_PATH)
     parser.add_argument("--processed-dir", type=Path, default=DEFAULT_PROCESSED_DIR)
     parser.add_argument("--checkpoint-dir", type=Path, default=DEFAULT_CHECKPOINT_DIR)
@@ -865,8 +940,8 @@ def main() -> None:
 
     summary = _load_json(args.summary)
     partition = _resolve_partition(summary, args.partition)
-    layout, thresholds, active_slots, saved_policy = load_winner_policy(
-        summary, partition
+    layout, thresholds, active_slots, saved_policy = load_saved_policy(
+        summary, args.saved_policy, partition
     )
     model_ids = active_model_ids(layout)
 
@@ -890,7 +965,7 @@ def main() -> None:
         models,
         registry,
         device,
-        active_slots=active_slots or None,
+        active_slots=active_slots,
         detector_cost_ms=args.detector_cost_ms,
     )
     benchmark = benchmark_live_cascade(
@@ -933,6 +1008,11 @@ def main() -> None:
             "outcomes": str(args.outcomes.resolve()),
             "registry": str(args.registry.resolve()),
         },
+        "saved_policy": args.saved_policy,
+        "configuration_partition": (
+            "validation" if partition in {"all", "holdout"} else partition
+        ),
+        "empirical_reference_partition": partition,
         "layout": {
             "initial": list(layout.initial),
             "specialized": {
@@ -941,7 +1021,7 @@ def main() -> None:
             },
         },
         "thresholds": thresholds,
-        "active_slots": list(active_slots),
+        "active_slots": None if active_slots is None else list(active_slots),
         "warmup_iterations_per_model": args.warmup_iterations,
         "available_samples": live_inputs.available_samples,
         "loaded_samples": int(len(live_inputs.mic)),
@@ -961,8 +1041,8 @@ def main() -> None:
                 "device": report["environment"]["device"],
                 "samples": report["loaded_samples"],
                 "accuracy": benchmark["accuracy"],
-                "detector_adjusted_expected_cost_ms": benchmark["costs"][
-                    "measured_detector_adjusted_expected_cost_ms"
+                "end_to_end_detector_adjusted_expected_cost_ms": benchmark["costs"][
+                    "measured_end_to_end_detector_adjusted_expected_cost_ms"
                 ],
                 "profiled_registry_expected_cost_ms": benchmark["costs"][
                     "profiled_registry_expected_cost_ms"

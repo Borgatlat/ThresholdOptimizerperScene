@@ -2,9 +2,24 @@
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 KI_NAMES = [f"K{i}" for i in range(7)] + ["Kdet"]
+
+
+def file_fingerprint(path: Path | str) -> dict[str, str | int]:
+    """Return portable identity metadata for one checkpoint or artifact."""
+    resolved = Path(path).expanduser().resolve()
+    digest = hashlib.sha256()
+    with resolved.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return {
+        "path": str(resolved),
+        "size_bytes": int(resolved.stat().st_size),
+        "sha256": digest.hexdigest(),
+    }
 
 
 def normalize_checkpoint_dir(checkpoint_dir: Path | str) -> Path:

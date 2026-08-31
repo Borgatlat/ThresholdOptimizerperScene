@@ -20,6 +20,10 @@ import numpy as np
 import pandas as pd
 import torch
 
+from experiments.m3n_vc.checkpoint_paths import (
+    file_fingerprint,
+    resolve_registry_checkpoint,
+)
 from experiments.m3n_vc.live_cascade_benchmark import (
     DEFAULT_CHECKPOINT_DIR,
     DEFAULT_DETECTOR_COST_MS,
@@ -351,19 +355,28 @@ def main() -> None:
             args.quality_batch_size,
         )
         record = registry.get(model_id)
+        if record is None:
+            raise ValueError(f"No registry record for {model_id}.")
         actual_parameters = sum(parameter.numel() for parameter in models[model_id].parameters())
-        if record is not None and record.num_params is not None:
+        if record.num_params is not None:
             if int(record.num_params) != actual_parameters:
                 raise ValueError(
                     f"{model_id} parameter count differs from registry: "
                     f"model={actual_parameters}, registry={record.num_params}."
                 )
+        checkpoint_path = resolve_registry_checkpoint(
+            record.checkpoint,
+            model_id,
+            args.checkpoint_dir,
+            registry_path=args.registry,
+        )
         profiles[model_id] = {
             **timing,
             **quality,
             "parameters": int(actual_parameters),
             "paper_modality": "Acoustic" if KI_REGISTRY[model_id].modality == "mic" else "Both",
             "eligible_timing_samples": int(eligible_samples),
+            "checkpoint": file_fingerprint(checkpoint_path),
         }
 
     environment = _environment(device, args.device)
@@ -434,6 +447,10 @@ def main() -> None:
         ),
         "synthetic_detector_cost_ms": args.detector_cost_ms,
         "source_registry": str(args.registry.resolve()),
+        "model_checkpoints": {
+            model_id: profiles[model_id]["checkpoint"]
+            for model_id in PROFILE_MODEL_IDS
+        },
     }
     _write_profiled_registry(
         args.registry,
@@ -470,6 +487,7 @@ def main() -> None:
         "classifier_table": classifier_table,
         "source_registry": str(args.registry.resolve()),
         "output_registry": str(args.output_registry.resolve()),
+        "model_checkpoints": registry_metadata["model_checkpoints"],
     }
     args.output_report.parent.mkdir(parents=True, exist_ok=True)
     args.output_report.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
