@@ -42,6 +42,7 @@ repo, so the optimizer code shares the same shape):
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -273,6 +274,8 @@ def collect_empirical_outcomes(
     output_path: str | Path | None = None,
     eval_runs: set[str] | str | None = None,
     batch_size: int = 64,
+    paper_detector: bool = False,
+    paper_detector_cost_ms: float = 10_000.0,
 ) -> dict:
     """Run K0-K6 + Kdet over one shared eval set and save per-sample outcomes.
 
@@ -319,7 +322,14 @@ def collect_empirical_outcomes(
     dataset = _build_shared_dataset(mic, geo, mask)
     eval_metadata = metadata.loc[mask].reset_index(drop=True)
 
-    models, registry, device = load_cascade_models(checkpoint_dir, registry_path)
+    model_ids = (
+        tuple(ki_name for ki_name in KI_REGISTRY if ki_name != "Kdet")
+        if paper_detector
+        else None
+    )
+    models, registry, device = load_cascade_models(
+        checkpoint_dir, registry_path, model_ids=model_ids
+    )
 
     metadata_rows: list[dict] = []
     outcome_frames: list[pd.DataFrame] = []
@@ -362,6 +372,37 @@ def collect_empirical_outcomes(
             )
         )
 
+    if paper_detector:
+        detector_cost = float(paper_detector_cost_ms)
+        detector_wcet = detector_cost
+        true_global_indices = eval_metadata["global_label"].astype(str).map(
+            {name: index for index, name in enumerate(GLOBAL_CLASS_NAMES)}
+        )
+        if true_global_indices.isna().any():
+            raise ValueError("Paper detector encountered an unknown global label.")
+        metadata_rows.append(
+            CandidateMeta(
+                id="Kdet",
+                kind="detector",
+                name="Kdet",
+                threshold=None,
+                cost=detector_cost,
+                wcet=detector_wcet,
+            ).__dict__
+            | {"group": None}
+        )
+        outcome_frames.append(
+            pd.DataFrame(
+                {
+                    "sample_id": sample_ids,
+                    "candidate_id": "Kdet",
+                    "accepted": np.ones(len(sample_ids), dtype=bool),
+                    "prediction": true_global_indices.to_numpy(dtype=int),
+                    "confidence": np.ones(len(sample_ids), dtype=float),
+                }
+            )
+        )
+
     labels_df = pd.DataFrame(
         {
             "sample_id": sample_ids,
@@ -373,13 +414,25 @@ def collect_empirical_outcomes(
     )
 
     det_rec = registry.get("Kdet")
+    detector_cost = (
+        float(paper_detector_cost_ms)
+        if paper_detector
+        else float(det_rec.runtime_ms) if det_rec and det_rec.runtime_ms is not None else float("nan")
+    )
+    detector_wcet = (
+        float(paper_detector_cost_ms)
+        if paper_detector
+        else float(det_rec.wcet_ms) if det_rec and det_rec.wcet_ms is not None else float("nan")
+    )
     detector_meta = {
         "id": "Kdet",
         "kind": "detector",
         "name": "Kdet",
-        "cost": float(det_rec.runtime_ms) if det_rec and det_rec.runtime_ms is not None else float("nan"),
-        "wcet": float(det_rec.wcet_ms) if det_rec and det_rec.wcet_ms is not None else float("nan"),
-        "p_correct": float(det_rec.p_correct) if det_rec else None,
+        "cost": detector_cost,
+        "wcet": detector_wcet,
+        "p_correct": (
+            1.0 if paper_detector else (float(det_rec.p_correct) if det_rec else None)
+        ),
     }
 
     payload = {
@@ -394,6 +447,29 @@ def collect_empirical_outcomes(
             router_outputs=tuple(INTERMEDIATE_CLASS_NAMES),
             split_group_column="run_id",
         ).as_dict(),
+        "collection": {
+            "scene": scene,
+            "registry": str(registry_path.resolve()),
+            "registry_sha256": hashlib.sha256(registry_path.read_bytes()).hexdigest(),
+            "checkpoint_dir": str(checkpoint_dir.resolve()),
+            "paper_detector": bool(paper_detector),
+            "detector_behavior": (
+                "perfect_oracle_non_sleeping"
+                if paper_detector
+                else "trained_checkpoint"
+            ),
+            "eval_runs": sorted(eval_metadata["run_id"].astype(str).unique()),
+            "cascade_partition_protocol": {
+                "optimization": (
+                    "first 80% within each of run1,run3,run5,run7,run9"
+                ),
+                "testing": "last 20% within each run",
+                "split_strategy": "blocked_per_run",
+                "holdout_fraction": 0.20,
+            } if scene == "h24" else None,
+            "batch_size": int(batch_size),
+            "device": str(device),
+        },
         "labels": labels_df,
         "candidates": pd.DataFrame(metadata_rows),
         "detector": detector_meta,
@@ -413,6 +489,17 @@ if __name__ == "__main__":
     parser.add_argument("--scene", default="h24",
                         help="Scene id: h24, h08, s31, a06, i29, or i22")
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--processed-dir", type=Path, default=DEFAULT_PROCESSED_DIR)
+    parser.add_argument("--checkpoint-dir", type=Path, default=DEFAULT_CHECKPOINT_DIR)
+    parser.add_argument(
+        "--registry",
+        type=Path,
+        default=DEFAULT_REGISTRY_PATH,
+        help=(
+            "Classifier registry supplying checkpoints and device-specific costs. "
+            "On Jetson, use classifier_registry_jetson_nano.json."
+        ),
+    )
     parser.add_argument(
         "--output-path",
         default=None,
@@ -424,14 +511,27 @@ if __name__ == "__main__":
         default=None,
         help="Explicit run ids to collect, or ALL (h24 default: run1 run3 run5 run7 run9)",
     )
+    parser.add_argument(
+        "--paper-detector",
+        action="store_true",
+        help="Synthesize the perfect non-sleeping fallback instead of loading Kdet.",
+    )
+    parser.add_argument("--paper-detector-cost-ms", type=float, default=10_000.0)
     args = parser.parse_args()
+    if args.batch_size < 1 or args.paper_detector_cost_ms < 0:
+        parser.error("Batch size must be positive and detector cost non-negative.")
 
     eval_runs = None
     if args.eval_runs:
         eval_runs = "ALL" if args.eval_runs == ["ALL"] else set(args.eval_runs)
     collect_empirical_outcomes(
         scene=args.scene,
+        processed_dir=args.processed_dir,
+        checkpoint_dir=args.checkpoint_dir,
+        registry_path=args.registry,
         output_path=args.output_path,
         eval_runs=eval_runs,
         batch_size=args.batch_size,
+        paper_detector=args.paper_detector,
+        paper_detector_cost_ms=args.paper_detector_cost_ms,
     )

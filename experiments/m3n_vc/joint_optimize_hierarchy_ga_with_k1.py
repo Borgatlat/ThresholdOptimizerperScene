@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict
 from pathlib import Path
 from time import perf_counter
@@ -70,6 +71,7 @@ DEFAULT_CROSSOVER_RATE = 0.80
 DEFAULT_MUTATION_RATE = 0.80
 DEFAULT_RANDOM_IMMIGRANT_RATE = 0.20
 DEFAULT_COMPONENT_RESAMPLE_RATE = 0.30
+DEFAULT_WORKERS = 24
 
 M3N_PROFILE = HierarchyProfile(
     dataset_id="m3n_vc/h24",
@@ -143,6 +145,48 @@ def _implementation_sha256() -> str:
     return digest.hexdigest()
 
 
+_PROCESS_INNER_FITNESS: InnerAnnealingFitness | None = None
+
+
+def _initialize_k1_fitness_process(
+    outcomes: str,
+    target_accuracy: float,
+    quantile_points: int,
+    iterations: int,
+    restarts: int,
+    inner_seed: int,
+    settings: Mapping[str, object],
+) -> None:
+    global _PROCESS_INNER_FITNESS
+    payload = load_empirical_outcomes(Path(outcomes))
+    validation_payload, _, _ = split_empirical_outcomes(
+        payload,
+        holdout_fraction=float(settings["holdout_fraction"]),
+        split_strategy=str(settings["split_strategy"]),
+        random_seed=int(settings["split_seed"]),
+    )
+    optimizer = HierarchyOptimizer(
+        validation_payload,
+        detector_mode=str(settings["detector_mode"]),
+        detector_cost_ms=float(settings["detector_cost_ms"]),
+    )
+    _PROCESS_INNER_FITNESS = InnerAnnealingFitness(
+        optimizer,
+        target_accuracy=target_accuracy,
+        quantile_points=quantile_points,
+        iterations=iterations,
+        inner_seed=inner_seed,
+        settings=settings,
+        restarts=restarts,
+    )
+
+
+def _evaluate_k1_indexed_layout(indexed: IndexedLayout) -> dict[str, object]:
+    if _PROCESS_INNER_FITNESS is None:
+        raise RuntimeError("The process-local K1 fitness evaluator was not initialized.")
+    return _PROCESS_INNER_FITNESS(indexed)
+
+
 class CachedGenomeFitness:
     """Append-only, replayable fitness cache for the deterministic GA."""
 
@@ -158,10 +202,12 @@ class CachedGenomeFitness:
         inner_seed: int,
         settings: Mapping[str, object],
         results_path: Path,
+        workers: int,
     ) -> None:
         self.space = space
         self.results_path = results_path
         self.settings = dict(settings)
+        self.workers = int(workers)
         self.records = _load_jsonl(results_path)
         for record in self.records.values():
             if not _settings_match(record.get("settings"), self.settings):
@@ -209,6 +255,69 @@ class CachedGenomeFitness:
             )
         return dict(record)
 
+    def evaluate_many(
+        self, genomes: list[TopologyGenome]
+    ) -> list[dict[str, object]]:
+        """Evaluate one generation concurrently while preserving result order."""
+
+        results: list[dict[str, object] | None] = [None] * len(genomes)
+        pending: list[tuple[int, IndexedLayout]] = []
+        next_index = len(self.records)
+        for position, genome in enumerate(genomes):
+            candidate_id = layout_id(genome, self.space)
+            cached = self.records.get(candidate_id)
+            if cached is not None:
+                self.cache_hits += 1
+                results[position] = dict(cached)
+                continue
+            pending.append(
+                (
+                    position,
+                    IndexedLayout(
+                        next_index,
+                        candidate_id,
+                        cascade_from_genome(genome, self.space),
+                    ),
+                )
+            )
+            next_index += 1
+
+        if pending:
+            indexed_layouts = [indexed for _, indexed in pending]
+            if self.workers == 1:
+                evaluated = map(self.inner, indexed_layouts)
+            else:
+                executor = ProcessPoolExecutor(
+                    max_workers=self.workers,
+                    initializer=_initialize_k1_fitness_process,
+                    initargs=(
+                        str(self.settings["outcomes"]),
+                        self.inner.target_accuracy,
+                        self.inner.quantile_points,
+                        self.inner.iterations,
+                        self.inner.restarts,
+                        self.inner.inner_seed,
+                        self.settings,
+                    ),
+                )
+                evaluated = executor.map(_evaluate_k1_indexed_layout, indexed_layouts)
+            try:
+                self.results_path.parent.mkdir(parents=True, exist_ok=True)
+                with self.results_path.open("a", encoding="utf-8", buffering=1) as handle:
+                    for (position, _), record in zip(pending, evaluated, strict=True):
+                        handle.write(json.dumps(record, sort_keys=True, default=float) + "\n")
+                        candidate_id = str(record["layout_id"])
+                        self.records[candidate_id] = record
+                        results[position] = dict(record)
+                        self.new_evaluations += 1
+            finally:
+                if self.workers != 1:
+                    executor.shutdown()
+
+        if any(record is None for record in results):
+            raise RuntimeError("K1 batch fitness failed to populate every result.")
+        return [dict(record) for record in results if record is not None]
+
 
 def _holdout_metrics(
     genome: TopologyGenome,
@@ -252,6 +361,7 @@ def run_k1_search(
     population_size: int = DEFAULT_POPULATION_SIZE,
     generations: int = DEFAULT_GENERATIONS,
     evaluation_budget: int = DEFAULT_EVALUATION_BUDGET,
+    workers: int = DEFAULT_WORKERS,
     overwrite: bool = False,
 ) -> dict[str, object]:
     payload = load_empirical_outcomes(outcomes)
@@ -272,6 +382,8 @@ def run_k1_search(
     )
     if iterations < 1 or restarts < 1:
         raise ValueError("iterations and restarts must both be positive.")
+    if workers < 1:
+        raise ValueError("workers must be positive.")
     if not population_size <= evaluation_budget <= layout_count:
         raise ValueError("evaluation_budget must be between population and space size.")
 
@@ -359,6 +471,7 @@ def run_k1_search(
         "holdout_fraction": float(holdout_fraction),
         "split_strategy": split_strategy,
         **asdict(config),
+        "workers": int(workers),
     }
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -383,6 +496,7 @@ def run_k1_search(
         inner_seed=inner_seed,
         settings=settings,
         results_path=results_path,
+        workers=workers,
     )
     print(
         f"K1-enabled memetic GA: {layout_count:,} legal layouts, "
@@ -454,6 +568,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--population-size", type=int, default=DEFAULT_POPULATION_SIZE)
     parser.add_argument("--generations", type=int, default=DEFAULT_GENERATIONS)
     parser.add_argument("--evaluation-budget", type=int, default=DEFAULT_EVALUATION_BUDGET)
+    parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     return parser
@@ -493,6 +608,7 @@ def main() -> None:
         population_size=args.population_size,
         generations=args.generations,
         evaluation_budget=args.evaluation_budget,
+        workers=args.workers,
         overwrite=args.overwrite,
     )
     winner = summary["winner"]

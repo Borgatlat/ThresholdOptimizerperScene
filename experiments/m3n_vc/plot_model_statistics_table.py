@@ -23,6 +23,7 @@ DEFAULT_REGISTRY = Path("checkpoints/classifier_registry.json")
 DEFAULT_OUTCOMES = Path("checkpoints/empirical_outcomes_h24_with_run9.pkl")
 DEFAULT_OUTPUT = Path("checkpoints/model_statistics_table_h24_with_run9.png")
 DEFAULT_STATISTICS_OUTPUT = Path("checkpoints/model_statistics_h24_with_run9.json")
+DEFAULT_PROFILE_REPORT = Path("checkpoints/jetson_nano_model_profile.json")
 PAPER_KDET_COST_MS = 10_000.0
 CLASSIFIER_IDS = tuple([f"K{i}" for i in range(7)] + ["Kdet"])
 
@@ -103,33 +104,52 @@ def plot_model_statistics_table(
     outcomes_path: Path = DEFAULT_OUTCOMES,
     output_path: Path = DEFAULT_OUTPUT,
     statistics_output_path: Path = DEFAULT_STATISTICS_OUTPUT,
+    profile_report_path: Path | None = None,
 ) -> Path:
-    statistics = _classifier_statistics(registry_path, outcomes_path)
-    payload = load_empirical_outcomes(outcomes_path)
-    labels = payload["labels"]
-    packet = {
-        "schema_version": "m3n-vc-model-statistics/v1",
-        "dataset": "m3n_vc/h24",
-        "outcomes": str(outcomes_path.resolve()),
-        "outcomes_sha256": hashlib.sha256(outcomes_path.read_bytes()).hexdigest(),
-        "registry": str(registry_path.resolve()),
-        "registry_sha256": hashlib.sha256(registry_path.read_bytes()).hexdigest(),
-        "sample_count": int(len(labels)),
-        "runs": sorted(str(run_id) for run_id in labels["run_id"].unique()),
-        "thresholds_by_level": {
-            level: threshold_hi_for_ki(classifier_id)
-            for classifier_id, level in (
-                ("K0", "intermediate"),
-                ("K2", "global"),
-                ("K4", "specialized"),
-            )
-        },
-        "definitions": {
-            "precision": "P(correct | accepted)",
-            "success_rate": "P(accepted)",
-        },
-        "classifiers": statistics,
-    }
+    if profile_report_path is not None:
+        profile_report = json.loads(profile_report_path.read_text(encoding="utf-8"))
+        statistics = profile_report["classifier_table"]
+        packet = {
+            "schema_version": "m3n-vc-model-statistics/v2",
+            "dataset": "m3n_vc/h24",
+            "profile_report": str(profile_report_path.resolve()),
+            "profile_report_sha256": hashlib.sha256(
+                profile_report_path.read_bytes()
+            ).hexdigest(),
+            "classifier_training_split": profile_report[
+                "classifier_training_split"
+            ],
+            "classifier_testing_split": profile_report["classifier_testing_split"],
+            "definitions": profile_report["definitions"],
+            "classifiers": statistics,
+        }
+    else:
+        statistics = _classifier_statistics(registry_path, outcomes_path)
+        payload = load_empirical_outcomes(outcomes_path)
+        labels = payload["labels"]
+        packet = {
+            "schema_version": "m3n-vc-model-statistics/v1",
+            "dataset": "m3n_vc/h24",
+            "outcomes": str(outcomes_path.resolve()),
+            "outcomes_sha256": hashlib.sha256(outcomes_path.read_bytes()).hexdigest(),
+            "registry": str(registry_path.resolve()),
+            "registry_sha256": hashlib.sha256(registry_path.read_bytes()).hexdigest(),
+            "sample_count": int(len(labels)),
+            "runs": sorted(str(run_id) for run_id in labels["run_id"].unique()),
+            "thresholds_by_level": {
+                level: threshold_hi_for_ki(classifier_id)
+                for classifier_id, level in (
+                    ("K0", "intermediate"),
+                    ("K2", "global"),
+                    ("K4", "specialized"),
+                )
+            },
+            "definitions": {
+                "precision": "P(correct | accepted)",
+                "success_rate": "P(accepted)",
+            },
+            "classifiers": statistics,
+        }
     statistics_output_path.parent.mkdir(parents=True, exist_ok=True)
     statistics_output_path.write_text(
         json.dumps(packet, indent=2, sort_keys=True),
@@ -234,8 +254,13 @@ def plot_model_statistics_table(
         "Precision = P(correct | accepted); success rate = P(accepted). "
         "Confidence threshold = 0.90 for global K2–K3 and 0.95 for "
         "intermediate/specialized K0–K1/K4–K6. "
-        "Statistics use h24 runs 1, 3, 5, 7, and 9 (9,546 samples). "
-        "SUV and COUPE statistics use in-domain samples. Execution time is the measured mean "
+        + (
+            "Statistics use the classifier-testing split (runs 1, 3, 5, 7 plus "
+            "the held-out 20% of run8). "
+            if profile_report_path is not None
+            else "Statistics use h24 runs 1, 3, 5, 7, and 9 (9,546 samples). "
+        )
+        + "SUV and COUPE statistics use in-domain samples. Execution time is the measured mean "
         "for K0–K6; Kdet is the perfect 10,000 ms paper-mode fallback.",
         ha="center",
         va="bottom",
@@ -259,6 +284,12 @@ def main() -> None:
         type=Path,
         default=DEFAULT_STATISTICS_OUTPUT,
     )
+    parser.add_argument(
+        "--profile-report",
+        type=Path,
+        default=None,
+        help="Use the Jetson classifier-profile packet instead of empirical outcomes.",
+    )
     args = parser.parse_args()
     print(
         plot_model_statistics_table(
@@ -266,6 +297,7 @@ def main() -> None:
             args.outcomes,
             args.output,
             args.statistics_output,
+            args.profile_report,
         )
     )
 

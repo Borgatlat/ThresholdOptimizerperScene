@@ -52,7 +52,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter
@@ -708,6 +708,52 @@ class InnerAnnealingFitness:
         }
 
 
+_PROCESS_FITNESS: InnerAnnealingFitness | None = None
+
+
+def _initialize_fitness_process(
+    outcomes: str,
+    target_accuracy: float,
+    quantile_points: int,
+    iterations: int,
+    inner_seed: int,
+    restarts: int,
+    settings: Mapping[str, object],
+) -> None:
+    """Build one process-local evaluator instead of sharing Python threads."""
+
+    global _PROCESS_FITNESS
+    payload = _without_candidates(
+        load_empirical_outcomes(Path(outcomes)), REMOVED_CANDIDATES
+    )
+    validation_payload, _, _ = split_empirical_outcomes(
+        payload,
+        holdout_fraction=float(settings["holdout_fraction"]),
+        split_strategy=str(settings["split_strategy"]),
+        random_seed=int(settings["split_seed"]),
+    )
+    optimizer = HierarchyOptimizer(
+        validation_payload,
+        detector_mode=str(settings["detector_mode"]),
+        detector_cost_ms=float(settings["detector_cost_ms"]),
+    )
+    _PROCESS_FITNESS = InnerAnnealingFitness(
+        optimizer,
+        target_accuracy=target_accuracy,
+        quantile_points=quantile_points,
+        iterations=iterations,
+        inner_seed=inner_seed,
+        settings=settings,
+        restarts=restarts,
+    )
+
+
+def _evaluate_in_fitness_process(indexed: IndexedLayout) -> dict[str, object]:
+    if _PROCESS_FITNESS is None:
+        raise RuntimeError("The process-local GA fitness evaluator was not initialized.")
+    return _PROCESS_FITNESS(indexed)
+
+
 def _load_jsonl(path: Path) -> dict[str, dict[str, object]]:
     """Load a cache and repair only an interrupted trailing JSONL record."""
 
@@ -833,8 +879,24 @@ def _evaluate_missing(
         if workers == 1:
             save(map(evaluate, entries))
         else:
-            with ThreadPoolExecutor(max_workers=workers) as executor:
-                save(executor.map(evaluate, entries))
+            if not isinstance(evaluate, InnerAnnealingFitness):
+                raise TypeError(
+                    "Process-parallel evaluation requires InnerAnnealingFitness."
+                )
+            with ProcessPoolExecutor(
+                max_workers=workers,
+                initializer=_initialize_fitness_process,
+                initargs=(
+                    str(evaluate.settings["outcomes"]),
+                    evaluate.target_accuracy,
+                    evaluate.quantile_points,
+                    evaluate.iterations,
+                    evaluate.inner_seed,
+                    evaluate.restarts,
+                    evaluate.settings,
+                ),
+            ) as executor:
+                save(executor.map(_evaluate_in_fitness_process, entries))
     return completed
 
 

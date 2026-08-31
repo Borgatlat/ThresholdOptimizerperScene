@@ -20,7 +20,7 @@ from experiments.m3n_vc.joint_optimize_hierarchy_ga import (
     _file_sha256,
     _write_json_atomic,
 )
-from hierarchy_optimizer import HierarchyOptimizer, PAPER_DETECTOR_COST_MS
+from hierarchy_optimizer import Cascade, HierarchyOptimizer, PAPER_DETECTOR_COST_MS
 from threshold_optimizer import (
     DEFAULT_SA_RESTARTS,
     FixedLayoutThresholdEvaluator,
@@ -127,6 +127,38 @@ def run_benchmark(
         "validation_pruned_policy_holdout_replay",
     )
 
+    linear_cascade = Cascade(
+        expected_cost=0.0,
+        initial=["K3", "K2", validation_optimizer.detector_id],
+        specialized={},
+        detector=validation_optimizer.detector_id,
+    )
+    linear_validation_evaluator = FixedLayoutThresholdEvaluator(
+        validation_optimizer, linear_cascade
+    )
+    linear_holdout_evaluator = FixedLayoutThresholdEvaluator(
+        holdout_optimizer, linear_cascade
+    )
+    linear_started = perf_counter()
+    linear_validation = optimize_fixed_layout_thresholds_simulated_annealing(
+        linear_validation_evaluator,
+        target_accuracy,
+        n_iterations=iterations,
+        random_seed=seed,
+        show_progress=False,
+        restarts=restarts,
+    )
+    linear_completion_seconds = perf_counter() - linear_started
+    linear_holdout = _constrained(
+        linear_holdout_evaluator.evaluate(
+            linear_validation["thresholds"],
+            strict_thresholds=True,
+            active_slots=linear_validation["active_slots"],
+        ),
+        target_accuracy,
+        "validation_pruned_policy_holdout_replay",
+    )
+
     summary: dict[str, object] = {
         "settings": {
             "dataset": "m3n_vc/h24",
@@ -163,6 +195,12 @@ def run_benchmark(
                 "completion_seconds": completion_seconds,
                 "validation": _compact_optimization(sa_validation),
                 "holdout": _compact_optimization(sa_holdout),
+            },
+            "sa_on_k3_k2_linear": {
+                "completion_seconds": linear_completion_seconds,
+                "layout": _cascade_payload(linear_cascade),
+                "validation": _compact_optimization(linear_validation),
+                "holdout": _compact_optimization(linear_holdout),
             },
         },
     }
