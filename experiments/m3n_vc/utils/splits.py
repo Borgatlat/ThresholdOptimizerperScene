@@ -38,6 +38,12 @@ DEFAULT_VAL_RUNS = {"run1", "run3", "run5", "run7"}
 
 DEFAULT_TEST_RUNS = {"run9"}
 
+# Shared h24 pool used by threshold/layout optimization.  Keep this separate
+# from DEFAULT_VAL_RUNS: run9 remains excluded from model-training validation,
+# but its background samples are included when collecting empirical outcomes.
+# The tuple records the intended append order for provenance and tests.
+H24_EMPIRICAL_RUNS = ("run1", "run3", "run5", "run7", "run9")
+
 
 
 # Specialized SUV: train gle350+cx30 long runs; val on short companion runs.

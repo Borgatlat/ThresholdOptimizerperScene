@@ -1,0 +1,411 @@
+{
+  "candidate_policy": "K0_K1_full_space",
+  "dataset": "m3n_vc/h24",
+  "detector_cost_ms": 10000.0,
+  "detector_mode": "paper",
+  "holdout_fraction": 0.2,
+  "holdout_usage": "not_evaluated",
+  "implementation_sha256": "f8fe0a665a941c2da32d053cef6cb522e2847eb54e19eae1a2f13fa40132f0dd",
+  "iterations_per_restart": 1000,
+  "layout_count": 10,
+  "layout_sampling": "established_exact_uniform_sample_layouts_prefix_conditioned_on_minimum",
+  "layout_seed": 20260818,
+  "layouts": [
+    {
+      "distinct_non_detector_classifiers": 7,
+      "layout": {
+        "initial": [
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K3",
+            "K5",
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "detector"
+          ],
+          "K1:coupe": [
+            "K5",
+            "K2",
+            "K3",
+            "detector"
+          ],
+          "K1:suv": [
+            "K2",
+            "K4",
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "1a4636d90f9dfcdb",
+      "layout_index": 0
+    },
+    {
+      "distinct_non_detector_classifiers": 6,
+      "layout": {
+        "initial": [
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K2",
+            "K5",
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K5",
+            "K6",
+            "K2",
+            "detector"
+          ],
+          "K1:suv": [
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "36bb1b883566558a",
+      "layout_index": 1
+    },
+    {
+      "distinct_non_detector_classifiers": 7,
+      "layout": {
+        "initial": [
+          "K0",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "K4",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K2",
+            "K5",
+            "K3",
+            "K6",
+            "detector"
+          ],
+          "K1:suv": [
+            "K2",
+            "K4",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "652d18d5fd1f2540",
+      "layout_index": 2
+    },
+    {
+      "distinct_non_detector_classifiers": 7,
+      "layout": {
+        "initial": [
+          "K1",
+          "K3",
+          "K0",
+          "K2",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K5",
+            "K2",
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K2",
+            "K6",
+            "K5",
+            "detector"
+          ],
+          "K1:suv": [
+            "K3",
+            "K4",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "461094a3f8a79942",
+      "layout_index": 3
+    },
+    {
+      "distinct_non_detector_classifiers": 6,
+      "layout": {
+        "initial": [
+          "K1",
+          "K2",
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "K4",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K3",
+            "K2",
+            "K5",
+            "detector"
+          ],
+          "K1:suv": [
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "757026c0348a6829",
+      "layout_index": 4
+    },
+    {
+      "distinct_non_detector_classifiers": 7,
+      "layout": {
+        "initial": [
+          "K0",
+          "K1",
+          "K2",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K3",
+            "K2",
+            "K5",
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "detector"
+          ],
+          "K1:coupe": [
+            "K3",
+            "K6",
+            "K2",
+            "detector"
+          ],
+          "K1:suv": [
+            "K4",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "7d96c396cb1d8cfd",
+      "layout_index": 5
+    },
+    {
+      "distinct_non_detector_classifiers": 7,
+      "layout": {
+        "initial": [
+          "K1",
+          "K0",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K2",
+            "K3",
+            "K5",
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "K3",
+            "K4",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K2",
+            "detector"
+          ],
+          "K1:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "6a941926caf7df04",
+      "layout_index": 6
+    },
+    {
+      "distinct_non_detector_classifiers": 6,
+      "layout": {
+        "initial": [
+          "K0",
+          "K1",
+          "K2",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K3",
+            "K2",
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "K2",
+            "K3",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:suv": [
+            "K4",
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "ea2a290fb52d16e8",
+      "layout_index": 7
+    },
+    {
+      "distinct_non_detector_classifiers": 7,
+      "layout": {
+        "initial": [
+          "K1",
+          "K0",
+          "K2",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K3",
+            "K5",
+            "K6",
+            "detector"
+          ],
+          "K0:suv": [
+            "K2",
+            "K4",
+            "K3",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "K5",
+            "K3",
+            "detector"
+          ],
+          "K1:suv": [
+            "K4",
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "08a5476cc6a9af4f",
+      "layout_index": 8
+    },
+    {
+      "distinct_non_detector_classifiers": 6,
+      "layout": {
+        "initial": [
+          "K1",
+          "K0",
+          "K2",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K2",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ],
+          "K1:coupe": [
+            "K6",
+            "K2",
+            "detector"
+          ],
+          "K1:suv": [
+            "K4",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "ee9e457ad51f984a",
+      "layout_index": 9
+    }
+  ],
+  "legal_layout_space_size": 11589085,
+  "minimum_distinct_non_detector_classifiers": 5,
+  "optimizer": {
+    "best_method": "best_of_10_chellapilla_continuous_gaussian_sa",
+    "continuous_thresholds": true,
+    "post_sa_polisher": false,
+    "random_global_proposal": false,
+    "selection": "repository_feasibility_aware_policy_key",
+    "single_method": "chellapilla_continuous_gaussian_sa"
+  },
+  "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+  "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+  "pairing": {
+    "all_full_restart_packets_persisted": true,
+    "best_of_10": "feasibility_aware_best_of_restart_indices_0_through_9",
+    "single": "restart_index_0",
+    "single_is_member_of_best_of_10_block": true,
+    "single_trajectory_recomputed": false
+  },
+  "partition": "validation",
+  "removed_candidates": [],
+  "restart_seed_rule": "trial_base_seed + restart_index",
+  "restarts_per_best_of_10": 10,
+  "schema_version": "chellapilla-single-vs-best10-settings/v1",
+  "seed_blocks_disjoint_across_trials_and_layouts": true,
+  "split_seed": 0,
+  "split_strategy": "blocked_per_run",
+  "target_accuracy": 0.9662,
+  "target_accuracy_source": "explicit_cli_or_api_override",
+  "trial_base_seed_rule": "layout_index * 1000000 + trial_index * 10",
+  "trials_per_layout": 100,
+  "workers": 16
+}

@@ -131,14 +131,25 @@ def run_memetic_search(
     generations_completed = 0
 
     for generation in range(config.generations):
-        for candidate_id in population:
-            if candidate_id in records:
-                continue
-            if len(records) >= config.evaluation_budget:
-                break
-            record = dict(evaluate(genomes[candidate_id]))
-            record.setdefault("layout_id", candidate_id)
-            records[candidate_id] = record
+        pending_ids = [
+            candidate_id
+            for candidate_id in population
+            if candidate_id not in records
+        ][: max(0, config.evaluation_budget - len(records))]
+        evaluate_many = getattr(evaluate, "evaluate_many", None)
+        if callable(evaluate_many) and pending_ids:
+            batch = evaluate_many([genomes[candidate_id] for candidate_id in pending_ids])
+            if len(batch) != len(pending_ids):
+                raise RuntimeError("Batch fitness returned the wrong number of records.")
+            for candidate_id, item in zip(pending_ids, batch, strict=True):
+                record = dict(item)
+                record.setdefault("layout_id", candidate_id)
+                records[candidate_id] = record
+        else:
+            for candidate_id in pending_ids:
+                record = dict(evaluate(genomes[candidate_id]))
+                record.setdefault("layout_id", candidate_id)
+                records[candidate_id] = record
         evaluated_population = [item for item in population if item in records]
         if not evaluated_population:
             break

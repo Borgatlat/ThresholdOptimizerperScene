@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Sequence
 
 import torch
 from torch import nn
@@ -56,6 +57,7 @@ def load_state_dict_for_ki(
 def load_cascade_models(
     checkpoint_dir: Path,
     registry_path: Path,
+    model_ids: Sequence[str] | None = None,
 ) -> tuple[dict[str, nn.Module], ClassifierRegistry, torch.device]:
     """Load all Ki models listed in KI_REGISTRY using registry metadata."""
     checkpoint_dir = Path(checkpoint_dir).expanduser().resolve()
@@ -64,7 +66,12 @@ def load_cascade_models(
     device = get_device()
     models: dict[str, nn.Module] = {}
 
-    for ki_name in KI_REGISTRY:
+    selected_ids = tuple(KI_REGISTRY) if model_ids is None else tuple(model_ids)
+    unknown = set(selected_ids) - set(KI_REGISTRY)
+    if unknown:
+        raise ValueError(f"Unknown classifier ids: {sorted(unknown)}")
+
+    for ki_name in selected_ids:
         rec = registry.get(ki_name)
         if rec is None:
             raise ValueError(f"No registry record for {ki_name}")

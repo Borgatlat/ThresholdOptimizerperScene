@@ -1,0 +1,100 @@
+{
+  "dataset": "m3n_vc/h24",
+  "detector_cost_ms": 10000.0,
+  "detector_mode": "paper",
+  "equal_evaluation_secondary": {
+    "random_layout_prefix": 512,
+    "scope": "validation_only_posthoc_exhaustive_oracle_replay"
+  },
+  "fixed_seed_fields": {
+    "inner_seed": 0,
+    "split_seed": 0
+  },
+  "genetic_algorithm": {
+    "algorithm": "constrained_memetic_genetic_algorithm",
+    "component_resample_rate": 0.3,
+    "crossover_rate": 0.8,
+    "elite_count": 4,
+    "evaluation_budget": 512,
+    "generations": 24,
+    "internal_workers": 1,
+    "mandatory_initial_member": {
+      "initial": [
+        "K3",
+        "detector"
+      ],
+      "specialized": {}
+    },
+    "max_restarts": 3,
+    "mutation_rate": 0.8,
+    "outer_schedule": "fixed",
+    "population_size": 32,
+    "random_immigrant_rate": 0.2,
+    "stagnation_generations": 6,
+    "tournament_size": 2
+  },
+  "layout_catalogue_sha256": "9907857a0bd3d1f008e63dddd138744f2d6c2fa7d5392b9a79aae90632ff0140",
+  "layout_space_size": 5545,
+  "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+  "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+  "primary_comparison": {
+    "cost_delta": "random_minus_ga_ms_positive_favors_ga",
+    "scope": "validation_only",
+    "selection_rule": "feasibility_aware_topology_selection"
+  },
+  "random_sampling": {
+    "algorithm": "uniform_random_layout_sampling_without_replacement",
+    "atomic_layout_overshoot_allowed": true,
+    "mandatory_initial_member": null,
+    "time_budget": "paired_ga_reported_elapsed_seconds_this_invocation"
+  },
+  "removed_candidates": [
+    "K1"
+  ],
+  "schema_version": "paired-ga-vs-random-k1-free/v1",
+  "search_asymmetry": "The GA is seeded with mandatory K3->detector while uniform random sampling is unseeded. Results therefore compare the implemented search procedures, including that a-priori GA advantage.",
+  "split": {
+    "holdout_fraction": 0.2,
+    "seed": 0,
+    "strategy": "blocked_per_run"
+  },
+  "target_accuracy": 0.9662,
+  "threshold_optimizer": {
+    "fitness_implementation_sha256": "6bf59e5e7de47be6ca5ba0839d60b8aac7862cf9c0573560188337c4ced733bf",
+    "freeze_validation_active_slots_on_holdout": true,
+    "inner_seed_varies_across_trials": false,
+    "iterations_per_restart": 1000,
+    "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+    "prune_stages_accepting_zero_validation_samples": true,
+    "quantile_points_recorded_but_unused": 50,
+    "restart_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "restarts": 10
+  },
+  "trial_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "varied_seed_fields": {
+    "genetic_algorithm": "outer_seed",
+    "random_sampling": "sampling_seed"
+  }
+}

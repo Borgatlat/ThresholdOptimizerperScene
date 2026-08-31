@@ -1,0 +1,15 @@
+{
+  "effective_phase_worker_limit": 10,
+  "internal_layout_workers": 1,
+  "invocation_kind": "fresh_or_cumulatively_resumed_random_search",
+  "parallel_trials_requested": 10,
+  "phase": "random_sampling",
+  "phase_trial_count": 10,
+  "schema_version": "paired-ga-vs-random-with-k1/v1",
+  "seed": 0,
+  "source_summary": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_with_k1_h24_target_090_paper_sa_10_trials\\trial_00\\random\\summary.json",
+  "source_summary_sha256": "2708b27b74dde827ed269fb82742eceee5dee383e0ebe74d7b0cc06544b36d0f",
+  "timing_note": "Wall time was measured while independent trials could execute concurrently.",
+  "wrapper_process_cpu_seconds": 2398.6875,
+  "wrapper_wall_seconds": 2416.9405480999994
+}

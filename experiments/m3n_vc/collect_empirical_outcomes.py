@@ -42,6 +42,7 @@ repo, so the optimizer code shares the same shape):
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -123,30 +124,25 @@ def _load_scene_spectrogram_cache(processed_dir: Path, scene: str) -> tuple[np.n
     return mic, geo, metadata
 
 
-def _shared_eval_mask(metadata: pd.DataFrame, eval_runs: set[str] | None) -> np.ndarray:
+def _shared_eval_mask(
+    metadata: pd.DataFrame,
+    eval_runs: set[str] | str | None,
+) -> np.ndarray:
     """Rows used for the shared outcome log.
 
-    Default (eval_runs=None): union of every split currently used anywhere
-    in utils/splits.py (DEFAULT_VAL_RUNS | SUV_VAL_RUNS | COUPE_VAL_RUNS).
-    This default is H24-SPECIFIC -- those run-id sets were chosen for h24's
-    particular run numbering and held-out convention, and have no meaning
-    for a different scene's run ids. For any non-h24 scene, this function
-    is instead called with eval_runs="ALL" (see collect_empirical_outcomes),
-    which uses every row in that scene -- there is no train/val split
-    concept for a scene you're only ever evaluating zero-shot on, never
-    training on.
+    Default (eval_runs=None): h24's empirical optimization pool, runs
+    1, 3, 5, 7, and 9.  Run9 contributes the background examples missing
+    from the four vehicle runs.  For any non-h24 scene, this function is
+    instead called with eval_runs="ALL" (see collect_empirical_outcomes),
+    which uses every row in that scene.
     """
     if eval_runs == "ALL":
         return np.ones(len(metadata), dtype=bool)
 
     if eval_runs is None:
-        from experiments.m3n_vc.utils.splits import (
-            COUPE_VAL_RUNS,
-            DEFAULT_VAL_RUNS,
-            SUV_VAL_RUNS,
-        )
+        from experiments.m3n_vc.utils.splits import H24_EMPIRICAL_RUNS
 
-        eval_runs = DEFAULT_VAL_RUNS | SUV_VAL_RUNS | COUPE_VAL_RUNS
+        eval_runs = set(H24_EMPIRICAL_RUNS)
 
     run_ids = metadata["run_id"].astype(str)
     return run_ids.isin(eval_runs).to_numpy()
@@ -277,6 +273,8 @@ def collect_empirical_outcomes(
     output_path: str | Path | None = None,
     eval_runs: set[str] | str | None = None,
     batch_size: int = 64,
+    paper_detector: bool = False,
+    paper_detector_cost_ms: float = 10_000.0,
 ) -> dict:
     """Run K0-K6 + Kdet over one shared eval set and save per-sample outcomes.
 
@@ -291,9 +289,8 @@ def collect_empirical_outcomes(
     eval_runs: defaults to "ALL" for any scene other than "h24" (no
         train/val split concept applies when you're only ever evaluating
         zero-shot, never training, on that scene's data). For "h24",
-        defaults to the existing DEFAULT_VAL_RUNS|SUV_VAL_RUNS|COUPE_VAL_RUNS
-        union, preserving old behavior. Pass an explicit set to override
-        either default.
+        defaults to runs 1, 3, 5, 7, and 9 so background is represented.
+        Pass an explicit set to override either default.
 
     output_path: defaults to checkpoints/empirical_outcomes_<scene>.pkl
         (or checkpoints/empirical_outcomes.pkl for scene="h24", to match
@@ -324,7 +321,14 @@ def collect_empirical_outcomes(
     dataset = _build_shared_dataset(mic, geo, mask)
     eval_metadata = metadata.loc[mask].reset_index(drop=True)
 
-    models, registry, device = load_cascade_models(checkpoint_dir, registry_path)
+    model_ids = (
+        tuple(ki_name for ki_name in KI_REGISTRY if ki_name != "Kdet")
+        if paper_detector
+        else None
+    )
+    models, registry, device = load_cascade_models(
+        checkpoint_dir, registry_path, model_ids=model_ids
+    )
 
     metadata_rows: list[dict] = []
     outcome_frames: list[pd.DataFrame] = []
@@ -367,6 +371,37 @@ def collect_empirical_outcomes(
             )
         )
 
+    if paper_detector:
+        detector_cost = float(paper_detector_cost_ms)
+        detector_wcet = detector_cost
+        true_global_indices = eval_metadata["global_label"].astype(str).map(
+            {name: index for index, name in enumerate(GLOBAL_CLASS_NAMES)}
+        )
+        if true_global_indices.isna().any():
+            raise ValueError("Paper detector encountered an unknown global label.")
+        metadata_rows.append(
+            CandidateMeta(
+                id="Kdet",
+                kind="detector",
+                name="Kdet",
+                threshold=None,
+                cost=detector_cost,
+                wcet=detector_wcet,
+            ).__dict__
+            | {"group": None}
+        )
+        outcome_frames.append(
+            pd.DataFrame(
+                {
+                    "sample_id": sample_ids,
+                    "candidate_id": "Kdet",
+                    "accepted": np.ones(len(sample_ids), dtype=bool),
+                    "prediction": true_global_indices.to_numpy(dtype=int),
+                    "confidence": np.ones(len(sample_ids), dtype=float),
+                }
+            )
+        )
+
     labels_df = pd.DataFrame(
         {
             "sample_id": sample_ids,
@@ -378,13 +413,25 @@ def collect_empirical_outcomes(
     )
 
     det_rec = registry.get("Kdet")
+    detector_cost = (
+        float(paper_detector_cost_ms)
+        if paper_detector
+        else float(det_rec.runtime_ms) if det_rec and det_rec.runtime_ms is not None else float("nan")
+    )
+    detector_wcet = (
+        float(paper_detector_cost_ms)
+        if paper_detector
+        else float(det_rec.wcet_ms) if det_rec and det_rec.wcet_ms is not None else float("nan")
+    )
     detector_meta = {
         "id": "Kdet",
         "kind": "detector",
         "name": "Kdet",
-        "cost": float(det_rec.runtime_ms) if det_rec and det_rec.runtime_ms is not None else float("nan"),
-        "wcet": float(det_rec.wcet_ms) if det_rec and det_rec.wcet_ms is not None else float("nan"),
-        "p_correct": float(det_rec.p_correct) if det_rec else None,
+        "cost": detector_cost,
+        "wcet": detector_wcet,
+        "p_correct": (
+            1.0 if paper_detector else (float(det_rec.p_correct) if det_rec else None)
+        ),
     }
 
     payload = {
@@ -399,6 +446,29 @@ def collect_empirical_outcomes(
             router_outputs=tuple(INTERMEDIATE_CLASS_NAMES),
             split_group_column="run_id",
         ).as_dict(),
+        "collection": {
+            "scene": scene,
+            "registry": str(registry_path.resolve()),
+            "registry_sha256": hashlib.sha256(registry_path.read_bytes()).hexdigest(),
+            "checkpoint_dir": str(checkpoint_dir.resolve()),
+            "paper_detector": bool(paper_detector),
+            "detector_behavior": (
+                "perfect_oracle_non_sleeping"
+                if paper_detector
+                else "trained_checkpoint"
+            ),
+            "eval_runs": sorted(eval_metadata["run_id"].astype(str).unique()),
+            "cascade_partition_protocol": {
+                "optimization": (
+                    "first 80% within each of run1,run3,run5,run7,run9"
+                ),
+                "testing": "last 20% within each run",
+                "split_strategy": "blocked_per_run",
+                "holdout_fraction": 0.20,
+            } if scene == "h24" else None,
+            "batch_size": int(batch_size),
+            "device": str(device),
+        },
         "labels": labels_df,
         "candidates": pd.DataFrame(metadata_rows),
         "detector": detector_meta,
@@ -418,6 +488,49 @@ if __name__ == "__main__":
     parser.add_argument("--scene", default="h24",
                         help="Scene id: h24, h08, s31, a06, i29, or i22")
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--processed-dir", type=Path, default=DEFAULT_PROCESSED_DIR)
+    parser.add_argument("--checkpoint-dir", type=Path, default=DEFAULT_CHECKPOINT_DIR)
+    parser.add_argument(
+        "--registry",
+        type=Path,
+        default=DEFAULT_REGISTRY_PATH,
+        help=(
+            "Classifier registry supplying checkpoints and device-specific costs. "
+            "On Jetson, use classifier_registry_jetson_nano.json."
+        ),
+    )
+    parser.add_argument(
+        "--output-path",
+        default=None,
+        help="Output pickle path (defaults to the scene's canonical checkpoint path)",
+    )
+    parser.add_argument(
+        "--eval-runs",
+        nargs="+",
+        default=None,
+        help="Explicit run ids to collect, or ALL (h24 default: run1 run3 run5 run7 run9)",
+    )
+    parser.add_argument(
+        "--paper-detector",
+        action="store_true",
+        help="Synthesize the perfect non-sleeping fallback instead of loading Kdet.",
+    )
+    parser.add_argument("--paper-detector-cost-ms", type=float, default=10_000.0)
     args = parser.parse_args()
+    if args.batch_size < 1 or args.paper_detector_cost_ms < 0:
+        parser.error("Batch size must be positive and detector cost non-negative.")
 
-    collect_empirical_outcomes(scene=args.scene, batch_size=args.batch_size)
+    eval_runs = None
+    if args.eval_runs:
+        eval_runs = "ALL" if args.eval_runs == ["ALL"] else set(args.eval_runs)
+    collect_empirical_outcomes(
+        scene=args.scene,
+        processed_dir=args.processed_dir,
+        checkpoint_dir=args.checkpoint_dir,
+        registry_path=args.registry,
+        output_path=args.output_path,
+        eval_runs=eval_runs,
+        batch_size=args.batch_size,
+        paper_detector=args.paper_detector,
+        paper_detector_cost_ms=args.paper_detector_cost_ms,
+    )

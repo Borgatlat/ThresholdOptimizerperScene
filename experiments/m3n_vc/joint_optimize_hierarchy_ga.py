@@ -3,11 +3,10 @@
 The outer optimizer is a constrained memetic genetic algorithm (GA).  A
 genome contains the initial cascade and the two K0 branches. The fitness of
 every previously unseen, non-detector-only genome is obtained by running the
-*same* threshold optimizer used by :mod:`brute_force_k1_free_layouts`: 8,000
-simulated-annealing iterations on 50-point confidence grids, followed by
-coordinate descent. The detector-only topology is scored directly, as in the
-brute force. Thus the approximation is only over which of the 5,545 layouts
-are visited; a visited layout is evaluated identically to the exhaustive run.
+canonical best-of-ten continuous Chellapilla SA. The detector-only topology
+is scored directly, as in the brute force. Thus the approximation is only
+over which of the 5,545 layouts are visited; a visited layout is evaluated
+identically to the exhaustive run.
 
 The defaults reproduce the brute-force experimental contract:
 
@@ -15,8 +14,7 @@ The defaults reproduce the brute-force experimental contract:
 * paper Kdet (perfect, 10,000 ms);
 * blocked-per-run 80/20 validation/holdout split;
 * the Fig. 1 K3 validation-accuracy target;
-* 50 confidence quantiles; and
-* an 8,000-step inner anneal with seed 0.
+* ten 1,000-iteration continuous-SA restarts with seeds 0 through 9.
 
 Only validation outcomes participate in the GA. The holdout is not consulted
 or evaluated, and the optional exhaustive reference is not read, until the
@@ -54,7 +52,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter
@@ -84,6 +82,7 @@ from empirical_outcomes import load_empirical_outcomes
 from hierarchy_optimizer import Cascade, HierarchyOptimizer, PAPER_DETECTOR_COST_MS
 from threshold_optimizer import (
     DEFAULT_QUANTILE_POINTS,
+    DEFAULT_SA_RESTARTS,
     FixedLayoutThresholdEvaluator,
     optimize_fixed_layout_thresholds_simulated_annealing,
     split_empirical_outcomes,
@@ -669,12 +668,14 @@ class InnerAnnealingFitness:
         iterations: int,
         inner_seed: int,
         settings: Mapping[str, object],
+        restarts: int = DEFAULT_SA_RESTARTS,
     ) -> None:
         self.optimizer = optimizer
         self.target_accuracy = float(target_accuracy)
         self.quantile_points = int(quantile_points)
         self.iterations = int(iterations)
         self.inner_seed = int(inner_seed)
+        self.restarts = int(restarts)
         self.settings = dict(settings)
 
     def __call__(self, indexed: IndexedLayout) -> dict[str, object]:
@@ -692,6 +693,7 @@ class InnerAnnealingFitness:
                 n_iterations=self.iterations,
                 random_seed=self.inner_seed,
                 show_progress=False,
+                restarts=self.restarts,
             )
         metrics = dict(metrics)
         metrics["feasible"] = bool(
@@ -704,6 +706,52 @@ class InnerAnnealingFitness:
             "settings": dict(self.settings),
             "validation": _compact_optimization(metrics),
         }
+
+
+_PROCESS_FITNESS: InnerAnnealingFitness | None = None
+
+
+def _initialize_fitness_process(
+    outcomes: str,
+    target_accuracy: float,
+    quantile_points: int,
+    iterations: int,
+    inner_seed: int,
+    restarts: int,
+    settings: Mapping[str, object],
+) -> None:
+    """Build one process-local evaluator instead of sharing Python threads."""
+
+    global _PROCESS_FITNESS
+    payload = _without_candidates(
+        load_empirical_outcomes(Path(outcomes)), REMOVED_CANDIDATES
+    )
+    validation_payload, _, _ = split_empirical_outcomes(
+        payload,
+        holdout_fraction=float(settings["holdout_fraction"]),
+        split_strategy=str(settings["split_strategy"]),
+        random_seed=int(settings["split_seed"]),
+    )
+    optimizer = HierarchyOptimizer(
+        validation_payload,
+        detector_mode=str(settings["detector_mode"]),
+        detector_cost_ms=float(settings["detector_cost_ms"]),
+    )
+    _PROCESS_FITNESS = InnerAnnealingFitness(
+        optimizer,
+        target_accuracy=target_accuracy,
+        quantile_points=quantile_points,
+        iterations=iterations,
+        inner_seed=inner_seed,
+        settings=settings,
+        restarts=restarts,
+    )
+
+
+def _evaluate_in_fitness_process(indexed: IndexedLayout) -> dict[str, object]:
+    if _PROCESS_FITNESS is None:
+        raise RuntimeError("The process-local GA fitness evaluator was not initialized.")
+    return _PROCESS_FITNESS(indexed)
 
 
 def _load_jsonl(path: Path) -> dict[str, dict[str, object]]:
@@ -774,15 +822,16 @@ def _fitness_implementation_sha256() -> str:
     """Fingerprint source files that define cached layout fitness."""
 
     source_dir = Path(__file__).resolve().parent
+    repository_root = source_dir.parents[1]
     digest = hashlib.sha256()
-    for name in (
-        "brute_force_k1_free_layouts.py",
-        "hierarchy_optimizer.py",
-        "joint_optimize_hierarchy_ga.py",
-        "threshold_optimizer.py",
+    for path in (
+        source_dir / "brute_force_k1_free_layouts.py",
+        repository_root / "hierarchy_optimizer.py",
+        source_dir / "joint_optimize_hierarchy_ga.py",
+        repository_root / "threshold_optimizer.py",
     ):
-        path = source_dir / name
-        digest.update(name.encode("utf-8"))
+        relative_path = path.relative_to(repository_root).as_posix()
+        digest.update(relative_path.encode("utf-8"))
         digest.update(path.read_bytes())
     return digest.hexdigest()
 
@@ -830,8 +879,24 @@ def _evaluate_missing(
         if workers == 1:
             save(map(evaluate, entries))
         else:
-            with ThreadPoolExecutor(max_workers=workers) as executor:
-                save(executor.map(evaluate, entries))
+            if not isinstance(evaluate, InnerAnnealingFitness):
+                raise TypeError(
+                    "Process-parallel evaluation requires InnerAnnealingFitness."
+                )
+            with ProcessPoolExecutor(
+                max_workers=workers,
+                initializer=_initialize_fitness_process,
+                initargs=(
+                    str(evaluate.settings["outcomes"]),
+                    evaluate.target_accuracy,
+                    evaluate.quantile_points,
+                    evaluate.iterations,
+                    evaluate.inner_seed,
+                    evaluate.restarts,
+                    evaluate.settings,
+                ),
+            ) as executor:
+                save(executor.map(_evaluate_in_fitness_process, entries))
     return completed
 
 
@@ -920,7 +985,10 @@ def _final_holdout(
         evaluator = FixedLayoutThresholdEvaluator(holdout_optimizer, cascade)
         thresholds = validation["thresholds"]
         assert isinstance(thresholds, Mapping)
-        metrics = evaluator.evaluate(thresholds)
+        replay_options: dict[str, object] = {"strict_thresholds": True}
+        if "active_slots" in validation:
+            replay_options["active_slots"] = validation["active_slots"]
+        metrics = evaluator.evaluate(thresholds, **replay_options)
     metrics = dict(metrics)
     metrics["feasible"] = bool(float(metrics["accuracy"]) >= target_accuracy)
     return _compact_optimization(metrics)
@@ -1196,6 +1264,21 @@ def _search_settings(
         ),
         "iterations": int(iterations),
         "quantile_points": int(quantile_points),
+        "threshold_optimizer": {
+            "method": (
+                f"best_of_{DEFAULT_SA_RESTARTS}_"
+                "chellapilla_continuous_gaussian_sa"
+            ),
+            "iterations_per_restart": int(iterations),
+            "restarts": DEFAULT_SA_RESTARTS,
+            "restart_seeds": [
+                inner_seed + index for index in range(DEFAULT_SA_RESTARTS)
+            ],
+            "continuous_thresholds": True,
+            "quantile_points_used": False,
+            "prune_stages_accepting_zero_validation_samples": True,
+            "freeze_validation_active_slots_on_holdout": True,
+        },
         "inner_seed": int(inner_seed),
         "split_seed": int(split_seed),
         "outer_seed": int(outer_seed),

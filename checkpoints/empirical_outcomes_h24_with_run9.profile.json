@@ -1,0 +1,28 @@
+{
+  "dataset_id": "m3n_vc/h24",
+  "global_classes": [
+    "gle350",
+    "cx30",
+    "mustang",
+    "miata",
+    "background"
+  ],
+  "groups": {
+    "coupe": [
+      "mustang",
+      "miata"
+    ],
+    "suv": [
+      "gle350",
+      "cx30"
+    ]
+  },
+  "max_router_depth": 1,
+  "router_outputs": [
+    "suv",
+    "coupe",
+    "background"
+  ],
+  "schema_version": "cascade-profile/v1",
+  "split_group_column": "run_id"
+}

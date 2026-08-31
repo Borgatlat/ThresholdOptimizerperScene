@@ -1,0 +1,402 @@
+{
+  "contract": {
+    "dataset": "m3n_vc/h24",
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "fixed_seed_fields": {
+      "inner_seed": 0,
+      "split_seed": 0,
+      "threshold_restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "genetic_algorithm": {
+      "algorithm": "dynamic_constrained_memetic_genetic_algorithm",
+      "allow_cached_reentry": false,
+      "component_resample_rate": 0.3,
+      "crossover_rate": 0.8,
+      "elite_count": 4,
+      "evaluation_budget": 512,
+      "generations": 24,
+      "internal_layout_workers": 1,
+      "mandatory_initial_member": {
+        "initial": [
+          "K3",
+          "detector"
+        ],
+        "specialized": {}
+      },
+      "mutation_rate": 0.8,
+      "population_size": 32,
+      "random_immigrant_rate": 0.2,
+      "tournament_size": 2
+    },
+    "implementation_fingerprints": {
+      "genetic_algorithm": "517cc85b9eb1967ec50cd84cf872803c526fecf9530ee056fb988d86166035cb",
+      "random_sampling": "7d3640b62be6dd86daa2b570c665268e71da0e78fe970ac16933f1031e2de798"
+    },
+    "layout_grammar": "depth_one_K0_K1",
+    "layout_space_size": 11589085,
+    "oracle_limitation": "No exhaustive K1-enabled oracle exists for the 11,589,085-layout space; global ranks, exact-optimum recovery, and optimum regret are therefore unavailable.",
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+    "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+    "primary_comparison": {
+      "cost_delta": "random_minus_ga_ms_positive_favors_ga",
+      "scope": "validation_only",
+      "selection_rule": "feasibility_aware_topology_selection"
+    },
+    "random_sampling": {
+      "algorithm": "uniform_random_implicit_layout_sampling_without_replacement",
+      "atomic_layout_overshoot_allowed": true,
+      "mandatory_initial_member": null,
+      "minimum_classifier_condition": null,
+      "sampler": "exact_uniform_over_all_legal_layouts",
+      "time_budget": "paired_ga_elapsed_seconds_this_invocation"
+    },
+    "removed_candidates": [],
+    "schema_version": "paired-ga-vs-random-with-k1/v1",
+    "search_asymmetry": "The GA is seeded with mandatory K3->detector while exact-uniform random sampling is unseeded. In addition, the GA representation's random initial members and immigrants sample component lengths uniformly, which overweights shorter layouts relative to exact-uniform sampling over the complete legal space. Results therefore compare the complete implemented search procedures, including both asymmetries.",
+    "split": {
+      "holdout_fraction": 0.2,
+      "seed": 0,
+      "strategy": "blocked_per_run"
+    },
+    "target_accuracy": 0.9,
+    "threshold_optimizer": {
+      "freeze_validation_active_slots_on_holdout": true,
+      "inner_seed_varies_across_trials": false,
+      "iterations_per_restart": 1000,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "prune_stages_accepting_zero_validation_samples": true,
+      "quantile_points_recorded_but_unused": 50,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "restarts": 10
+    },
+    "trial_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "varied_seed_fields": {
+      "genetic_algorithm": "outer_seed",
+      "random_sampling": "sampling_seed"
+    }
+  },
+  "deadline_censored_random_validation_secondary": {
+    "available": true,
+    "both_feasible": true,
+    "holdout_used": false,
+    "layout_id": "1b55e6982a9978d7",
+    "layout_index": 245,
+    "layouts_completed_by_deadline": 373,
+    "method": "exclude_random_layouts_completed_after_paired_GA_budget",
+    "overtime_layouts_excluded": 1,
+    "random_minus_ga_cost_ms": 0.005622580194705407,
+    "selection_outcome": "ga_better",
+    "validation": {
+      "accuracy": 0.9000968366688186,
+      "expected_cost_ms": 6.224344460735384,
+      "feasible": true
+    }
+  },
+  "holdout_descriptive": {
+    "not_used_for_selection": true,
+    "random_minus_ga_accuracy": 0.0,
+    "random_minus_ga_cost_ms": -0.007180127113374013
+  },
+  "interpretation_limitations": [
+    "The GA is seeded with mandatory K3->detector while exact-uniform random sampling is unseeded. In addition, the GA representation's random initial members and immigrants sample component lengths uniformly, which overweights shorter layouts relative to exact-uniform sampling over the complete legal space. Results therefore compare the complete implemented search procedures, including both asymmetries.",
+    "No exhaustive K1-enabled oracle exists for the 11,589,085-layout space; global ranks, exact-optimum recovery, and optimum regret are therefore unavailable.",
+    "Ten outer seeds provide limited power; holdout results are descriptive only."
+  ],
+  "methods": {
+    "genetic_algorithm": {
+      "active_slots": [
+        "K0",
+        "K3@initial[3]",
+        "K6",
+        "K2@specialized[K0:coupe][2]",
+        "K4",
+        "K3@specialized[K0:suv][1]"
+      ],
+      "elapsed_seconds": 2377.1996399999916,
+      "elapsed_source_field": "elapsed_seconds_this_invocation",
+      "evaluated_layouts": 512,
+      "holdout": {
+        "accuracy": 0.9077419354838709,
+        "expected_cost_ms": 6.224499579004928,
+        "feasible": true,
+        "route_counts": {
+          "K0": 25,
+          "K3@initial[3]": 231,
+          "K3@specialized[K0:suv][1]": 75,
+          "K4": 673,
+          "K6": 546
+        }
+      },
+      "layout": {
+        "initial": [
+          "K0",
+          "K2",
+          "K1",
+          "K3",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K5",
+            "K2",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "detector"
+          ],
+          "K1:coupe": [
+            "detector"
+          ],
+          "K1:suv": [
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "b00b6cfdbff7ea38",
+      "layout_index": 317,
+      "pruned_slots": [
+        "K2@initial[1]",
+        "K1",
+        "K5",
+        "K3@specialized[K0:coupe][3]"
+      ],
+      "source": {
+        "evaluations_path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_with_k1_h24_target_090_paper_sa_10_trials\\trial_05\\ga\\evaluations.jsonl",
+        "evaluations_sha256": "4f5cf139cb6d4160ac9174ded4aef530c41f00281fb10aca0ae0e3dbaed00d52",
+        "summary_path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_with_k1_h24_target_090_paper_sa_10_trials\\trial_05\\ga\\summary.json",
+        "summary_sha256": "645bfa5f1817b71442f357a077c59cbf4d3d04f6a5a8296d0066094dfa7040d7"
+      },
+      "thresholds": {
+        "K0": 0.7997684260586598,
+        "K1": 0.99456511533579,
+        "K2@initial[1]": 0.9961022796874394,
+        "K2@specialized[K0:coupe][2]": 0.25856156607499825,
+        "K3@initial[3]": 0.22996000873334602,
+        "K3@specialized[K0:coupe][3]": 0.07960442111453352,
+        "K3@specialized[K0:suv][1]": 0.2801106897308071,
+        "K4": 0.8342534390035007,
+        "K5": 0.8922231374585843,
+        "K6": 0.5021621773647026
+      },
+      "validation": {
+        "accuracy": 0.9000968366688186,
+        "expected_cost_ms": 6.218721880540679,
+        "feasible": true,
+        "route_counts": {
+          "K0": 71,
+          "K2@specialized[K0:coupe][2]": 2,
+          "K3@initial[3]": 887,
+          "K3@specialized[K0:suv][1]": 321,
+          "K4": 2723,
+          "K6": 2192
+        }
+      }
+    },
+    "random_sampling": {
+      "active_slots": [
+        "K0",
+        "K3@initial[1]",
+        "K6",
+        "K5",
+        "K4@specialized[K0:suv][0]",
+        "K3@specialized[K0:suv][1]"
+      ],
+      "elapsed_seconds": 2380.105491800001,
+      "elapsed_source_field": "search_elapsed_seconds",
+      "evaluated_layouts": 374,
+      "holdout": {
+        "accuracy": 0.9077419354838709,
+        "expected_cost_ms": 6.217319451891554,
+        "feasible": true,
+        "route_counts": {
+          "K0": 24,
+          "K3@initial[1]": 233,
+          "K3@specialized[K0:suv][1]": 71,
+          "K4@specialized[K0:suv][0]": 677,
+          "K5": 7,
+          "K6": 538
+        }
+      },
+      "layout": {
+        "initial": [
+          "K0",
+          "K3",
+          "K1",
+          "K2",
+          "detector"
+        ],
+        "specialized": {
+          "K0:coupe": [
+            "K6",
+            "K5",
+            "K2",
+            "K3",
+            "detector"
+          ],
+          "K0:suv": [
+            "K4",
+            "K3",
+            "K2",
+            "detector"
+          ],
+          "K1:coupe": [
+            "detector"
+          ],
+          "K1:suv": [
+            "K4",
+            "K2",
+            "detector"
+          ]
+        }
+      },
+      "layout_id": "1b55e6982a9978d7",
+      "layout_index": 245,
+      "pruned_slots": [
+        "K1",
+        "K2@initial[3]",
+        "K2@specialized[K0:coupe][2]",
+        "K3@specialized[K0:coupe][3]",
+        "K2@specialized[K0:suv][2]",
+        "K4@specialized[K1:suv][0]",
+        "K2@specialized[K1:suv][1]"
+      ],
+      "source": {
+        "evaluations_path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_with_k1_h24_target_090_paper_sa_10_trials\\trial_05\\random\\evaluations.jsonl",
+        "evaluations_sha256": "52f679fc8c05dd58c7b3b7532b31dddd2ec3c692e7d979e555dd6ac39f4335de",
+        "summary_path": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_with_k1_h24_target_090_paper_sa_10_trials\\trial_05\\random\\summary.json",
+        "summary_sha256": "08dceecada2e8e429ae4bc1a9cda64c77df1bd37f398708d623a8a2e476ae6c0"
+      },
+      "thresholds": {
+        "K0": 0.8022075110741832,
+        "K1": 0.29660242606466364,
+        "K2@initial[3]": 0.8285358387892424,
+        "K2@specialized[K0:coupe][2]": 0.8668302077785287,
+        "K2@specialized[K0:suv][2]": 0.7408244740792522,
+        "K2@specialized[K1:suv][1]": 0.6318407566690252,
+        "K3@initial[1]": 0.034446171566516366,
+        "K3@specialized[K0:coupe][3]": 0.985454934110462,
+        "K3@specialized[K0:suv][1]": 0.20272107466311087,
+        "K4@specialized[K0:suv][0]": 0.8271180467744861,
+        "K4@specialized[K1:suv][0]": 0.6191177898929789,
+        "K5": 0.16088280338097286,
+        "K6": 0.5436287521378059
+      },
+      "validation": {
+        "accuracy": 0.9000968366688186,
+        "expected_cost_ms": 6.224344460735384,
+        "feasible": true,
+        "route_counts": {
+          "K0": 71,
+          "K3@initial[1]": 897,
+          "K3@specialized[K0:suv][1]": 310,
+          "K4@specialized[K0:suv][0]": 2732,
+          "K5": 35,
+          "K6": 2151
+        }
+      }
+    }
+  },
+  "primary_validation_comparison": {
+    "both_feasible": true,
+    "random_minus_ga_accuracy": 0.0,
+    "random_minus_ga_cost_ms": 0.005622580194705407,
+    "raw_random_minus_ga_cost_ms_descriptive": 0.005622580194705407,
+    "selection_outcome": "ga_better"
+  },
+  "schema_version": "paired-ga-vs-random-with-k1/v1",
+  "seed_plan": {
+    "fixed_inner_seed": 0,
+    "fixed_restart_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "fixed_split_seed": 0,
+    "ga_outer_seed": 5,
+    "random_sampling_seed": 5
+  },
+  "timing": {
+    "budget_source": "ga.elapsed_seconds_this_invocation",
+    "fairness_note": "GA elapsed excludes its winner-only holdout replay. Random receives that GA validation-search duration; its raw result may include one atomic layout completed just after the deadline.",
+    "ga_phase": {
+      "effective_phase_worker_limit": 10,
+      "internal_layout_workers": 1,
+      "invocation_kind": "fresh_uninterrupted_ga_required_for_time_matching",
+      "parallel_trials_requested": 10,
+      "phase": "genetic_algorithm",
+      "phase_trial_count": 10,
+      "schema_version": "paired-ga-vs-random-with-k1/v1",
+      "seed": 5,
+      "source_summary": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_with_k1_h24_target_090_paper_sa_10_trials\\trial_05\\ga\\summary.json",
+      "source_summary_sha256": "645bfa5f1817b71442f357a077c59cbf4d3d04f6a5a8296d0066094dfa7040d7",
+      "timing_note": "Wall time was measured while independent trials could execute concurrently.",
+      "wrapper_process_cpu_seconds": 2358.203125,
+      "wrapper_wall_seconds": 2377.3236282
+    },
+    "ga_reported_seconds": 2377.1996399999916,
+    "random_atomic_overshoot_seconds": 2.905851800009259,
+    "random_budget_seconds": 2377.1996399999916,
+    "random_phase": {
+      "effective_phase_worker_limit": 10,
+      "internal_layout_workers": 1,
+      "invocation_kind": "fresh_or_cumulatively_resumed_random_search",
+      "parallel_trials_requested": 10,
+      "phase": "random_sampling",
+      "phase_trial_count": 10,
+      "schema_version": "paired-ga-vs-random-with-k1/v1",
+      "seed": 5,
+      "source_summary": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_with_k1_h24_target_090_paper_sa_10_trials\\trial_05\\random\\summary.json",
+      "source_summary_sha256": "08dceecada2e8e429ae4bc1a9cda64c77df1bd37f398708d623a8a2e476ae6c0",
+      "timing_note": "Wall time was measured while independent trials could execute concurrently.",
+      "wrapper_process_cpu_seconds": 2361.03125,
+      "wrapper_wall_seconds": 2380.227041399994
+    },
+    "random_search_elapsed_seconds": 2380.105491800001
+  },
+  "trial_seed": 5
+}

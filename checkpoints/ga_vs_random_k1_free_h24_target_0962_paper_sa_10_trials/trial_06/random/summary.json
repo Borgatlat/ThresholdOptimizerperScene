@@ -1,0 +1,333 @@
+{
+  "evaluations": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_k1_free_h24_target_0962_paper_sa_10_trials\\trial_06\\random\\evaluations.jsonl",
+  "evaluations_sha256": "93692f130d3124735613adc7ef3e19b19c1e7099c2079bf0f071ee5ac4ed9353",
+  "fraction_of_layout_space": 0.08494138863841298,
+  "holdout_usage": "winner_only_after_validation_search",
+  "new_evaluations_this_invocation": 471,
+  "search_elapsed_seconds": 2329.224855799999,
+  "settings": {
+    "algorithm": "uniform_random_layout_sampling_without_replacement",
+    "dataset": "m3n_vc/h24",
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "fitness_implementation_sha256": "6bf59e5e7de47be6ca5ba0839d60b8aac7862cf9c0573560188337c4ced733bf",
+    "holdout_fraction": 0.2,
+    "layout_order_sha256": "83199f4421cb62bb2f132297408dbc3d989ac79510382b88931bf6cc35a75bc8",
+    "layout_space_size": 5545,
+    "max_layouts": null,
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+    "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+    "removed_candidates": [
+      "K1"
+    ],
+    "sampling_seed": 6,
+    "schema_version": "random-joint-layout-search/v1",
+    "split_seed": 0,
+    "split_strategy": "blocked_per_run",
+    "target_accuracy": 0.9662,
+    "threshold_optimizer": {
+      "continuous_thresholds": true,
+      "freeze_validation_active_slots_on_holdout": true,
+      "iterations_per_restart": 1000,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "prune_stages_accepting_zero_validation_samples": true,
+      "quantile_points_used": false,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "restarts": 10
+    },
+    "time_budget_seconds": 2329.0499435999955
+  },
+  "split": {
+    "holdout_fraction": 0.2,
+    "holdout_samples": 1550,
+    "per_group": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "per_run": {
+      "run1": {
+        "holdout": 431,
+        "validation": 1723
+      },
+      "run3": {
+        "holdout": 382,
+        "validation": 1526
+      },
+      "run5": {
+        "holdout": 367,
+        "validation": 1469
+      },
+      "run7": {
+        "holdout": 370,
+        "validation": 1478
+      }
+    },
+    "random_seed": 0,
+    "split_group_column": "run_id",
+    "strategy": "blocked_per_run",
+    "validation_samples": 6196
+  },
+  "stop_reason": "time_budget_reached",
+  "time_budget_overshoot_seconds": 0.17491220000374597,
+  "total_elapsed_seconds_including_holdout": 2329.2362242999952,
+  "unique_layouts_evaluated": 471,
+  "winner": {
+    "evaluation_wall_seconds": 3.424175699998159,
+    "holdout": {
+      "accuracy": 0.964516129032258,
+      "active_slots": [
+        "K3",
+        "K2"
+      ],
+      "correct": 1495,
+      "expected_cost": 664.7301358331686,
+      "feasible": false,
+      "macro_accuracy": 0.9632139634071595,
+      "method": "validation_pruned_policy_holdout_replay",
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9921465968586387,
+          "correct": 379,
+          "total": 382
+        },
+        "gle350": {
+          "accuracy": 0.988399071925754,
+          "correct": 426,
+          "total": 431
+        },
+        "miata": {
+          "accuracy": 0.9540540540540541,
+          "correct": 353,
+          "total": 370
+        },
+        "mustang": {
+          "accuracy": 0.9182561307901907,
+          "correct": 337,
+          "total": 367
+        }
+      },
+      "pruned_slots": [
+        "K0",
+        "K5",
+        "K4"
+      ],
+      "route_counts": {
+        "K2": 1,
+        "K3": 1448,
+        "detector": 101
+      },
+      "target_accuracy": 0.9662,
+      "thresholds": {
+        "K0": 1.0,
+        "K2": 0.9895781954650074,
+        "K3": 0.7041937851318593,
+        "K4": 0.6773727117374003,
+        "K5": 0.9777516842275907
+      },
+      "total": 1550,
+      "worst_class_accuracy": 0.9182561307901907
+    },
+    "layout": {
+      "initial": [
+        "K3",
+        "K2",
+        "K0",
+        "detector"
+      ],
+      "specialized": {
+        "K0:coupe": [
+          "K5",
+          "detector"
+        ],
+        "K0:suv": [
+          "K4",
+          "detector"
+        ]
+      }
+    },
+    "layout_id": "d9232bbb09295828",
+    "layout_index": 3378,
+    "sample_rank": 60,
+    "search_elapsed_seconds_at_completion": 312.6240542000014,
+    "settings": {
+      "algorithm": "uniform_random_layout_sampling_without_replacement",
+      "dataset": "m3n_vc/h24",
+      "detector_cost_ms": 10000.0,
+      "detector_mode": "paper",
+      "fitness_implementation_sha256": "6bf59e5e7de47be6ca5ba0839d60b8aac7862cf9c0573560188337c4ced733bf",
+      "holdout_fraction": 0.2,
+      "layout_order_sha256": "83199f4421cb62bb2f132297408dbc3d989ac79510382b88931bf6cc35a75bc8",
+      "layout_space_size": 5545,
+      "max_layouts": null,
+      "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+      "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+      "removed_candidates": [
+        "K1"
+      ],
+      "sampling_seed": 6,
+      "schema_version": "random-joint-layout-search/v1",
+      "split_seed": 0,
+      "split_strategy": "blocked_per_run",
+      "target_accuracy": 0.9662,
+      "threshold_optimizer": {
+        "continuous_thresholds": true,
+        "freeze_validation_active_slots_on_holdout": true,
+        "iterations_per_restart": 1000,
+        "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+        "prune_stages_accepting_zero_validation_samples": true,
+        "quantile_points_used": false,
+        "restart_seeds": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "restarts": 10
+      },
+      "time_budget_seconds": 2329.0499435999955
+    },
+    "validation": {
+      "accuracy": 0.9662685603615235,
+      "active_slots": [
+        "K3",
+        "K2"
+      ],
+      "annealing_accepted_moves": 734,
+      "annealing_elapsed_seconds": 3.4053891000221483,
+      "annealing_evaluations": 10010,
+      "annealing_iterations": 10000,
+      "correct": 5987,
+      "elapsed_seconds": 3.4136574000003748,
+      "evaluations": 10010,
+      "expected_cost": 744.2852776132405,
+      "feasible": true,
+      "infeasible_proposals_rejected": 7113,
+      "iterations_per_restart": 1000,
+      "macro_accuracy": 0.9648832598930839,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "per_class_accuracy": {
+        "background": {
+          "accuracy": null,
+          "correct": 0,
+          "total": 0
+        },
+        "cx30": {
+          "accuracy": 0.9934469200524246,
+          "correct": 1516,
+          "total": 1526
+        },
+        "gle350": {
+          "accuracy": 0.9930354033662218,
+          "correct": 1711,
+          "total": 1723
+        },
+        "miata": {
+          "accuracy": 0.9431664411366711,
+          "correct": 1394,
+          "total": 1478
+        },
+        "mustang": {
+          "accuracy": 0.9298842750170184,
+          "correct": 1366,
+          "total": 1469
+        }
+      },
+      "pruned_slots": [
+        "K0",
+        "K5",
+        "K4"
+      ],
+      "restart_accuracies": [
+        0.9662685603615235,
+        0.9662685603615235,
+        0.9662685603615235,
+        0.9662685603615235,
+        0.9662685603615235,
+        0.9662685603615235,
+        0.9662685603615235,
+        0.9662685603615235,
+        0.9662685603615235,
+        0.9662685603615235
+      ],
+      "restart_costs_ms": [
+        744.2852776132405,
+        744.2852776132405,
+        744.2852776132405,
+        744.2852776132405,
+        744.2852776132405,
+        744.2852776132405,
+        744.2852776132405,
+        744.2852776132405,
+        747.0203115431918,
+        744.2852776132405
+      ],
+      "restart_count": 10,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "route_counts": {
+        "K2": 2,
+        "K3": 5741,
+        "detector": 453
+      },
+      "selected_restart_index": 0,
+      "selected_restart_seed": 0,
+      "target_accuracy": 0.9662,
+      "thresholds": {
+        "K0": 1.0,
+        "K2": 0.9895781954650074,
+        "K3": 0.7041937851318593,
+        "K4": 0.6773727117374003,
+        "K5": 0.9777516842275907
+      },
+      "total": 6196,
+      "total_requested_iterations": 10000,
+      "worst_class_accuracy": 0.9298842750170184
+    }
+  }
+}

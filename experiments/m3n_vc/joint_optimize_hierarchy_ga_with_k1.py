@@ -2,8 +2,10 @@
 
 Unlike the historical K1-free experiment, the complete legal layout space
 contains millions of topologies and is therefore represented dynamically
-rather than materialized as a catalogue.  Every visited topology still gets
-the same 8,000-step, 50-quantile inner threshold optimization.
+rather than materialized as a catalogue. Every visited topology receives the
+canonical best-of-ten, 1,000-iteration continuous Chellapilla SA. The target
+accuracy defaults to the fixed-threshold DP baseline with all candidates,
+including K1, available.
 """
 
 from __future__ import annotations
@@ -11,6 +13,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict
 from pathlib import Path
 from time import perf_counter
@@ -50,13 +53,14 @@ from layout_search import (
 )
 from threshold_optimizer import (
     DEFAULT_QUANTILE_POINTS,
+    DEFAULT_SA_RESTARTS,
     FixedLayoutThresholdEvaluator,
     split_empirical_outcomes,
 )
 
 
-DEFAULT_TARGET_ACCURACY = 0.9662
-DEFAULT_OUTPUT_DIR = Path("checkpoints/joint_ga_with_k1_h24_target_096")
+DEFAULT_TARGET_ACCURACY: float | None = None
+DEFAULT_OUTPUT_DIR = Path("checkpoints/joint_ga_with_k1_h24_dp_target_paper_sa")
 DEFAULT_POPULATION_SIZE = 32
 DEFAULT_GENERATIONS = 24
 DEFAULT_EVALUATION_BUDGET = 512
@@ -66,6 +70,7 @@ DEFAULT_CROSSOVER_RATE = 0.80
 DEFAULT_MUTATION_RATE = 0.80
 DEFAULT_RANDOM_IMMIGRANT_RATE = 0.20
 DEFAULT_COMPONENT_RESAMPLE_RATE = 0.30
+DEFAULT_WORKERS = 24
 
 M3N_PROFILE = HierarchyProfile(
     dataset_id="m3n_vc/h24",
@@ -139,6 +144,48 @@ def _implementation_sha256() -> str:
     return digest.hexdigest()
 
 
+_PROCESS_INNER_FITNESS: InnerAnnealingFitness | None = None
+
+
+def _initialize_k1_fitness_process(
+    outcomes: str,
+    target_accuracy: float,
+    quantile_points: int,
+    iterations: int,
+    restarts: int,
+    inner_seed: int,
+    settings: Mapping[str, object],
+) -> None:
+    global _PROCESS_INNER_FITNESS
+    payload = load_empirical_outcomes(Path(outcomes))
+    validation_payload, _, _ = split_empirical_outcomes(
+        payload,
+        holdout_fraction=float(settings["holdout_fraction"]),
+        split_strategy=str(settings["split_strategy"]),
+        random_seed=int(settings["split_seed"]),
+    )
+    optimizer = HierarchyOptimizer(
+        validation_payload,
+        detector_mode=str(settings["detector_mode"]),
+        detector_cost_ms=float(settings["detector_cost_ms"]),
+    )
+    _PROCESS_INNER_FITNESS = InnerAnnealingFitness(
+        optimizer,
+        target_accuracy=target_accuracy,
+        quantile_points=quantile_points,
+        iterations=iterations,
+        inner_seed=inner_seed,
+        settings=settings,
+        restarts=restarts,
+    )
+
+
+def _evaluate_k1_indexed_layout(indexed: IndexedLayout) -> dict[str, object]:
+    if _PROCESS_INNER_FITNESS is None:
+        raise RuntimeError("The process-local K1 fitness evaluator was not initialized.")
+    return _PROCESS_INNER_FITNESS(indexed)
+
+
 class CachedGenomeFitness:
     """Append-only, replayable fitness cache for the deterministic GA."""
 
@@ -150,13 +197,16 @@ class CachedGenomeFitness:
         target_accuracy: float,
         quantile_points: int,
         iterations: int,
+        restarts: int,
         inner_seed: int,
         settings: Mapping[str, object],
         results_path: Path,
+        workers: int,
     ) -> None:
         self.space = space
         self.results_path = results_path
         self.settings = dict(settings)
+        self.workers = int(workers)
         self.records = _load_jsonl(results_path)
         for record in self.records.values():
             if not _settings_match(record.get("settings"), self.settings):
@@ -171,6 +221,7 @@ class CachedGenomeFitness:
             iterations=iterations,
             inner_seed=inner_seed,
             settings=self.settings,
+            restarts=restarts,
         )
         self.cache_hits = 0
         self.new_evaluations = 0
@@ -203,6 +254,69 @@ class CachedGenomeFitness:
             )
         return dict(record)
 
+    def evaluate_many(
+        self, genomes: list[TopologyGenome]
+    ) -> list[dict[str, object]]:
+        """Evaluate one generation concurrently while preserving result order."""
+
+        results: list[dict[str, object] | None] = [None] * len(genomes)
+        pending: list[tuple[int, IndexedLayout]] = []
+        next_index = len(self.records)
+        for position, genome in enumerate(genomes):
+            candidate_id = layout_id(genome, self.space)
+            cached = self.records.get(candidate_id)
+            if cached is not None:
+                self.cache_hits += 1
+                results[position] = dict(cached)
+                continue
+            pending.append(
+                (
+                    position,
+                    IndexedLayout(
+                        next_index,
+                        candidate_id,
+                        cascade_from_genome(genome, self.space),
+                    ),
+                )
+            )
+            next_index += 1
+
+        if pending:
+            indexed_layouts = [indexed for _, indexed in pending]
+            if self.workers == 1:
+                evaluated = map(self.inner, indexed_layouts)
+            else:
+                executor = ProcessPoolExecutor(
+                    max_workers=self.workers,
+                    initializer=_initialize_k1_fitness_process,
+                    initargs=(
+                        str(self.settings["outcomes"]),
+                        self.inner.target_accuracy,
+                        self.inner.quantile_points,
+                        self.inner.iterations,
+                        self.inner.restarts,
+                        self.inner.inner_seed,
+                        self.settings,
+                    ),
+                )
+                evaluated = executor.map(_evaluate_k1_indexed_layout, indexed_layouts)
+            try:
+                self.results_path.parent.mkdir(parents=True, exist_ok=True)
+                with self.results_path.open("a", encoding="utf-8", buffering=1) as handle:
+                    for (position, _), record in zip(pending, evaluated, strict=True):
+                        handle.write(json.dumps(record, sort_keys=True, default=float) + "\n")
+                        candidate_id = str(record["layout_id"])
+                        self.records[candidate_id] = record
+                        results[position] = dict(record)
+                        self.new_evaluations += 1
+            finally:
+                if self.workers != 1:
+                    executor.shutdown()
+
+        if any(record is None for record in results):
+            raise RuntimeError("K1 batch fitness failed to populate every result.")
+        return [dict(record) for record in results if record is not None]
+
 
 def _holdout_metrics(
     genome: TopologyGenome,
@@ -218,8 +332,12 @@ def _holdout_metrics(
         thresholds = validation.get("thresholds")
         if not isinstance(thresholds, Mapping):
             raise ValueError("The winning validation policy has no thresholds.")
+        replay_options: dict[str, object] = {"strict_thresholds": True}
+        if "active_slots" in validation:
+            replay_options["active_slots"] = validation["active_slots"]
         metrics = FixedLayoutThresholdEvaluator(optimizer, cascade).evaluate(
-            thresholds
+            thresholds,
+            **replay_options,
         )
     metrics = dict(metrics)
     metrics["feasible"] = bool(float(metrics["accuracy"]) >= target_accuracy)
@@ -230,8 +348,9 @@ def run_k1_search(
     *,
     outcomes: Path = DEFAULT_OUTCOMES,
     output_dir: Path = DEFAULT_OUTPUT_DIR,
-    target_accuracy: float = DEFAULT_TARGET_ACCURACY,
+    target_accuracy: float | None = DEFAULT_TARGET_ACCURACY,
     iterations: int = DEFAULT_ITERATIONS,
+    restarts: int = DEFAULT_SA_RESTARTS,
     quantile_points: int = DEFAULT_QUANTILE_POINTS,
     inner_seed: int = DEFAULT_SEED,
     split_seed: int = DEFAULT_SEED,
@@ -241,6 +360,7 @@ def run_k1_search(
     population_size: int = DEFAULT_POPULATION_SIZE,
     generations: int = DEFAULT_GENERATIONS,
     evaluation_budget: int = DEFAULT_EVALUATION_BUDGET,
+    workers: int = DEFAULT_WORKERS,
     overwrite: bool = False,
 ) -> dict[str, object]:
     payload = load_empirical_outcomes(outcomes)
@@ -259,42 +379,12 @@ def run_k1_search(
         random_seed=outer_seed,
         allow_cached_reentry=False,
     )
+    if iterations < 1 or restarts < 1:
+        raise ValueError("iterations and restarts must both be positive.")
+    if workers < 1:
+        raise ValueError("workers must be positive.")
     if not population_size <= evaluation_budget <= layout_count:
         raise ValueError("evaluation_budget must be between population and space size.")
-
-    settings: dict[str, object] = {
-        "algorithm": "dynamic_constrained_memetic_genetic_algorithm",
-        "layout_grammar": "depth_one_K0_K1",
-        "layout_space_size": layout_count,
-        "fitness_implementation_sha256": _implementation_sha256(),
-        "outcomes": str(outcomes.resolve()),
-        "outcomes_sha256": _file_sha256(outcomes),
-        "removed_candidates": [],
-        "detector_mode": "paper",
-        "detector_cost_ms": float(PAPER_DETECTOR_COST_MS),
-        "target_accuracy": float(target_accuracy),
-        "target_accuracy_source": "explicit_0962",
-        "iterations": int(iterations),
-        "quantile_points": int(quantile_points),
-        "inner_seed": int(inner_seed),
-        "split_seed": int(split_seed),
-        "outer_seed": int(outer_seed),
-        "holdout_fraction": float(holdout_fraction),
-        "split_strategy": split_strategy,
-        **asdict(config),
-    }
-
-    output_dir.mkdir(parents=True, exist_ok=True)
-    results_path = output_dir / "evaluations.jsonl"
-    summary_path = output_dir / "summary.json"
-    if overwrite:
-        results_path.unlink(missing_ok=True)
-        summary_path.unlink(missing_ok=True)
-    if summary_path.exists():
-        summary = json.loads(summary_path.read_text(encoding="utf-8"))
-        if _settings_match(summary.get("settings"), settings):
-            return summary
-        raise ValueError("Existing summary belongs to another experiment.")
 
     validation_payload, holdout_payload, split = split_empirical_outcomes(
         payload,
@@ -312,15 +402,100 @@ def run_k1_search(
         detector_mode="paper",
         detector_cost_ms=PAPER_DETECTOR_COST_MS,
     )
+    dp_cascade = validation_optimizer.synthesize()
+    dp_validation = dict(
+        FixedLayoutThresholdEvaluator(validation_optimizer, dp_cascade).evaluate(
+            prune_reject_all_stages=True,
+            strict_thresholds=True,
+        )
+    )
+    dp_fixed_validation_accuracy = float(dp_validation["accuracy"])
+    if target_accuracy is None:
+        target_accuracy = dp_fixed_validation_accuracy
+        target_accuracy_source = "full_candidate_dp_fixed_threshold_validation_accuracy"
+    else:
+        target_accuracy = float(target_accuracy)
+        target_accuracy_source = "explicit_cli_or_api_override"
+    if not 0.0 <= target_accuracy <= 1.0:
+        raise ValueError("target_accuracy must be between 0 and 1 inclusive.")
+    dp_validation.update(
+        {
+            "feasible": bool(dp_fixed_validation_accuracy >= target_accuracy),
+            "target_accuracy": target_accuracy,
+            "method": "full_candidate_dp_fixed_thresholds",
+        }
+    )
+    dp_holdout = dict(
+        FixedLayoutThresholdEvaluator(holdout_optimizer, dp_cascade).evaluate(
+            strict_thresholds=True,
+            active_slots=dp_validation["active_slots"],
+        )
+    )
+    dp_holdout.update(
+        {
+            "feasible": bool(float(dp_holdout["accuracy"]) >= target_accuracy),
+            "target_accuracy": target_accuracy,
+            "method": "validation_pruned_policy_holdout_replay",
+        }
+    )
+
+    settings: dict[str, object] = {
+        "algorithm": "dynamic_constrained_memetic_genetic_algorithm",
+        "dataset": "m3n_vc/h24",
+        "layout_grammar": "depth_one_K0_K1",
+        "layout_space_size": layout_count,
+        "fitness_implementation_sha256": _implementation_sha256(),
+        "outcomes": str(outcomes.resolve()),
+        "outcomes_sha256": _file_sha256(outcomes),
+        "removed_candidates": [],
+        "detector_mode": "paper",
+        "detector_cost_ms": float(PAPER_DETECTOR_COST_MS),
+        "target_accuracy": float(target_accuracy),
+        "target_accuracy_source": target_accuracy_source,
+        "dp_fixed_validation_accuracy": dp_fixed_validation_accuracy,
+        "threshold_optimizer": {
+            "method": f"best_of_{restarts}_chellapilla_continuous_gaussian_sa",
+            "iterations_per_restart": int(iterations),
+            "restarts": int(restarts),
+            "restart_seeds": [inner_seed + index for index in range(restarts)],
+            "continuous_thresholds": True,
+            "quantile_points_used": False,
+            "prune_stages_accepting_zero_validation_samples": True,
+            "freeze_validation_active_slots_on_holdout": True,
+        },
+        "quantile_points_compatibility_argument": int(quantile_points),
+        "inner_seed": int(inner_seed),
+        "split_seed": int(split_seed),
+        "outer_seed": int(outer_seed),
+        "holdout_fraction": float(holdout_fraction),
+        "split_strategy": split_strategy,
+        **asdict(config),
+        "workers": int(workers),
+    }
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    results_path = output_dir / "evaluations.jsonl"
+    summary_path = output_dir / "summary.json"
+    if overwrite:
+        results_path.unlink(missing_ok=True)
+        summary_path.unlink(missing_ok=True)
+    if summary_path.exists():
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        if _settings_match(summary.get("settings"), settings):
+            return summary
+        raise ValueError("Existing summary belongs to another experiment.")
+
     fitness = CachedGenomeFitness(
         validation_optimizer,
         space,
         target_accuracy=target_accuracy,
         quantile_points=quantile_points,
         iterations=iterations,
+        restarts=restarts,
         inner_seed=inner_seed,
         settings=settings,
         results_path=results_path,
+        workers=workers,
     )
     print(
         f"K1-enabled memetic GA: {layout_count:,} legal layouts, "
@@ -366,6 +541,11 @@ def run_k1_search(
         "new_evaluations_this_invocation": fitness.new_evaluations,
         "elapsed_seconds_this_invocation": elapsed,
         "split": split,
+        "dp_fixed_threshold_baseline": {
+            "layout": _cascade_payload(dp_cascade),
+            "validation": _compact_optimization(dp_validation),
+            "holdout": _compact_optimization(dp_holdout),
+        },
         "holdout_usage": "winner_only_after_validation_search",
         "winner": winner,
     }
@@ -379,6 +559,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--target-accuracy", type=float, default=DEFAULT_TARGET_ACCURACY)
     parser.add_argument("--iterations", type=int, default=DEFAULT_ITERATIONS)
+    parser.add_argument("--restarts", type=int, default=DEFAULT_SA_RESTARTS)
     parser.add_argument("--quantile-points", type=int, default=DEFAULT_QUANTILE_POINTS)
     parser.add_argument("--inner-seed", type=int, default=DEFAULT_SEED)
     parser.add_argument("--split-seed", type=int, default=DEFAULT_SEED)
@@ -386,6 +567,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--population-size", type=int, default=DEFAULT_POPULATION_SIZE)
     parser.add_argument("--generations", type=int, default=DEFAULT_GENERATIONS)
     parser.add_argument("--evaluation-budget", type=int, default=DEFAULT_EVALUATION_BUDGET)
+    parser.add_argument("--workers", type=int, default=DEFAULT_WORKERS)
     parser.add_argument("--overwrite", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     return parser
@@ -404,7 +586,9 @@ def main() -> None:
                     "fraction_evaluated": args.evaluation_budget
                     / legal_layout_count(space),
                     "iterations_per_layout": args.iterations,
-                    "quantile_points": args.quantile_points,
+                    "restarts_per_layout": args.restarts,
+                    "total_iterations_per_layout": args.iterations * args.restarts,
+                    "threshold_optimizer": "chellapilla_continuous_gaussian_sa",
                 },
                 indent=2,
             )
@@ -415,6 +599,7 @@ def main() -> None:
         output_dir=args.output_dir,
         target_accuracy=args.target_accuracy,
         iterations=args.iterations,
+        restarts=args.restarts,
         quantile_points=args.quantile_points,
         inner_seed=args.inner_seed,
         split_seed=args.split_seed,
@@ -422,6 +607,7 @@ def main() -> None:
         population_size=args.population_size,
         generations=args.generations,
         evaluation_budget=args.evaluation_budget,
+        workers=args.workers,
         overwrite=args.overwrite,
     )
     winner = summary["winner"]

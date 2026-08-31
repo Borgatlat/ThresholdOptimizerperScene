@@ -6,16 +6,21 @@ loads the saved baseline and optimized threshold policies, runs their frozen
 hierarchy against real spectrogram inputs, and measures their end-to-end
 latency on the current machine.
 
-This script requires a policy optimized with the logged, trained ``Kdet``.
-Whenever a frozen layout reaches the detector sentinel, it runs that same
-real model and compares its final global-label prediction with ground truth.
+For the paper-mode experiments, ``detector`` is an oracle with a synthetic
+10,000 ms cost.  It therefore returns the ground-truth label immediately and
+adds the configured cost without sleeping.  K0-K6 are always real model
+forwards.  Run ``profile_models_jetson.py`` first so the report can also
+recalculate expected cost from timings measured on the deployment device.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import platform
+import sys
 import time
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping, Sequence
@@ -31,11 +36,15 @@ from experiments.m3n_vc.utils.classifier_registry import ClassifierRegistry
 from experiments.m3n_vc.utils.labels import GLOBAL_CLASS_NAMES, KI_REGISTRY
 
 
-DEFAULT_METRICS_PATH = Path("checkpoints/threshold_optimizer_trained_metrics.json")
-DEFAULT_OUTPUT_PATH = Path("checkpoints/empirical_outcomes.pkl")
+DEFAULT_METRICS_PATH = Path(
+    "checkpoints/k1_including_h24_with_run9_target_095_paper_sa/ga/summary.json"
+)
+DEFAULT_OUTPUT_PATH = Path("checkpoints/empirical_outcomes_h24_with_run9.pkl")
 DEFAULT_PROCESSED_DIR = Path("datasets/processed")
 DEFAULT_CHECKPOINT_DIR = Path("checkpoints")
-DEFAULT_REGISTRY_PATH = Path("checkpoints/classifier_registry.json")
+DEFAULT_REGISTRY_PATH = Path("checkpoints/classifier_registry_jetson_nano.json")
+DEFAULT_REPORT_PATH = Path("checkpoints/jetson_nano_live_cascade_h24.json")
+DEFAULT_DETECTOR_COST_MS = 10_000.0
 DETECTOR_SENTINEL = "detector"
 
 
@@ -52,6 +61,24 @@ class LiveInputs:
     true_labels: np.ndarray
     scene: str
     available_samples: int
+
+
+@dataclass(frozen=True)
+class CascadeRun:
+    prediction: str
+    terminal_route: str
+    route_path: tuple[str, ...]
+    invocations: tuple[tuple[str, str, float], ...]
+    measured_wall_ms: float
+    synthetic_detector_ms: float
+
+    @property
+    def measured_model_ms(self) -> float:
+        return float(sum(latency for _, _, latency in self.invocations))
+
+    @property
+    def detector_used(self) -> bool:
+        return self.synthetic_detector_ms > 0.0
 
 
 def _load_json(path: str | Path) -> dict:
@@ -91,8 +118,10 @@ def _load_scene_arrays(processed_dir: str | Path, scene: str) -> tuple[np.ndarra
     normalized_mic = scene_dir / f"{scene}_paired_mic_norm.npy"
     normalized_geo = scene_dir / f"{scene}_paired_geo_norm.npy"
     if normalized_mic.is_file() and normalized_geo.is_file():
-        mic = np.load(normalized_mic)
-        geo = np.load(normalized_geo)
+        # Memory mapping matters on a 4 GB Jetson Nano; selected rows are
+        # copied only after the saved validation/testing split is resolved.
+        mic = np.load(normalized_mic, mmap_mode="r")
+        geo = np.load(normalized_geo, mmap_mode="r")
     else:
         mic = _normalize_spectrograms(np.load(scene_dir / f"{scene}_paired_mic.npy"))
         geo = _normalize_spectrograms(np.load(scene_dir / f"{scene}_paired_geo.npy"))
@@ -105,14 +134,18 @@ def _resolve_partition(metrics: Mapping[str, object], partition: str) -> str:
     return "holdout" if "split" in metrics else "all"
 
 
-def _require_trained_detector_metrics(metrics: Mapping[str, object]) -> None:
-    detector_mode = metrics.get("detector_mode")
-    if detector_mode != "trained":
-        raise ValueError(
-            "Live comparison requires metrics optimized with the real logged Kdet "
-            "(--detector-mode trained). The supplied metrics use "
-            f"{detector_mode!r}; regenerate them before benchmarking."
-        )
+def resolve_device(requested: str = "auto") -> torch.device:
+    """Prefer CUDA, but make Jetson installations without CUDA usable on CPU."""
+    if requested not in {"auto", "cuda", "cpu"}:
+        raise ValueError("device must be auto, cuda, or cpu")
+    if requested != "cpu" and torch.cuda.is_available():
+        torch.backends.cudnn.benchmark = True
+        return torch.device("cuda")
+    if requested == "cuda":
+        print("CUDA was requested but is unavailable; falling back to CPU.")
+    elif requested == "auto":
+        print("CUDA is unavailable; using CPU.")
+    return torch.device("cpu")
 
 
 def _policy_section(metrics: Mapping[str, object], policy: str, partition: str) -> Mapping[str, object]:
@@ -160,6 +193,54 @@ def load_policy_thresholds(
     return {str(candidate_id): float(value) for candidate_id, value in thresholds.items()}
 
 
+def load_winner_policy(
+    summary: Mapping[str, object],
+    partition: str,
+) -> tuple["FrozenLayout", dict[str, float], tuple[str, ...], Mapping[str, object]]:
+    """Read a joint-optimizer winner while retaining position-specific slots."""
+    winner = summary.get("winner")
+    if not isinstance(winner, Mapping):
+        raise ValueError("Summary has no winner object.")
+    raw_layout = winner.get("layout")
+    if not isinstance(raw_layout, Mapping):
+        raise ValueError("Summary winner has no layout object.")
+    initial = raw_layout.get("initial")
+    specialized = raw_layout.get("specialized")
+    if not isinstance(initial, list) or not isinstance(specialized, Mapping):
+        raise ValueError("Winner layout is missing initial or specialized chains.")
+
+    parsed_specialized: dict[tuple[str, str], tuple[str, ...]] = {}
+    for key, chain in specialized.items():
+        if not isinstance(key, str) or ":" not in key or not isinstance(chain, list):
+            raise ValueError(f"Malformed winner specialized layout: {key!r}")
+        router_id, group = key.split(":", 1)
+        parsed_specialized[(router_id, group)] = tuple(str(value) for value in chain)
+
+    saved_partition = "holdout" if partition in {"all", "holdout"} else partition
+    policy = winner.get(saved_partition)
+    if not isinstance(policy, Mapping):
+        raise ValueError(f"Winner has no {saved_partition!r} policy packet.")
+    raw_thresholds = policy.get("thresholds")
+    if not isinstance(raw_thresholds, Mapping):
+        raise ValueError(f"Winner {saved_partition!r} packet has no thresholds.")
+    raw_active = policy.get("active_slots")
+    if raw_active is None:
+        active_slots: tuple[str, ...] = ()
+    elif isinstance(raw_active, list):
+        active_slots = tuple(str(value) for value in raw_active)
+    else:
+        raise ValueError("Winner active_slots must be a list when present.")
+    return (
+        FrozenLayout(
+            initial=tuple(str(value) for value in initial),
+            specialized=parsed_specialized,
+        ),
+        {str(key): float(value) for key, value in raw_thresholds.items()},
+        active_slots,
+        policy,
+    )
+
+
 def load_frozen_layout(metrics: Mapping[str, object]) -> FrozenLayout:
     split = metrics.get("split")
     if not isinstance(split, Mapping):
@@ -194,8 +275,6 @@ def active_model_ids(layout: FrozenLayout) -> tuple[str, ...]:
                 continue
             seen.add(candidate_id)
             ordered.append(candidate_id)
-    if "Kdet" not in seen:
-        ordered.append("Kdet")
     return tuple(ordered)
 
 
@@ -203,12 +282,13 @@ def load_live_models(
     model_ids: Sequence[str],
     checkpoint_dir: str | Path,
     registry_path: str | Path,
+    device: torch.device | None = None,
 ) -> tuple[dict[str, torch.nn.Module], ClassifierRegistry, torch.device]:
-    """Load only models reached by the saved layout, plus Kdet."""
+    """Load only real models reached by the saved layout."""
     checkpoint_dir = Path(checkpoint_dir).expanduser().resolve()
     registry_path = Path(registry_path).expanduser().resolve()
     registry = ClassifierRegistry.load(registry_path)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = device or resolve_device("auto")
     models: dict[str, torch.nn.Module] = {}
 
     for model_id in model_ids:
@@ -235,7 +315,7 @@ def load_live_models(
 
 
 class LiveCascade:
-    """Execute one frozen hierarchy using live softmax confidences."""
+    """Execute one frozen hierarchy with real Ki models and an oracle detector."""
 
     def __init__(
         self,
@@ -243,6 +323,10 @@ class LiveCascade:
         thresholds: Mapping[str, float],
         models: Mapping[str, torch.nn.Module],
         registry: ClassifierRegistry,
+        device: torch.device,
+        *,
+        active_slots: Sequence[str] | None = None,
+        detector_cost_ms: float = DEFAULT_DETECTOR_COST_MS,
     ) -> None:
         self.layout = layout
         self.threshold_slots = enumerate_threshold_slots(
@@ -257,22 +341,40 @@ class LiveCascade:
         self._slot_by_location = {
             slot.location: slot.key for slot in self.threshold_slots
         }
+        known_slots = {slot.key for slot in self.threshold_slots}
+        unknown_active = set(active_slots or ()) - known_slots
+        if unknown_active:
+            raise ValueError(f"active_slots contains unknown slots: {sorted(unknown_active)}")
+        self.active_slots = None if active_slots is None else frozenset(active_slots)
         self.models = models
+        self.device = device
+        self.detector_cost_ms = float(detector_cost_ms)
         self.class_names = {
             model_id: tuple(registry.get(model_id).class_names)  # type: ignore[union-attr]
             for model_id in models
         }
 
     @torch.inference_mode()
-    def run(self, mic: torch.Tensor, geo: torch.Tensor) -> str:
-        """Run the live cascade and return its final global-label prediction."""
+    def run(self, mic: torch.Tensor, geo: torch.Tensor, true_label: str) -> CascadeRun:
+        """Run one sample; the detector returns ``true_label`` without waiting."""
+        _synchronize(self.device)
+        wall_started = time.perf_counter()
+        route_path: list[str] = []
+        invocations: list[tuple[str, str, float]] = []
+
         for index, candidate_id in enumerate(self.layout.initial):
             if candidate_id == DETECTOR_SENTINEL:
-                return self._infer("Kdet", mic, geo)[0]
+                return self._finish(
+                    true_label, DETECTOR_SENTINEL, route_path, invocations, wall_started, True
+                )
 
-            label, confidence = self._infer(candidate_id, mic, geo)
             slot_id = self._slot_by_location[f"initial[{index}]"]
-            if confidence < self.thresholds[slot_id]:
+            if not self._is_active(slot_id):
+                continue
+            label, confidence, latency_ms = self._infer(candidate_id, mic, geo)
+            route_path.append(slot_id)
+            invocations.append((slot_id, candidate_id, latency_ms))
+            if confidence <= self.thresholds[slot_id]:
                 continue
 
             if KI_REGISTRY[candidate_id].level == "intermediate":
@@ -281,21 +383,38 @@ class LiveCascade:
                         (candidate_id, label), (DETECTOR_SENTINEL,)
                     )
                     return self._run_specialized(
-                        chain, candidate_id, label, mic, geo
+                        chain,
+                        candidate_id,
+                        label,
+                        mic,
+                        geo,
+                        true_label,
+                        route_path,
+                        invocations,
+                        wall_started,
                     )
                 # "background" is a valid global leaf from an identifier.
                 if label in GLOBAL_CLASS_NAMES:
-                    return label
-                return self._infer("Kdet", mic, geo)[0]
+                    return self._finish(
+                        label, slot_id, route_path, invocations, wall_started, False
+                    )
+                return self._finish(
+                    true_label, DETECTOR_SENTINEL, route_path, invocations, wall_started, True
+                )
 
-            return label
+            return self._finish(label, slot_id, route_path, invocations, wall_started, False)
 
-        return self._infer("Kdet", mic, geo)[0]
+        return self._finish(
+            true_label, DETECTOR_SENTINEL, route_path, invocations, wall_started, True
+        )
 
-    def warmup_models(self, mic: torch.Tensor, geo: torch.Tensor) -> None:
-        """Warm every reachable model once, including branch-only models."""
+    def warmup_models(
+        self, mic: torch.Tensor, geo: torch.Tensor, iterations: int = 25
+    ) -> None:
+        """Warm every reachable real model; detector is synthetic and omitted."""
         for candidate_id in self.models:
-            self._infer(candidate_id, mic, geo)
+            for _ in range(max(0, iterations)):
+                self._infer(candidate_id, mic, geo)
 
     def _run_specialized(
         self,
@@ -304,25 +423,71 @@ class LiveCascade:
         group: str,
         mic: torch.Tensor,
         geo: torch.Tensor,
-    ) -> str:
+        true_label: str,
+        route_path: list[str],
+        invocations: list[tuple[str, str, float]],
+        wall_started: float,
+    ) -> CascadeRun:
         for index, candidate_id in enumerate(chain):
             if candidate_id == DETECTOR_SENTINEL:
-                return self._infer("Kdet", mic, geo)[0]
-            label, confidence = self._infer(candidate_id, mic, geo)
+                return self._finish(
+                    true_label, DETECTOR_SENTINEL, route_path, invocations, wall_started, True
+                )
             location = f"specialized[{router_id}:{group}][{index}]"
             slot_id = self._slot_by_location[location]
-            if confidence >= self.thresholds[slot_id]:
-                return label
-        return self._infer("Kdet", mic, geo)[0]
+            if not self._is_active(slot_id):
+                continue
+            label, confidence, latency_ms = self._infer(candidate_id, mic, geo)
+            route_path.append(slot_id)
+            invocations.append((slot_id, candidate_id, latency_ms))
+            if confidence > self.thresholds[slot_id]:
+                return self._finish(
+                    label, slot_id, route_path, invocations, wall_started, False
+                )
+        return self._finish(
+            true_label, DETECTOR_SENTINEL, route_path, invocations, wall_started, True
+        )
 
-    def _infer(self, candidate_id: str, mic: torch.Tensor, geo: torch.Tensor) -> tuple[str, float]:
+    def _is_active(self, slot_id: str) -> bool:
+        return self.active_slots is None or slot_id in self.active_slots
+
+    def _finish(
+        self,
+        prediction: str,
+        terminal_route: str,
+        route_path: Sequence[str],
+        invocations: Sequence[tuple[str, str, float]],
+        wall_started: float,
+        detector_used: bool,
+    ) -> CascadeRun:
+        _synchronize(self.device)
+        return CascadeRun(
+            prediction=prediction,
+            terminal_route=terminal_route,
+            route_path=tuple(route_path) + (("detector",) if detector_used else ()),
+            invocations=tuple(invocations),
+            measured_wall_ms=(time.perf_counter() - wall_started) * 1000.0,
+            synthetic_detector_ms=self.detector_cost_ms if detector_used else 0.0,
+        )
+
+    def _infer(
+        self, candidate_id: str, mic: torch.Tensor, geo: torch.Tensor
+    ) -> tuple[str, float, float]:
         model = self.models[candidate_id]
+        _synchronize(self.device)
+        started = time.perf_counter()
         if KI_REGISTRY[candidate_id].modality == "mic":
             logits = model(mic)
         else:
             logits = model(mic, geo)
         confidence, class_index = torch.softmax(logits, dim=1).max(dim=1)
-        return self.class_names[candidate_id][int(class_index.item())], float(confidence.item())
+        _synchronize(self.device)
+        elapsed_ms = (time.perf_counter() - started) * 1000.0
+        return (
+            self.class_names[candidate_id][int(class_index.item())],
+            float(confidence.item()),
+            elapsed_ms,
+        )
 
 
 def _select_partition_sample_ids(
@@ -475,32 +640,25 @@ def _synchronize(device: torch.device) -> None:
         torch.cuda.synchronize(device)
 
 
-def _measure_one(
-    cascade: LiveCascade,
-    mic: torch.Tensor,
-    geo: torch.Tensor,
-    device: torch.device,
-) -> tuple[float, str]:
-    _synchronize(device)
-    started = time.perf_counter()
-    prediction = cascade.run(mic, geo)
-    _synchronize(device)
-    return (time.perf_counter() - started) * 1000.0, prediction
-
-
 def _latency_summary(latencies_ms: Sequence[float]) -> dict[str, float | int]:
     values = np.asarray(latencies_ms, dtype=float)
     if len(values) == 0:
         raise ValueError("No timed samples were collected.")
+    mean = float(values.mean())
+    maximum = float(values.max())
+    stdev = float(values.std())
     return {
         "samples": int(len(values)),
-        "avg_ms": float(values.mean()),
+        "mean_ms": mean,
+        "avg_ms": mean,
         "median_ms": float(np.median(values)),
         "p95_ms": float(np.percentile(values, 95)),
         "p99_ms": float(np.percentile(values, 99)),
-        "wcet_ms": float(values.max()),
+        "max_ms": maximum,
+        "wcet_ms": maximum,
         "min_ms": float(values.min()),
-        "std_ms": float(values.std()),
+        "stdev_ms": stdev,
+        "std_ms": stdev,
         "total_ms": float(values.sum()),
     }
 
@@ -542,83 +700,111 @@ def _accuracy_summary(
     }
 
 
-def benchmark_live_policies(
-    baseline: LiveCascade,
-    optimized: LiveCascade,
+def benchmark_live_cascade(
+    cascade: LiveCascade,
     mic: torch.Tensor,
     geo: torch.Tensor,
     true_labels: Sequence[str],
-    device: torch.device,
-    warmup_samples: int,
-    timed_samples: int,
-    random_seed: int,
-) -> tuple[dict, dict]:
+    registry: ClassifierRegistry,
+    warmup_iterations: int,
+) -> dict:
+    """Run the selected policy once over every loaded testing sample."""
     if len(mic) != len(geo):
         raise ValueError("Mic and geo input counts differ.")
     if len(mic) != len(true_labels):
         raise ValueError("Live input count differs from the number of ground-truth labels.")
-    if len(mic) < 2:
-        raise ValueError("Need at least two live samples to benchmark a cascade.")
+    if len(mic) == 0:
+        raise ValueError("No live samples were loaded.")
 
-    rng = np.random.default_rng(random_seed)
-    order = rng.permutation(len(mic))
-    warmup_count = min(max(warmup_samples, 0), len(order) - 1)
-    remaining = order[warmup_count:]
-    if timed_samples > 0:
-        remaining = remaining[: min(timed_samples, len(remaining))]
-    if len(remaining) == 0:
-        raise ValueError("No samples remain after warmup; lower --warmup-samples.")
+    cascade.warmup_models(mic[:1], geo[:1], warmup_iterations)
+    _synchronize(cascade.device)
 
-    # First-use kernel/runtime work should not pollute either policy's timing.
-    baseline.warmup_models(mic[:1], geo[:1])
-    optimized.warmup_models(mic[:1], geo[:1])
-    _synchronize(device)
-    baseline_latencies: list[float] = []
-    optimized_latencies: list[float] = []
-    baseline_predictions: list[str] = []
-    optimized_predictions: list[str] = []
-    accuracy_indices: list[int] = []
-    for index in order[:warmup_count]:
-        index = int(index)
-        sample_mic = mic[index : index + 1]
-        sample_geo = geo[index : index + 1]
-        baseline_predictions.append(baseline.run(sample_mic, sample_geo))
-        optimized_predictions.append(optimized.run(sample_mic, sample_geo))
-        accuracy_indices.append(index)
-    _synchronize(device)
+    runs: list[CascadeRun] = []
+    for index, truth in enumerate(np.asarray(true_labels, dtype=str)):
+        runs.append(
+            cascade.run(
+                mic[index : index + 1],
+                geo[index : index + 1],
+                str(truth),
+            )
+        )
 
-    for position, index in enumerate(remaining):
-        index = int(index)
-        sample_mic = mic[index : index + 1]
-        sample_geo = geo[index : index + 1]
-        # Alternate first position so neither policy always benefits from cache state.
-        if position % 2 == 0:
-            latency, prediction = _measure_one(optimized, sample_mic, sample_geo, device)
-            optimized_latencies.append(latency)
-            optimized_predictions.append(prediction)
-            latency, prediction = _measure_one(baseline, sample_mic, sample_geo, device)
-            baseline_latencies.append(latency)
-            baseline_predictions.append(prediction)
-        else:
-            latency, prediction = _measure_one(baseline, sample_mic, sample_geo, device)
-            baseline_latencies.append(latency)
-            baseline_predictions.append(prediction)
-            latency, prediction = _measure_one(optimized, sample_mic, sample_geo, device)
-            optimized_latencies.append(latency)
-            optimized_predictions.append(prediction)
-        accuracy_indices.append(index)
+    invocation_counts_by_slot: Counter[str] = Counter()
+    invocation_counts_by_model: Counter[str] = Counter()
+    invocation_timings_by_slot: dict[str, list[float]] = defaultdict(list)
+    invocation_timings_by_model: dict[str, list[float]] = defaultdict(list)
+    for run in runs:
+        for slot_id, model_id, latency_ms in run.invocations:
+            invocation_counts_by_slot[slot_id] += 1
+            invocation_counts_by_model[model_id] += 1
+            invocation_timings_by_slot[slot_id].append(latency_ms)
+            invocation_timings_by_model[model_id].append(latency_ms)
 
-    accuracy_truth = np.asarray(true_labels, dtype=str)[accuracy_indices]
-    return (
-        {
-            **_latency_summary(baseline_latencies),
-            **_accuracy_summary(baseline_predictions, accuracy_truth),
+    detector_routes = sum(run.detector_used for run in runs)
+    profile_total_ms = float(detector_routes * cascade.detector_cost_ms)
+    for model_id, count in invocation_counts_by_model.items():
+        record = registry.get(model_id)
+        if record is None or record.runtime_ms is None:
+            raise ValueError(f"Registry has no profiled runtime_ms for {model_id}.")
+        profile_total_ms += count * float(record.runtime_ms)
+
+    truth = np.asarray(true_labels, dtype=str)
+    predictions = [run.prediction for run in runs]
+    measured_model = [run.measured_model_ms for run in runs]
+    measured_wall = [run.measured_wall_ms for run in runs]
+    adjusted = [
+        run.measured_model_ms + run.synthetic_detector_ms for run in runs
+    ]
+    terminal_counts = Counter(run.terminal_route for run in runs)
+    route_path_counts = Counter(" -> ".join(run.route_path) for run in runs)
+
+    return {
+        **_accuracy_summary(predictions, truth),
+        "measured_wall_latency": _latency_summary(measured_wall),
+        "measured_model_latency": _latency_summary(measured_model),
+        "costs": {
+            "detector_cost_ms": cascade.detector_cost_ms,
+            "measured_detector_adjusted_expected_cost_ms": float(np.mean(adjusted)),
+            "profiled_registry_expected_cost_ms": profile_total_ms / len(runs),
+            "measured_real_model_total_ms": float(np.sum(measured_model)),
+            "synthetic_detector_total_ms": float(
+                detector_routes * cascade.detector_cost_ms
+            ),
         },
-        {
-            **_latency_summary(optimized_latencies),
-            **_accuracy_summary(optimized_predictions, accuracy_truth),
+        "routing": {
+            "terminal_route_counts": dict(sorted(terminal_counts.items())),
+            "route_path_counts": dict(sorted(route_path_counts.items())),
+            "detector_routes": int(detector_routes),
+            "detector_route_fraction": float(detector_routes / len(runs)),
+            "invocation_counts_by_slot": dict(sorted(invocation_counts_by_slot.items())),
+            "invocation_counts_by_model": dict(sorted(invocation_counts_by_model.items())),
         },
-    )
+        "invocation_timing_by_slot": {
+            key: _latency_summary(values)
+            for key, values in sorted(invocation_timings_by_slot.items())
+        },
+        "invocation_timing_by_model": {
+            key: _latency_summary(values)
+            for key, values in sorted(invocation_timings_by_model.items())
+        },
+        "samples": [
+            {
+                "sample_index": index,
+                "true_label": str(truth[index]),
+                "prediction": run.prediction,
+                "correct": bool(run.prediction == truth[index]),
+                "terminal_route": run.terminal_route,
+                "route_path": list(run.route_path),
+                "measured_wall_ms": run.measured_wall_ms,
+                "measured_model_ms": run.measured_model_ms,
+                "synthetic_detector_ms": run.synthetic_detector_ms,
+                "detector_adjusted_cost_ms": (
+                    run.measured_model_ms + run.synthetic_detector_ms
+                ),
+            }
+            for index, run in enumerate(runs)
+        ],
+    }
 
 
 def _device_description(device: torch.device) -> str:
@@ -629,99 +815,124 @@ def _device_description(device: torch.device) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Benchmark saved baseline/optimized thresholds with live model inference."
+        description=(
+            "Run the saved joint-optimizer winner with live K0-K6 inference and "
+            "a non-sleeping synthetic detector."
+        )
     )
-    parser.add_argument("--metrics", type=Path, default=DEFAULT_METRICS_PATH)
+    parser.add_argument("--summary", type=Path, default=DEFAULT_METRICS_PATH)
     parser.add_argument("--outcomes", type=Path, default=DEFAULT_OUTPUT_PATH)
     parser.add_argument("--processed-dir", type=Path, default=DEFAULT_PROCESSED_DIR)
     parser.add_argument("--checkpoint-dir", type=Path, default=DEFAULT_CHECKPOINT_DIR)
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY_PATH)
+    parser.add_argument("--device", choices=("auto", "cuda", "cpu"), default="auto")
     parser.add_argument("--scene", default=None, help="Infer from outcomes when omitted.")
     parser.add_argument(
         "--partition",
         choices=("auto", "all", "validation", "holdout"),
-        default="auto",
+        default="holdout",
         help=(
-            "Use the same saved partition as the threshold policy. With --scene, "
-            "all samples from every processed input without needing outcomes metadata."
+            "Dataset partition to execute. 'holdout' reproduces the saved testing split."
         ),
     )
     parser.add_argument(
-        "--warmup-samples",
+        "--warmup-iterations",
         type=int,
         default=25,
-        help="Untimed dynamic-cascade warmup samples per policy.",
+        help="Untimed forwards per reachable real model before the cascade run.",
     )
     parser.add_argument(
-        "--timed-samples",
+        "--max-samples",
         type=int,
-        default=250,
-        help="Timed samples; use 0 to time every sample in the selected partition.",
+        default=0,
+        help="Optional cap; 0 runs every sample in the selected partition.",
     )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument(
+        "--detector-cost-ms", type=float, default=DEFAULT_DETECTOR_COST_MS
+    )
+    parser.add_argument(
         "--output",
         type=Path,
-        default=None,
-        help="Optional path for the JSON benchmark report.",
+        default=DEFAULT_REPORT_PATH,
+        help="JSON benchmark report path.",
     )
     args = parser.parse_args()
-    if args.warmup_samples < 0 or args.timed_samples < 0:
-        parser.error("--warmup-samples and --timed-samples must be non-negative.")
+    if args.warmup_iterations < 0 or args.max_samples < 0:
+        parser.error("--warmup-iterations and --max-samples must be non-negative.")
+    if args.detector_cost_ms < 0:
+        parser.error("--detector-cost-ms must be non-negative.")
 
-    metrics = _load_json(args.metrics)
-    _require_trained_detector_metrics(metrics)
-    partition = _resolve_partition(metrics, args.partition)
-    layout = load_frozen_layout(metrics)
-    baseline_thresholds = load_policy_thresholds(metrics, "baseline", partition)
-    optimized_thresholds = load_policy_thresholds(metrics, "optimized", partition)
+    summary = _load_json(args.summary)
+    partition = _resolve_partition(summary, args.partition)
+    layout, thresholds, active_slots, saved_policy = load_winner_policy(
+        summary, partition
+    )
     model_ids = active_model_ids(layout)
 
+    device = resolve_device(args.device)
     models, registry, device = load_live_models(
-        model_ids, args.checkpoint_dir, args.registry
-    )
-    input_sample_limit = (
-        args.warmup_samples + args.timed_samples if args.timed_samples > 0 else 0
+        model_ids, args.checkpoint_dir, args.registry, device
     )
     live_inputs = load_live_inputs(
         args.outcomes,
-        metrics,
+        summary,
         args.scene,
         partition,
         args.processed_dir,
         device,
-        input_sample_limit,
+        args.max_samples,
         args.seed,
     )
-    baseline = LiveCascade(layout, baseline_thresholds, models, registry)
-    optimized = LiveCascade(layout, optimized_thresholds, models, registry)
-    baseline_stats, optimized_stats = benchmark_live_policies(
-        baseline,
-        optimized,
+    cascade = LiveCascade(
+        layout,
+        thresholds,
+        models,
+        registry,
+        device,
+        active_slots=active_slots or None,
+        detector_cost_ms=args.detector_cost_ms,
+    )
+    benchmark = benchmark_live_cascade(
+        cascade,
         live_inputs.mic,
         live_inputs.geo,
         live_inputs.true_labels,
-        device,
-        args.warmup_samples,
-        args.timed_samples,
-        args.seed,
+        registry,
+        args.warmup_iterations,
     )
 
     report = {
+        "schema_version": "live-cascade-benchmark/v1",
         "scene": live_inputs.scene,
         "partition": partition,
-        "device": _device_description(device),
-        "torch_version": torch.__version__,
+        "environment": {
+            "device": _device_description(device),
+            "device_request": args.device,
+            "cuda_available": bool(torch.cuda.is_available()),
+            "torch_version": torch.__version__,
+            "python_version": sys.version,
+            "platform": platform.platform(),
+            "machine": platform.machine(),
+        },
         "timing_scope": (
-            "live model forwards, softmax, and cascade routing; excludes data "
-            "loading and host-to-device transfer"
+            "batch-size-1 live model forwards, softmax, and routing; CUDA is "
+            "synchronized around every forward; excludes model loading, data "
+            "loading, and host-to-device transfer"
         ),
-        "detector_mode": "trained",
-        "fallback": "live trained Kdet model",
+        "detector": {
+            "mode": "paper_oracle_non_sleeping",
+            "cost_ms": args.detector_cost_ms,
+            "behavior": "returns ground truth immediately and adds cost without sleeping",
+        },
         "accuracy_scope": (
-            "live predictions on every loaded sample, including untimed warmup "
-            "samples; use --timed-samples 0 to load the full selected partition"
+            "live predictions over every loaded sample after separate untimed warmup"
         ),
+        "sources": {
+            "summary": str(args.summary.resolve()),
+            "outcomes": str(args.outcomes.resolve()),
+            "registry": str(args.registry.resolve()),
+        },
         "layout": {
             "initial": list(layout.initial),
             "specialized": {
@@ -729,26 +940,39 @@ def main() -> None:
                 for (router_id, group), chain in layout.specialized.items()
             },
         },
-        "warmup_samples_per_policy": args.warmup_samples,
+        "thresholds": thresholds,
+        "active_slots": list(active_slots),
+        "warmup_iterations_per_model": args.warmup_iterations,
         "available_samples": live_inputs.available_samples,
         "loaded_samples": int(len(live_inputs.mic)),
-        "baseline": {"thresholds": baseline_thresholds, **baseline_stats},
-        "optimized": {"thresholds": optimized_thresholds, **optimized_stats},
-        "optimized_vs_baseline": {
-            "avg_speedup": float(baseline_stats["avg_ms"] / optimized_stats["avg_ms"]),
-            "avg_reduction_percent": float(
-                100.0 * (1.0 - optimized_stats["avg_ms"] / baseline_stats["avg_ms"])
-            ),
-            "p95_speedup": float(baseline_stats["p95_ms"] / optimized_stats["p95_ms"]),
-            "wcet_speedup": float(baseline_stats["wcet_ms"] / optimized_stats["wcet_ms"]),
+        "saved_empirical_reference": {
+            key: saved_policy.get(key)
+            for key in ("accuracy", "expected_cost", "route_counts", "total")
+            if key in saved_policy
         },
+        "benchmark": benchmark,
     }
     text = json.dumps(report, indent=2, sort_keys=True)
-    print(text)
-    if args.output is not None:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(text + "\n")
-        print(f"Wrote {args.output}")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(text + "\n")
+    print(
+        json.dumps(
+            {
+                "device": report["environment"]["device"],
+                "samples": report["loaded_samples"],
+                "accuracy": benchmark["accuracy"],
+                "detector_adjusted_expected_cost_ms": benchmark["costs"][
+                    "measured_detector_adjusted_expected_cost_ms"
+                ],
+                "profiled_registry_expected_cost_ms": benchmark["costs"][
+                    "profiled_registry_expected_cost_ms"
+                ],
+                "detector_routes": benchmark["routing"]["detector_routes"],
+                "output": str(args.output),
+            },
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

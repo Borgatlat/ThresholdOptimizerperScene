@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+import tempfile
 import unittest
 
 import numpy as np
@@ -14,6 +16,7 @@ from experiments.m3n_vc.benchmark_chellapilla_sa import (
 from experiments.m3n_vc.joint_optimize_hierarchy_ga_with_k1 import (
     build_k1_layout_space,
     legal_layout_count,
+    run_k1_search,
 )
 from layout_search import (
     TopologyGenome,
@@ -101,6 +104,26 @@ class K1EnabledGenomeTests(unittest.TestCase):
         self.assertEqual(len(layouts), 10)
         self.assertEqual(len(set(layouts)), 10)
         self.assertTrue(all(len(_classifier_ids(layout)) >= 5 for layout in layouts))
+
+    def test_real_two_layout_smoke_packet_identifies_dataset(self) -> None:
+        outcomes = Path("checkpoints/empirical_outcomes.pkl")
+        if not outcomes.is_file():
+            self.skipTest("The h24 empirical outcomes are not available.")
+        with tempfile.TemporaryDirectory() as temporary:
+            summary = run_k1_search(
+                outcomes=outcomes,
+                output_dir=Path(temporary),
+                target_accuracy=0.90,
+                iterations=1,
+                restarts=1,
+                quantile_points=3,
+                population_size=2,
+                generations=1,
+                evaluation_budget=2,
+            )
+
+        self.assertEqual(summary["settings"]["dataset"], "m3n_vc/h24")
+        self.assertEqual(summary["unique_layouts_evaluated"], 2)
 
 
 if __name__ == "__main__":

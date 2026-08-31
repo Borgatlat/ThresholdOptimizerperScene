@@ -1,0 +1,153 @@
+{
+  "history": [
+    {
+      "best_layout_id": "989586f6b981dca6",
+      "best_layout_index": 5084,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 103.22950401136622,
+      "generation": 0,
+      "new_layouts_evaluated": 8,
+      "next_population_parameters": {
+        "component_resample_rate": 0.56875,
+        "crossover_rate": 0.61875,
+        "elite_count": 2,
+        "mutation_rate": 0.921875,
+        "random_immigrant_rate": 0.37812500000000004,
+        "tournament_size": 2
+      },
+      "next_population_schedule_progress": 0.0625,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 32
+    }
+  ],
+  "next_generation": 1,
+  "next_population": [
+    "989586f6b981dca6",
+    "0601ca116cb62d8d",
+    "abcda27700497376",
+    "1bd2a511d211aa1d",
+    "fa7f494b64e4c6e9",
+    "083494cbbcc0ed22",
+    "2b6fc6d2ea9926fc",
+    "f7ec05b607feea1d",
+    "305ed70a0bd0e7dc",
+    "f60e46107bf4e943",
+    "296cb5b4478092a6",
+    "7feedee5bb49e0cc",
+    "af9963c81942c5b4",
+    "587981359d4e8742",
+    "d998b2b0a348ff38",
+    "4e280a5bdd4f2254",
+    "798d54026a8a97af",
+    "2887bfbfc3c765cd",
+    "b56de71aed0625c9",
+    "a4d28af0173948dc",
+    "b5688b8dd1e329bf",
+    "55eec47b706c8dc9",
+    "6750960d6115f14e",
+    "dde6ec962182e11a",
+    "55882b2a8d80023f",
+    "0a0cedef2c3491aa",
+    "87c082e481471ba5",
+    "f3de7db3b396c2c5",
+    "9a4c6efc828d688a",
+    "35a967e71d855332",
+    "4b83048219efb2f8",
+    "4c9be4c30cad2e0b"
+  ],
+  "restart_count": 0,
+  "rng_state": {
+    "bit_generator": "PCG64",
+    "has_uint32": 1,
+    "state": {
+      "inc": 87136372517582989555478159403783844777,
+      "state": 34528316374579532138320514484037170644
+    },
+    "uinteger": 3717409151
+  },
+  "settings": {
+    "algorithm": "annealed_constrained_memetic_genetic_algorithm",
+    "annealed_outer_schedule": {
+      "component_resample_rate": {
+        "end": 0.1,
+        "start": 0.6
+      },
+      "crossover_rate": {
+        "end": 0.9,
+        "start": 0.6
+      },
+      "elite_count": {
+        "end": 6,
+        "start": 2
+      },
+      "mutation_rate": {
+        "end": 0.5,
+        "start": 0.95
+      },
+      "random_immigrant_rate": {
+        "end": 0.05,
+        "start": 0.4
+      },
+      "tournament_size": {
+        "end": 4,
+        "start": 2
+      }
+    },
+    "component_resample_rate": 0.3,
+    "crossover_rate": 0.8,
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "elite_count": 4,
+    "evaluation_budget": 512,
+    "fitness_cache_schema": 1,
+    "fitness_implementation_sha256": "6bf59e5e7de47be6ca5ba0839d60b8aac7862cf9c0573560188337c4ced733bf",
+    "generations": 24,
+    "holdout_fraction": 0.2,
+    "inner_seed": 0,
+    "iterations": 1000,
+    "layout_catalogue_sha256": "9907857a0bd3d1f008e63dddd138744f2d6c2fa7d5392b9a79aae90632ff0140",
+    "max_restarts": 3,
+    "mutation_rate": 0.8,
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes_h24_with_run9.pkl",
+    "outcomes_sha256": "bba4c751e7bd6836dc49870dbb8f678b77c2984e9d884ab474356adfb6880429",
+    "outer_parameter_schedule": "linear_annealed",
+    "outer_seed": 0,
+    "population_size": 32,
+    "quantile_points": 50,
+    "random_immigrant_rate": 0.2,
+    "removed_candidates": [
+      "K1"
+    ],
+    "split_seed": 0,
+    "split_strategy": "blocked_per_run",
+    "stagnation_generations": 6,
+    "target_accuracy": 0.95,
+    "target_accuracy_source": "explicit",
+    "threshold_optimizer": {
+      "continuous_thresholds": true,
+      "freeze_validation_active_slots_on_holdout": true,
+      "iterations_per_restart": 1000,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "prune_stages_accepting_zero_validation_samples": true,
+      "quantile_points_used": false,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "restarts": 10
+    },
+    "tournament_size": 2
+  },
+  "stagnant_generations": 0,
+  "status": "running"
+}

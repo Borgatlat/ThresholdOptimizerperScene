@@ -1,0 +1,485 @@
+{
+  "history": [
+    {
+      "best_layout_id": "989586f6b981dca6",
+      "best_layout_index": 5084,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 103.22950401136622,
+      "generation": 0,
+      "new_layouts_evaluated": 32,
+      "next_population_parameters": {
+        "component_resample_rate": 0.56875,
+        "crossover_rate": 0.61875,
+        "elite_count": 2,
+        "mutation_rate": 0.921875,
+        "random_immigrant_rate": 0.37812500000000004,
+        "tournament_size": 2
+      },
+      "next_population_schedule_progress": 0.0625,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 32
+    },
+    {
+      "best_layout_id": "2b6fc6d2ea9926fc",
+      "best_layout_index": 1189,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 87.49807150206657,
+      "generation": 1,
+      "new_layouts_evaluated": 30,
+      "next_population_parameters": {
+        "component_resample_rate": 0.539453125,
+        "crossover_rate": 0.636328125,
+        "elite_count": 2,
+        "mutation_rate": 0.8955078125,
+        "random_immigrant_rate": 0.35761718750000004,
+        "tournament_size": 2
+      },
+      "next_population_schedule_progress": 0.12109375,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 62
+    },
+    {
+      "best_layout_id": "2b6fc6d2ea9926fc",
+      "best_layout_index": 1189,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 87.49807150206657,
+      "generation": 2,
+      "new_layouts_evaluated": 30,
+      "next_population_parameters": {
+        "component_resample_rate": 0.51015625,
+        "crossover_rate": 0.65390625,
+        "elite_count": 3,
+        "mutation_rate": 0.869140625,
+        "random_immigrant_rate": 0.33710937500000004,
+        "tournament_size": 2
+      },
+      "next_population_schedule_progress": 0.1796875,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 92
+    },
+    {
+      "best_layout_id": "2b6fc6d2ea9926fc",
+      "best_layout_index": 1189,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 87.49807150206657,
+      "generation": 3,
+      "new_layouts_evaluated": 29,
+      "next_population_parameters": {
+        "component_resample_rate": 0.4818359375,
+        "crossover_rate": 0.6708984375,
+        "elite_count": 3,
+        "mutation_rate": 0.84365234375,
+        "random_immigrant_rate": 0.31728515625000003,
+        "tournament_size": 2
+      },
+      "next_population_schedule_progress": 0.236328125,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 2,
+      "unique_layouts_evaluated": 121
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 4,
+      "new_layouts_evaluated": 29,
+      "next_population_parameters": {
+        "component_resample_rate": 0.453515625,
+        "crossover_rate": 0.687890625,
+        "elite_count": 3,
+        "mutation_rate": 0.8181640625,
+        "random_immigrant_rate": 0.2974609375,
+        "tournament_size": 3
+      },
+      "next_population_schedule_progress": 0.29296875,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 0,
+      "unique_layouts_evaluated": 150
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 5,
+      "new_layouts_evaluated": 29,
+      "next_population_parameters": {
+        "component_resample_rate": 0.4251953125,
+        "crossover_rate": 0.7048828125,
+        "elite_count": 3,
+        "mutation_rate": 0.7926757812499999,
+        "random_immigrant_rate": 0.27763671875,
+        "tournament_size": 3
+      },
+      "next_population_schedule_progress": 0.349609375,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 179
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 6,
+      "new_layouts_evaluated": 29,
+      "next_population_parameters": {
+        "component_resample_rate": 0.396875,
+        "crossover_rate": 0.721875,
+        "elite_count": 4,
+        "mutation_rate": 0.7671874999999999,
+        "random_immigrant_rate": 0.2578125,
+        "tournament_size": 3
+      },
+      "next_population_schedule_progress": 0.40625,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 2,
+      "unique_layouts_evaluated": 208
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 7,
+      "new_layouts_evaluated": 28,
+      "next_population_parameters": {
+        "component_resample_rate": 0.36953125,
+        "crossover_rate": 0.73828125,
+        "elite_count": 4,
+        "mutation_rate": 0.742578125,
+        "random_immigrant_rate": 0.238671875,
+        "tournament_size": 3
+      },
+      "next_population_schedule_progress": 0.4609375,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 3,
+      "unique_layouts_evaluated": 236
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 8,
+      "new_layouts_evaluated": 28,
+      "next_population_parameters": {
+        "component_resample_rate": 0.3421875,
+        "crossover_rate": 0.7546875,
+        "elite_count": 4,
+        "mutation_rate": 0.71796875,
+        "random_immigrant_rate": 0.21953125,
+        "tournament_size": 3
+      },
+      "next_population_schedule_progress": 0.515625,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 4,
+      "unique_layouts_evaluated": 264
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 9,
+      "new_layouts_evaluated": 28,
+      "next_population_parameters": {
+        "component_resample_rate": 0.31484375,
+        "crossover_rate": 0.77109375,
+        "elite_count": 4,
+        "mutation_rate": 0.693359375,
+        "random_immigrant_rate": 0.20039062500000002,
+        "tournament_size": 3
+      },
+      "next_population_schedule_progress": 0.5703125,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 5,
+      "unique_layouts_evaluated": 292
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 10,
+      "new_layouts_evaluated": 28,
+      "next_population_parameters": null,
+      "next_population_schedule_progress": 0.625,
+      "next_population_strategy": "restart",
+      "restart_after_generation": true,
+      "stagnant_generations": 6,
+      "unique_layouts_evaluated": 320
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 11,
+      "new_layouts_evaluated": 31,
+      "next_population_parameters": {
+        "component_resample_rate": 0.2572265625,
+        "crossover_rate": 0.8056640625,
+        "elite_count": 5,
+        "mutation_rate": 0.64150390625,
+        "random_immigrant_rate": 0.16005859375,
+        "tournament_size": 3
+      },
+      "next_population_schedule_progress": 0.685546875,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 351
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 12,
+      "new_layouts_evaluated": 27,
+      "next_population_parameters": {
+        "component_resample_rate": 0.23085937499999998,
+        "crossover_rate": 0.821484375,
+        "elite_count": 5,
+        "mutation_rate": 0.6177734374999999,
+        "random_immigrant_rate": 0.1416015625,
+        "tournament_size": 3
+      },
+      "next_population_schedule_progress": 0.73828125,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 2,
+      "unique_layouts_evaluated": 378
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 13,
+      "new_layouts_evaluated": 27,
+      "next_population_parameters": {
+        "component_resample_rate": 0.20449218749999998,
+        "crossover_rate": 0.8373046875,
+        "elite_count": 5,
+        "mutation_rate": 0.59404296875,
+        "random_immigrant_rate": 0.12314453125000002,
+        "tournament_size": 4
+      },
+      "next_population_schedule_progress": 0.791015625,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 3,
+      "unique_layouts_evaluated": 405
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 14,
+      "new_layouts_evaluated": 27,
+      "next_population_parameters": {
+        "component_resample_rate": 0.17812499999999998,
+        "crossover_rate": 0.853125,
+        "elite_count": 5,
+        "mutation_rate": 0.5703125,
+        "random_immigrant_rate": 0.10468749999999999,
+        "tournament_size": 4
+      },
+      "next_population_schedule_progress": 0.84375,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 4,
+      "unique_layouts_evaluated": 432
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 15,
+      "new_layouts_evaluated": 27,
+      "next_population_parameters": {
+        "component_resample_rate": 0.15175781249999998,
+        "crossover_rate": 0.8689453125,
+        "elite_count": 6,
+        "mutation_rate": 0.54658203125,
+        "random_immigrant_rate": 0.08623046875000001,
+        "tournament_size": 4
+      },
+      "next_population_schedule_progress": 0.896484375,
+      "next_population_strategy": "breed",
+      "restart_after_generation": false,
+      "stagnant_generations": 5,
+      "unique_layouts_evaluated": 459
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 16,
+      "new_layouts_evaluated": 26,
+      "next_population_parameters": null,
+      "next_population_schedule_progress": 0.947265625,
+      "next_population_strategy": "restart",
+      "restart_after_generation": true,
+      "stagnant_generations": 6,
+      "unique_layouts_evaluated": 485
+    },
+    {
+      "best_layout_id": "b3a584243a448f90",
+      "best_layout_index": 3399,
+      "best_validation_accuracy": 0.9501047668936616,
+      "best_validation_cost_ms": 78.31854200981151,
+      "generation": 17,
+      "new_layouts_evaluated": 27,
+      "next_population_parameters": null,
+      "next_population_schedule_progress": null,
+      "next_population_strategy": null,
+      "restart_after_generation": false,
+      "stagnant_generations": 1,
+      "unique_layouts_evaluated": 512
+    }
+  ],
+  "next_generation": 17,
+  "next_population": [
+    "b3a584243a448f90",
+    "7b6ab0298b37a54d",
+    "7fdf7af98abf8f68",
+    "c33093e339756ae2",
+    "9af778fbe7000f35",
+    "36ea972819288caf",
+    "91cfb04b142a7886",
+    "51ddf5ad1df65625",
+    "ba4cc7562306e533",
+    "2fb1d54a55cc1f0f",
+    "6a88afd46f2eef15",
+    "2c84a9e830018a3c",
+    "1fc98ece3f4216d1",
+    "c1189eabc1ccdef1",
+    "2d9ded5f8d4f7887",
+    "03a613eeed2a822c",
+    "d445942cc12fc113",
+    "f4cbbc97e9b585ee",
+    "8bb6c0ba971530e5",
+    "d44195a3df704cdd",
+    "c4f4c44d21cf16b8",
+    "c32ab7586f2ee786",
+    "830b7d73847514a3",
+    "629381f413dcbec1",
+    "7234b4a58c709e60",
+    "5d17d92deec18286",
+    "229d75d93cec0c1c",
+    "3acb8c903e1c3b75"
+  ],
+  "restart_count": 2,
+  "rng_state": {
+    "bit_generator": "PCG64",
+    "has_uint32": 0,
+    "state": {
+      "inc": 87136372517582989555478159403783844777,
+      "state": 208570786611985357278164719571241172452
+    },
+    "uinteger": 4219532613
+  },
+  "settings": {
+    "algorithm": "annealed_constrained_memetic_genetic_algorithm",
+    "annealed_outer_schedule": {
+      "component_resample_rate": {
+        "end": 0.1,
+        "start": 0.6
+      },
+      "crossover_rate": {
+        "end": 0.9,
+        "start": 0.6
+      },
+      "elite_count": {
+        "end": 6,
+        "start": 2
+      },
+      "mutation_rate": {
+        "end": 0.5,
+        "start": 0.95
+      },
+      "random_immigrant_rate": {
+        "end": 0.05,
+        "start": 0.4
+      },
+      "tournament_size": {
+        "end": 4,
+        "start": 2
+      }
+    },
+    "component_resample_rate": 0.3,
+    "crossover_rate": 0.8,
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "elite_count": 4,
+    "evaluation_budget": 512,
+    "fitness_cache_schema": 1,
+    "fitness_implementation_sha256": "e83933804f3bebfd7893d670e791c9e73a7b6fd89bdc1127aa4306c94ffbc814",
+    "generations": 24,
+    "holdout_fraction": 0.2,
+    "inner_seed": 0,
+    "iterations": 1000,
+    "layout_catalogue_sha256": "9907857a0bd3d1f008e63dddd138744f2d6c2fa7d5392b9a79aae90632ff0140",
+    "max_restarts": 3,
+    "mutation_rate": 0.8,
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes_h24_with_run9.pkl",
+    "outcomes_sha256": "bba4c751e7bd6836dc49870dbb8f678b77c2984e9d884ab474356adfb6880429",
+    "outer_parameter_schedule": "linear_annealed",
+    "outer_seed": 0,
+    "population_size": 32,
+    "quantile_points": 50,
+    "random_immigrant_rate": 0.2,
+    "removed_candidates": [
+      "K1"
+    ],
+    "split_seed": 0,
+    "split_strategy": "blocked_per_run",
+    "stagnation_generations": 6,
+    "target_accuracy": 0.95,
+    "target_accuracy_source": "explicit",
+    "threshold_optimizer": {
+      "continuous_thresholds": true,
+      "freeze_validation_active_slots_on_holdout": true,
+      "iterations_per_restart": 1000,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "prune_stages_accepting_zero_validation_samples": true,
+      "quantile_points_used": false,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "restarts": 10
+    },
+    "tournament_size": 2
+  },
+  "stagnant_generations": 1,
+  "status": "complete"
+}

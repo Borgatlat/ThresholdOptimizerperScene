@@ -1,0 +1,57 @@
+{
+  "evaluated_layouts": 365,
+  "sample_prefix_sha256": "f9830d6a82dfab6ff3ac4de58afbe9cfbf0642c5106956b50134d0272fc75339",
+  "search_elapsed_seconds": 2338.0352887000045,
+  "settings": {
+    "algorithm": "uniform_random_implicit_layout_sampling_without_replacement",
+    "dataset": "m3n_vc/h24",
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "fitness_implementation_sha256": "7d3640b62be6dd86daa2b570c665268e71da0e78fe970ac16933f1031e2de798",
+    "holdout_fraction": 0.2,
+    "inner_seed": 0,
+    "layout_grammar": "depth_one_K0_K1",
+    "layout_sampler": {
+      "deduplication_key": "canonical_space_index",
+      "materializes_full_space": false,
+      "random_generator": "numpy.default_rng",
+      "schema_version": "implicit-depth-one-layout-sampler/v1",
+      "selection": "exact_uniform_without_replacement"
+    },
+    "layout_space_size": 11589085,
+    "max_layouts": null,
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+    "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+    "quantile_points_compatibility_argument": 50,
+    "removed_candidates": [],
+    "sampling_seed": 4,
+    "schema_version": "random-joint-layout-search-with-k1/v1",
+    "split_seed": 0,
+    "split_strategy": "blocked_per_run",
+    "target_accuracy": 0.9,
+    "target_accuracy_source": "explicit_cli_or_api_override",
+    "threshold_optimizer": {
+      "continuous_thresholds": true,
+      "freeze_validation_active_slots_on_holdout": true,
+      "iterations_per_restart": 1000,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "prune_stages_accepting_zero_validation_samples": true,
+      "quantile_points_used": false,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "restarts": 10
+    },
+    "time_budget_seconds": 2333.350329599998
+  },
+  "status": "complete"
+}

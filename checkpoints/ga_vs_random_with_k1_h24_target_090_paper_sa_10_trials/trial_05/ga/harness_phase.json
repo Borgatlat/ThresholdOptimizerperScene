@@ -1,0 +1,15 @@
+{
+  "effective_phase_worker_limit": 10,
+  "internal_layout_workers": 1,
+  "invocation_kind": "fresh_uninterrupted_ga_required_for_time_matching",
+  "parallel_trials_requested": 10,
+  "phase": "genetic_algorithm",
+  "phase_trial_count": 10,
+  "schema_version": "paired-ga-vs-random-with-k1/v1",
+  "seed": 5,
+  "source_summary": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\ga_vs_random_with_k1_h24_target_090_paper_sa_10_trials\\trial_05\\ga\\summary.json",
+  "source_summary_sha256": "645bfa5f1817b71442f357a077c59cbf4d3d04f6a5a8296d0066094dfa7040d7",
+  "timing_note": "Wall time was measured while independent trials could execute concurrently.",
+  "wrapper_process_cpu_seconds": 2358.203125,
+  "wrapper_wall_seconds": 2377.3236282
+}

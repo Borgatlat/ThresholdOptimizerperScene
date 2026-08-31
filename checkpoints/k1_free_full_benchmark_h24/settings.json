@@ -1,0 +1,24 @@
+{
+  "base_seed": 0,
+  "dataset": "m3n_vc/h24",
+  "detector_cost_ms": 10000.0,
+  "detector_mode": "paper",
+  "expected_layout_count": 5545,
+  "holdout_fraction": 0.2,
+  "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+  "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+  "removed_candidates": [
+    "K1"
+  ],
+  "schema_version": "k1-free-optimizer-benchmark/v1",
+  "selected_layout_count": 5545,
+  "split_seed": 0,
+  "split_strategy": "blocked_per_run",
+  "target_accuracy": 0.9657843770174306,
+  "target_accuracy_source": "k1_free_dp_fixed_threshold_validation_accuracy",
+  "threshold_optimizer": {
+    "iterations_per_restart": 1000,
+    "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+    "restarts": 10
+  }
+}

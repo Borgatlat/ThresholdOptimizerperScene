@@ -1,0 +1,316 @@
+{
+  "assumptions_and_limitations": [
+    "The GA is seeded with mandatory K3->detector while exact-uniform random sampling is unseeded. In addition, the GA representation's random initial members and immigrants sample component lengths uniformly, which overweights shorter layouts relative to exact-uniform sampling over the complete legal space. Results therefore compare the complete implemented search procedures, including both asymmetries.",
+    "No exhaustive K1-enabled oracle exists for the 11,589,085-layout space; global ranks, exact-optimum recovery, and optimum regret are therefore unavailable.",
+    "Trials vary outer layout-search seeds only; split and threshold-SA seeds are fixed.",
+    "The exact sign test has limited power with ten trials.",
+    "Concurrent independent trials can affect measured wall times.",
+    "Raw random results may include one deadline-crossing atomic layout; a censored sensitivity is reported.",
+    "Holdout outcomes are descriptive and never select a winner."
+  ],
+  "complete": true,
+  "completed_trials": 10,
+  "contract": {
+    "dataset": "m3n_vc/h24",
+    "detector_cost_ms": 10000.0,
+    "detector_mode": "paper",
+    "fixed_seed_fields": {
+      "inner_seed": 0,
+      "split_seed": 0,
+      "threshold_restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "genetic_algorithm": {
+      "algorithm": "dynamic_constrained_memetic_genetic_algorithm",
+      "allow_cached_reentry": false,
+      "component_resample_rate": 0.3,
+      "crossover_rate": 0.8,
+      "elite_count": 4,
+      "evaluation_budget": 512,
+      "generations": 24,
+      "internal_layout_workers": 1,
+      "mandatory_initial_member": {
+        "initial": [
+          "K3",
+          "detector"
+        ],
+        "specialized": {}
+      },
+      "mutation_rate": 0.8,
+      "population_size": 32,
+      "random_immigrant_rate": 0.2,
+      "tournament_size": 2
+    },
+    "implementation_fingerprints": {
+      "genetic_algorithm": "517cc85b9eb1967ec50cd84cf872803c526fecf9530ee056fb988d86166035cb",
+      "random_sampling": "7d3640b62be6dd86daa2b570c665268e71da0e78fe970ac16933f1031e2de798"
+    },
+    "layout_grammar": "depth_one_K0_K1",
+    "layout_space_size": 11589085,
+    "oracle_limitation": "No exhaustive K1-enabled oracle exists for the 11,589,085-layout space; global ranks, exact-optimum recovery, and optimum regret are therefore unavailable.",
+    "outcomes": "C:\\Users\\TheSandwichCoder\\Documents\\GitHub\\ThresholdOptimizerperScene\\checkpoints\\empirical_outcomes.pkl",
+    "outcomes_sha256": "50af0cfc0a219401e9c9526ec9c11836f5305b6b95a2ea2cdf5eabdf54f3d6a2",
+    "primary_comparison": {
+      "cost_delta": "random_minus_ga_ms_positive_favors_ga",
+      "scope": "validation_only",
+      "selection_rule": "feasibility_aware_topology_selection"
+    },
+    "random_sampling": {
+      "algorithm": "uniform_random_implicit_layout_sampling_without_replacement",
+      "atomic_layout_overshoot_allowed": true,
+      "mandatory_initial_member": null,
+      "minimum_classifier_condition": null,
+      "sampler": "exact_uniform_over_all_legal_layouts",
+      "time_budget": "paired_ga_elapsed_seconds_this_invocation"
+    },
+    "removed_candidates": [],
+    "schema_version": "paired-ga-vs-random-with-k1/v1",
+    "search_asymmetry": "The GA is seeded with mandatory K3->detector while exact-uniform random sampling is unseeded. In addition, the GA representation's random initial members and immigrants sample component lengths uniformly, which overweights shorter layouts relative to exact-uniform sampling over the complete legal space. Results therefore compare the complete implemented search procedures, including both asymmetries.",
+    "split": {
+      "holdout_fraction": 0.2,
+      "seed": 0,
+      "strategy": "blocked_per_run"
+    },
+    "target_accuracy": 0.9,
+    "threshold_optimizer": {
+      "freeze_validation_active_slots_on_holdout": true,
+      "inner_seed_varies_across_trials": false,
+      "iterations_per_restart": 1000,
+      "method": "best_of_10_chellapilla_continuous_gaussian_sa",
+      "prune_stages_accepting_zero_validation_samples": true,
+      "quantile_points_recorded_but_unused": 50,
+      "restart_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "restarts": 10
+    },
+    "trial_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "varied_seed_fields": {
+      "genetic_algorithm": "outer_seed",
+      "random_sampling": "sampling_seed"
+    }
+  },
+  "deadline_censored_random_validation_secondary": {
+    "available_trials": 10,
+    "exact_two_sided_sign_test": {
+      "p_value": 0.109375,
+      "ties_excluded": 0
+    },
+    "feasible_random_minus_ga_cost_ms": {
+      "maximum": 0.008461118306033022,
+      "mean": 0.002846209229872709,
+      "median": 0.003335113306997428,
+      "minimum": -0.0037096833624747916,
+      "population_stddev": 0.0033015048761135014
+    },
+    "method": "exclude_random_layouts_completed_after_paired_GA_budget",
+    "overtime_layouts_excluded": {
+      "maximum": 1.0,
+      "mean": 1.0,
+      "median": 1.0,
+      "minimum": 1.0,
+      "population_stddev": 0.0
+    },
+    "paired_outcomes": {
+      "ga_better": 8,
+      "random_better": 2,
+      "tie": 0
+    }
+  },
+  "expected_trials": 10,
+  "holdout_descriptive": {
+    "not_used_for_selection": true,
+    "random_minus_ga_accuracy": {
+      "maximum": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "minimum": 0.0,
+      "population_stddev": 0.0
+    },
+    "random_minus_ga_cost_ms": {
+      "maximum": 0.018167192249131325,
+      "mean": 0.0021395445149204662,
+      "median": 0.0,
+      "minimum": -0.014143876791293586,
+      "population_stddev": 0.008687167698778104
+    }
+  },
+  "oracle_comparison": {
+    "available": false,
+    "reason": "No exhaustive K1-enabled oracle exists for the 11,589,085-layout space; global ranks, exact-optimum recovery, and optimum regret are therefore unavailable."
+  },
+  "orchestration": {
+    "ga_phase_pending_trials": 10,
+    "internal_layout_workers": 1,
+    "parallel_trials_requested": 10,
+    "phase_barrier": "all_pending_GA_then_all_pending_random",
+    "random_phase_pending_trials": 10,
+    "thread_limits": {
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1"
+    },
+    "timing_interpretation": "Wrapper wall and process CPU time are recorded per invocation. Random budgets use GA-reported validation-search wall time.",
+    "worker_progress_output": "suppressed"
+  },
+  "primary_validation_comparison": {
+    "bootstrap_95pct_mean_feasible_delta_ms": [
+      0.0007595245178939704,
+      0.004802197032915697
+    ],
+    "exact_two_sided_sign_test": {
+      "non_tied_trials": 10,
+      "p_value": 0.109375,
+      "ties_excluded": 0
+    },
+    "feasible_random_minus_ga_cost_ms": {
+      "maximum": 0.008461118306033022,
+      "mean": 0.002846209229872709,
+      "median": 0.003335113306997428,
+      "minimum": -0.0037096833624747916,
+      "population_stddev": 0.0033015048761135014
+    },
+    "ga_validation_cost_ms": {
+      "maximum": 6.2227011423243965,
+      "mean": 6.220809901874379,
+      "median": 6.221212861005014,
+      "minimum": 6.216657083895599,
+      "population_stddev": 0.0017596562302429873
+    },
+    "metric": "feasibility-aware selection; feasible cost delta is random-GA",
+    "paired_outcomes": {
+      "ga_better": 8,
+      "random_better": 2,
+      "tie": 0
+    },
+    "positive_feasible_cost_delta_favors": "genetic_algorithm",
+    "random_validation_cost_ms": {
+      "maximum": 6.226904948973344,
+      "mean": 6.223656111104251,
+      "median": 6.224731331468508,
+      "minimum": 6.21705796428637,
+      "population_stddev": 0.002687467987773656
+    },
+    "raw_random_minus_ga_cost_ms_descriptive": {
+      "maximum": 0.008461118306033022,
+      "mean": 0.002846209229872709,
+      "median": 0.003335113306997428,
+      "minimum": -0.0037096833624747916,
+      "population_stddev": 0.0033015048761135014
+    }
+  },
+  "schema_version": "paired-ga-vs-random-with-k1/v1",
+  "search_effort": {
+    "ga_elapsed_seconds": {
+      "maximum": 2453.045417500005,
+      "mean": 2390.342659789999,
+      "median": 2396.644139499993,
+      "minimum": 2324.7084329000063,
+      "population_stddev": 40.85018415491589
+    },
+    "ga_evaluated_layouts": {
+      "maximum": 512.0,
+      "mean": 512.0,
+      "median": 512.0,
+      "minimum": 512.0,
+      "population_stddev": 0.0
+    },
+    "random_elapsed_seconds": {
+      "maximum": 2455.8070805999887,
+      "mean": 2393.0220591400007,
+      "median": 2398.4665029000025,
+      "minimum": 2328.8357827,
+      "population_stddev": 40.10681916479148
+    },
+    "random_evaluated_layouts": {
+      "maximum": 388.0,
+      "mean": 373.3,
+      "median": 375.0,
+      "minimum": 359.0,
+      "population_stddev": 7.925276020429825
+    }
+  },
+  "trials": [
+    {
+      "summary": "trial_00/summary.json",
+      "summary_sha256": "1a28df3b361dca59a96ddf969754bc099ad8dbf1079fd3c5548674b527a4c55f",
+      "trial_seed": 0
+    },
+    {
+      "summary": "trial_01/summary.json",
+      "summary_sha256": "af0675811680f757fc7c8999329bbacb88d20526dc0e8d18ff6ab8b494c55b62",
+      "trial_seed": 1
+    },
+    {
+      "summary": "trial_02/summary.json",
+      "summary_sha256": "580c7fe883ec99d48770448bbf591347d8b166876220b398291e1f9cc6853dba",
+      "trial_seed": 2
+    },
+    {
+      "summary": "trial_03/summary.json",
+      "summary_sha256": "0e23a454f7ed71713974a7cbf768ae2e78a3b5ea704d6b75ac432d2258e3988a",
+      "trial_seed": 3
+    },
+    {
+      "summary": "trial_04/summary.json",
+      "summary_sha256": "be7e212470b564ac5fd0ed7d299b068e940f6ff45e7a7c5866e122056b6b11ad",
+      "trial_seed": 4
+    },
+    {
+      "summary": "trial_05/summary.json",
+      "summary_sha256": "3b796e44ac7b9aeeb8f6fe0478ceb9267f3b48d171b2a89b6914c444fb3127c7",
+      "trial_seed": 5
+    },
+    {
+      "summary": "trial_06/summary.json",
+      "summary_sha256": "33907b2f64417528c2a74f4334a26c390fabe8088e7c4870a478f9bea07a60bc",
+      "trial_seed": 6
+    },
+    {
+      "summary": "trial_07/summary.json",
+      "summary_sha256": "d3d1b1a5b580e8f22bfd4b587a2e2313cf32edd4149170d35da4e596a2679d2f",
+      "trial_seed": 7
+    },
+    {
+      "summary": "trial_08/summary.json",
+      "summary_sha256": "33c5fe491a880b4538979ba24b0e505ee3f529309a2ebe01518604238727b452",
+      "trial_seed": 8
+    },
+    {
+      "summary": "trial_09/summary.json",
+      "summary_sha256": "b14cbe138564d1e146bd293fd17ccfd7dbd13fc56b0c13446bde57fb5b2cdd0b",
+      "trial_seed": 9
+    }
+  ]
+}
