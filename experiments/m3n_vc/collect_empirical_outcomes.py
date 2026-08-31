@@ -54,8 +54,7 @@ from torch.utils.data import DataLoader
 from cascade_profile import HierarchyProfile
 from empirical_outcomes import save_empirical_outcomes
 from experiments.m3n_vc.loader import load_cascade_models
-from experiments.m3n_vc.training.trainer import KiDataset, load_spectrogram_cache
-from experiments.m3n_vc.utils.classifier_registry import ClassifierRegistry
+from experiments.m3n_vc.training.trainer import KiDataset
 from experiments.m3n_vc.utils.labels import (
     GLOBAL_CLASS_NAMES,
     INTERMEDIATE_CLASS_NAMES,

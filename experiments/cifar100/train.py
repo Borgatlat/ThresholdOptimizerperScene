@@ -8,7 +8,6 @@ cascade-validation partition is never passed to this module.
 from __future__ import annotations
 
 import argparse
-import copy
 import json
 import math
 import os

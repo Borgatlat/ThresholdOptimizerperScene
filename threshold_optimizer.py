@@ -1351,6 +1351,8 @@ def optimize_fixed_layout_thresholds_legacy_grid_sa(
     final_temperature = max(1e-6, initial_temperature * 1e-3)
 
 
+    # trange is tqdm's range(): same loop, plus an optional progress bar.
+    # `disable=not show_progress` keeps tests silent when show_progress=False.
     with trange(
         n_iterations,
         desc="Simulated annealing",

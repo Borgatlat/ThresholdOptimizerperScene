@@ -51,7 +51,6 @@ from pathlib import Path
 from typing import Mapping
 
 import numpy as np
-import pandas as pd
 
 from empirical_outcomes import DEFAULT_OUTPUT_PATH, load_empirical_outcomes
 from cascade_profile import profile_from_payload

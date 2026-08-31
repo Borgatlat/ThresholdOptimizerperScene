@@ -2,7 +2,7 @@
 Doesn't fix anything -- just reports exactly what's wrong so we know which
 fix to write. Run this, paste the output.
 
-Usage: python diagnose_scene_issues.py
+Usage: python -m experiments.m3n_vc.diagnose_scene
 """
 
 from pathlib import Path

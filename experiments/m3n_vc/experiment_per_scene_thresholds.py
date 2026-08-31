@@ -36,8 +36,7 @@ import json
 from pathlib import Path
 from traceback import format_exc
 
-from empirical_outcomes import load_empirical_outcomes
-from hierarchy_optimizer import Cascade, HierarchyOptimizer, PAPER_DETECTOR_COST_MS
+from hierarchy_optimizer import Cascade, PAPER_DETECTOR_COST_MS
 from threshold_optimizer import (
     DEFAULT_QUANTILE_POINTS,
     optimize_and_evaluate_holdout,

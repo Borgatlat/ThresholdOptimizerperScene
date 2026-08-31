@@ -4,7 +4,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import numpy as np
 
 from cascade_profile import HierarchyProfile
 from empirical_outcomes import (

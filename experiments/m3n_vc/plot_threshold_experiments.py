@@ -13,7 +13,6 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any
 
 import matplotlib
 
@@ -21,7 +20,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
 
 
 DEFAULT_RESULTS_DIR = Path("checkpoints/threshold_experiments")

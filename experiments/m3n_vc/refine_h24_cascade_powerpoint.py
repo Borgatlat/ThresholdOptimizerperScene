@@ -20,10 +20,6 @@ from pptx.util import Pt
 
 from empirical_outcomes import load_empirical_outcomes
 from experiments.m3n_vc._legacy_h24_report_plot import (
-    DEFAULT_APPROXIMATE_REPORT,
-    DEFAULT_BASELINE_REPORT,
-    DEFAULT_BRUTE_FORCE_REPORT,
-    DEFAULT_BRUTE_FORCE_RESULTS,
     DEFAULT_OUTCOMES,
     _holdout_evaluator,
     load_methods,
